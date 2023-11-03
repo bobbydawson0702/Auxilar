@@ -17,6 +17,7 @@ const JobSchema = new Schema({
   budget_type: {
     type: Number,
     required: true,
+    enum: [0, 1],
     default: 0
   },
   budget_amount: {
@@ -29,7 +30,8 @@ const JobSchema = new Schema({
   },
   end_date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    required: true
   },
   expire_date: {
     type: Date,
@@ -39,14 +41,9 @@ const JobSchema = new Schema({
     type: Number,
     default: 0
   },
-  skill_set: [
-    {
-      skill: {
-        type: String,
-        required: true,
-      }
-    }
-  ],
+  skill_set: {
+    type: [String]
+  },
   job_type: {
     type: String,
     required: true,

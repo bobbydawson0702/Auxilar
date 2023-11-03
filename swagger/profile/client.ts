@@ -7,6 +7,9 @@ export const ProfileSwagger = {
       400: {
         description: "Input Fields Required.",
       },
+      403: {
+        description: "Forbidden request",
+      },
       501: {
         description: "Requeset not implemented.",
       },

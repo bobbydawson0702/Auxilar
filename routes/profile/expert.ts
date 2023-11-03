@@ -1,0 +1,619 @@
+import { Request, ResponseToolkit } from "@hapi/hapi";
+// import Jwt from 'jsonwebtoken';
+// import bcrypt from 'bcrypt';
+// import fs from 'fs';
+// import { Path } from "mongoose";
+// import process from "process";
+
+import Account from "../../models/account";
+// import config from '../config';
+import {
+  ProfileSwagger,
+  deleteProfileSwagger,
+  getProfileSwagger,
+  updateBaseInfoSwagger,
+  updatePersonDetailSwagger,
+  updatePortfolioSwagger,
+  updateResumeSwagger,
+  updateSummarySwagger,
+  updateVerifierSwagger,
+} from "../../swagger/profile/expert";
+import {
+  ProfileSchema,
+  updateBaseInfoSchema,
+  updatePersonDetailSchema,
+  updatePortfolioSchema,
+  updateResumeSchema,
+  updateSummarySchema,
+  updateVerifierSchema,
+} from "../../validation/profile/expert";
+import Expert from "../../models/profile/expert";
+import { getAllSkills } from "../../swagger/skill";
+import Skill from "../../models/skill";
+import Major from "../../models/major";
+
+const options = { abortEarly: false, stripUnknown: true };
+
+export let expertRoute = [
+  {
+    method: "POST",
+    path: "/",
+    // config: {
+    options: {
+      auth: "jwt",
+      description: "Create  expert profile",
+      plugins: ProfileSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: ProfileSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `POST api/v1/expert request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        // check account type
+        // if(account.account_type !== 'expert') {
+        //   return response.response({status:'err', err: 'Not allowed expert profile!'}).code(403);
+        // }
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const expertField = {
+          account: account.id,
+          address: data["address"],
+          post_number: data["post_number"],
+          languages: data["languages"],
+          avatar: data["avatar"] ?? null,
+          hourly_rate: data["hourly_rate"],
+          summary: data["summary"],
+          verified_by: data["verified_by"],
+          portfolios: data["portfolios"],
+          skills: data["skills"],
+          majors: data["majors"],
+          resume: data["resume"],
+          profile_links: data["profile_links"],
+          linkedin: data["linkedin"],
+        };
+
+        // const expert = await Expert.findOneAndUpdate(
+        //   { account: account.id },
+        //   { $set: expertField },
+        //   { new: true, upsert: true, setDefaultsOnInsert: true }
+        // );
+
+        const expert = new Expert(expertField);
+        await expert.save();
+
+        const responseData = await expert.populate("account", [
+          "first_name",
+          "last_name",
+          "email",
+        ]);
+        console.log(`response data : ${responseData}`);
+
+        return response
+          .response({ status: "ok", data: "Profile created successfully" })
+          .code(201);
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+  {
+    method: "GET",
+    path: "/",
+    options: {
+      auth: "jwt",
+      description: "Get expert profile",
+      plugins: getProfileSwagger,
+      tags: ["api", "expert"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `GET api/v1/expert/ request from ${request.auth.credentials.email}`
+        );
+        const expert = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        });
+        if (!expert) {
+          console.log("Profile not found!");
+          return response
+            .response({ status: "err", err: "Profile not found!" })
+            .code(404);
+        }
+
+        // const responseData = await expert
+        // .populate("account", ["first_name", "last_name", "email"])
+        // .select("-ongoing_project");
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        })
+          .populate("account", ["first_name", "last_name", "email"])
+          .select("-ongoing_project");
+
+        // const responseData = expert;
+        console.log("request success");
+        console.log(`response data : ${responseData}`);
+        return response
+          .response({ status: "ok", data: responseData })
+          .code(200);
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/person-info",
+    options: {
+      auth: "jwt",
+      description: "Update expert base info",
+      plugins: updateBaseInfoSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updateBaseInfoSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/person-info request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const expert = await Expert.findOneAndUpdate(
+          { account: account.id },
+          {
+            $set: {
+              avatar: data["avatar"],
+              hourly_rate: data["hourly_rate"],
+            },
+          }
+        );
+        await expert.save();
+
+        const responseData = await expert.populate("account", [
+          "first_name",
+          "last_name",
+          "email",
+        ]);
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          data: "Profile updated successfully",
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/summary",
+    options: {
+      auth: "jwt",
+      description: "Update expert summary",
+      plugins: updateSummarySwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updateSummarySchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/summary request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const expert = await Expert.findOneAndUpdate(
+          { account: account.id },
+          {
+            $set: {
+              summary: data["summary"],
+            },
+          }
+        );
+        await expert.save();
+
+        const responseData = await expert.populate("account", [
+          "first_name",
+          "last_name",
+          "email",
+        ]);
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          data: "Profile updated successfully",
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/portfolio",
+    options: {
+      auth: "jwt",
+      description: "Update expert portfolio",
+      plugins: updatePortfolioSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updatePortfolioSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/portfolio request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const expert = await Expert.findOneAndUpdate(
+          { account: account.id },
+          {
+            $set: {
+              portfolios: data["portfolios"],
+            },
+          }
+        );
+
+        await expert.save();
+
+        const responseData = await expert.populate("account", [
+          "first_name",
+          "last_name",
+          "email",
+        ]);
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          data: "Profile updated successfully",
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/verifier",
+    options: {
+      auth: "jwt",
+      description: "Update expert verifier",
+      plugins: updateVerifierSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updateVerifierSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/verifier request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const expert = await Expert.findOneAndUpdate(
+          { account: account.id },
+          {
+            $set: {
+              verified_by: data["verified_by"],
+            },
+          }
+        );
+
+        await expert.save();
+
+        const responseData = await expert.populate("account", [
+          "first_name",
+          "last_name",
+          "email",
+        ]);
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          data: "Profile updated successfully",
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/resume",
+    options: {
+      auth: "jwt",
+      description: "Update expert resume",
+      plugins: updateResumeSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updateResumeSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/resume request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const expert = await Expert.findOneAndUpdate(
+          { account: account.id },
+          {
+            $set: {
+              resume: data["resume"],
+            },
+          }
+        );
+
+        await expert.save();
+
+        const responseData = await expert.populate("account", [
+          "first_name",
+          "last_name",
+          "email",
+        ]);
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          data: "Profile updated successfully",
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/person-detail",
+    options: {
+      auth: "jwt",
+      description: "Update expert person-detail",
+      plugins: updatePersonDetailSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updatePersonDetailSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/person-detail request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const updateData = {
+          address: data["address"] ?? null,
+          post_number: data["post_number"] ?? null,
+          languages: data["languages"] ?? null,
+          skills: data["skills"] ?? null,
+          majors: data["majors"] ?? null,
+          reviews: data["reviews"] ?? null,
+          active_status: data["active_status"] ?? null,
+          account_status: data["account_status"] ?? null,
+          profile_links: data["profile_links"] ?? null,
+          linkedin: data["linkedin"] ?? null,
+        };
+
+        const expert = await Expert.findOneAndUpdate(
+          { account: account.id },
+          {
+            $set: { updateData },
+          }
+        );
+
+        await expert.save();
+
+        const responseData = await expert.populate("account", [
+          "first_name",
+          "last_name",
+          "email",
+        ]);
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          data: "Profile updated successfully",
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "DELETE",
+    path: "/",
+    options: {
+      auth: "jwt",
+      description: "Delete expert profile",
+      plugins: deleteProfileSwagger,
+      tags: ["api", "expert"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `DELETE api/v1/expert request from ${request.auth.credentials.email}`
+        );
+        const deleteStatus = await Expert.deleteOne({
+          account: request.auth.credentials.accountId,
+        });
+        console.log("delete result ----------->", deleteStatus);
+        if (deleteStatus.deletedCount)
+          return response
+            .response({ status: "ok", data: "Successfuly deleted!" })
+            .code(200);
+        else
+          return response
+            .response({ status: "err", err: "Profile not found!" })
+            .code(404);
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "GET",
+    path: "/all-skills",
+    options: {
+      auth: "jwt",
+      description: "Get all recorded Skills",
+      plugins: getAllSkills,
+      tags: ["api", "expert"],
+    },
+
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `GET api/v1/expert/all-skills request from ${request.auth.credentials.email}`
+        );
+        const allSkills = await Skill.find();
+        if (!allSkills) {
+          return response
+            .response({ status: "err", err: "Recorded skill not found!" })
+            .code(404);
+        }
+        return response.response({ status: "ok", data: allSkills }).code(200);
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "GET",
+    path: "/all-majors",
+    options: {
+      auth: "jwt",
+      description: "Get all recorded Majors",
+      plugins: getAllSkills,
+      tags: ["api", "expert"],
+    },
+
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `GET api/v1/expert/all-majors request from ${request.auth.credentials.email}`
+        );
+        const allMajors = await Major.find();
+        if (!allMajors) {
+          return response
+            .response({ status: "err", err: "Recorded major not found!" })
+            .code(404);
+        }
+        return response.response({ status: "ok", data: allMajors }).code(200);
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+];

@@ -46,6 +46,7 @@ exports.accountRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
+                console.log(`POST api/v1/account/register request from ...`);
                 const email = request.payload["email"];
                 const account = yield account_1.default.findOne({ email });
                 if (account) {
@@ -148,6 +149,7 @@ exports.accountRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
+                console.log(`GET api/v1/account/verify-email/${request.params.token} request from ...`);
                 // console.log(request.params.token);
                 // console.log(request.auth.credentials.accountId);
                 // const account = await Account.findById(request.auth.credentials.accountId);
@@ -209,6 +211,7 @@ exports.accountRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
+                console.log(`POST api/v1/account/signin request from ${request.payload["email"]}`);
                 const email = request.payload["email"];
                 const password = request.payload["password"];
                 const account = yield account_1.default.findOne({ email });
@@ -250,6 +253,7 @@ exports.accountRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
+                console.log(`GET api/v1/account/me request from ${request.auth.credentials.email}`);
                 console.log(request.auth.credentials.email);
                 const account = yield account_1.default.findOne({
                     email: request.auth.credentials.email,
@@ -295,6 +299,7 @@ exports.accountRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
+                console.log(`POST api/v1/account/change-password request from ${request.auth.credentials.email}`);
                 const new_Password = request.payload["new_password"];
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 // if (!account) {
@@ -338,6 +343,7 @@ exports.accountRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
+                console.log(`POST api/v1/account/forgot-password request from ...`);
                 const account = yield account_1.default.findOne({
                     email: request.payload["email"],
                 });
@@ -395,12 +401,12 @@ exports.accountRoute = [
         }),
     },
     {
-        method: 'POST',
-        path: '/reset-password',
+        method: "POST",
+        path: "/reset-password",
         options: {
-            description: 'Reset password',
+            description: "Reset password",
             plugins: account_2.resetAccountPasswordSwagger,
-            tags: ['api', 'account'],
+            tags: ["api", "account"],
             validate: {
                 payload: account_3.resetAccountPasswordSchema,
                 options,
@@ -411,10 +417,11 @@ exports.accountRoute = [
                         };
                     });
                     return h.response(details).code(400).takeover();
-                }
-            }
+                },
+            },
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            console.log(`POST api/v1/account/reset-password request from ...`);
             const email = request.payload["email"];
             const code = request.payload["passcode"];
             // const {email, code, new_password} = request.payload
@@ -425,8 +432,8 @@ exports.accountRoute = [
             if (!passcode) {
                 return response.response({ err: "Passcode incorrect!" }).code(404);
             }
-            return response.response({ msg: 'Reset your password' }).code(200);
-        })
+            return response.response({ msg: "Reset your password" }).code(200);
+        }),
     },
     {
         method: "POST",
@@ -452,13 +459,14 @@ exports.accountRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
+                console.log(`POST api/v1/account/update-password request from ...`);
                 // const decoded = Jwt.decode(request.params.token);
                 console.log(request.payload);
                 const email = request.payload["email"];
                 const new_Password = request.payload["new_password"];
                 const account = yield account_1.default.findOne({ email });
                 if (!account) {
-                    return response.response({ err: 'Account not found!' }).code(404);
+                    return response.response({ err: "Account not found!" }).code(404);
                 }
                 const hash = yield bcrypt_1.default.hash(new_Password, 10);
                 account.password = hash;

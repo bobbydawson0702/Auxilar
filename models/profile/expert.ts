@@ -1,13 +1,13 @@
-import { array } from "joi";
-
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 const ExpertSchema = new Schema({
+
   account: {
     type: Schema.Types.ObjectId,
     ref: 'account'
   },
+  
 
   address: {
     type: String,
@@ -34,32 +34,11 @@ const ExpertSchema = new Schema({
     }
   ],
 
-  ongoing_project: [
-    {
-      project: {
-        type: Schema.Types.ObjectId
-      }
-    }
-  ],
-
   avatar: {
     type: String
   },
 
-  reviews: [
-    {
-      review: {
-        type: String,
-      }
-    }
-  ],
-
-  active_status: {
-    type: Boolean,
-    default: 1,
-  },
-
-  rating: {
+  hourly_rate: {
     type: String,
     required: true,
   },
@@ -69,6 +48,7 @@ const ExpertSchema = new Schema({
     required: true,
   },
 
+  
   verified_by: [
     {
       content: {
@@ -80,11 +60,6 @@ const ExpertSchema = new Schema({
       }
     }
   ],
-
-  account_status: {
-    type: Number,
-    default: 0
-  },
 
   portfolios: [
     {
@@ -104,7 +79,55 @@ const ExpertSchema = new Schema({
 
   majors: {
     type: [String]
+  },
+  
+  ongoing_project: [
+    {
+      project: {
+        type: Schema.Types.ObjectId
+      }
+    }
+  ],
+  
+  
+  reviews: [
+    {
+      reviewer: {
+        type: String,
+      },
+      reviewe: {
+        type: String,
+      },
+      rate: {
+        type: Number,
+      }
+    }
+  ],
+
+  active_status: {
+    type: Boolean,
+    default: 1,
+  },
+
+
+  account_status: {
+    type: Number,
+    default: 0
+  },
+
+
+  resume: {
+    type: String,
+  },
+
+  profile_links: {
+    type: [String]
+  },
+
+  linkedin: {
+    type: String,
   }
+
 });
 
 const Expert = mongoose.model('expert', ExpertSchema);
