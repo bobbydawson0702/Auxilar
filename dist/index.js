@@ -65,7 +65,7 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         plugin: hapi_swagger_1.default,
         options: {
             info: {
-                title: "ShipFinex Backend API",
+                title: "Auxilar Backend API",
                 version: "1.0.0",
             },
             securityDefinitions: {

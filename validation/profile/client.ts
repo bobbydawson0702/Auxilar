@@ -23,7 +23,7 @@ export const ProfileSchema = Joi.object({
 		"any.required": "Please provide address.",
 	}),
 
-	languages: Joi.array<String>().required().messages({
+	languages: Joi.array<Object>().required().messages({
 		"any.required": "Please provide languages",
 	}),
 

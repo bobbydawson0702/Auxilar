@@ -506,7 +506,7 @@ export let expertRoute = [
         const expert = await Expert.findOneAndUpdate(
           { account: account.id },
           {
-            $set: { updateData },
+            $set: updateData
           }
         );
 

@@ -34,7 +34,7 @@ const init = async () => {
     plugin: HapiSwagger,
     options: {
       info: {
-        title: "ShipFinex Backend API",
+        title: "Auxilar Backend API",
         version: "1.0.0",
       },
       securityDefinitions: {

@@ -119,9 +119,15 @@ exports.expertRoute = [
                         .response({ status: "err", err: "Profile not found!" })
                         .code(404);
                 }
-                const responseData = yield expert
+                // const responseData = await expert
+                // .populate("account", ["first_name", "last_name", "email"])
+                // .select("-ongoing_project");
+                const responseData = yield expert_3.default.findOne({
+                    account: request.auth.credentials.accountId,
+                })
                     .populate("account", ["first_name", "last_name", "email"])
                     .select("-ongoing_project");
+                // const responseData = expert;
                 console.log("request success");
                 console.log(`response data : ${responseData}`);
                 return response
@@ -414,7 +420,7 @@ exports.expertRoute = [
                     linkedin: (_l = data["linkedin"]) !== null && _l !== void 0 ? _l : null,
                 };
                 const expert = yield expert_3.default.findOneAndUpdate({ account: account.id }, {
-                    $set: { updateData }
+                    $set: updateData
                 });
                 yield expert.save();
                 const responseData = yield expert.populate("account", [
