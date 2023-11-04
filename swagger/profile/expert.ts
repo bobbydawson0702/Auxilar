@@ -76,6 +76,21 @@ export const updatePortfolioSwagger = {
     },
   },
 };
+export const updatePortfolioItemSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "success.",
+      },
+      404: {
+        description: "Profile not found!",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
 export const updateVerifierSwagger = {
   "hapi-swagger": {
     responses: {
@@ -116,7 +131,22 @@ export const updatePersonDetailSwagger = {
         description: "Profile not found!",
       },
       501: {
-        description: "Requeset not implemented.",
+        description: "Request not implemented.",
+      },
+    },
+  },
+};
+export const updateEducationSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "success.",
+      },
+      404: {
+        description: "Profile not found!",
+      },
+      501: {
+        description: "Request not implemented.",
       },
     },
   },

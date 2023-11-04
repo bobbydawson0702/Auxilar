@@ -12,7 +12,9 @@ import {
   deleteProfileSwagger,
   getProfileSwagger,
   updateBaseInfoSwagger,
+  updateEducationSwagger,
   updatePersonDetailSwagger,
+  updatePortfolioItemSwagger,
   updatePortfolioSwagger,
   updateResumeSwagger,
   updateSummarySwagger,
@@ -21,7 +23,9 @@ import {
 import {
   ProfileSchema,
   updateBaseInfoSchema,
+  updateEducationSchema,
   updatePersonDetailSchema,
+  updatePortfolioItemSchema,
   updatePortfolioSchema,
   updateResumeSchema,
   updateSummarySchema,
@@ -64,9 +68,9 @@ export let expertRoute = [
           request.auth.credentials.accountId
         );
         // check account type
-        // if(account.account_type !== 'expert') {
-        //   return response.response({status:'err', err: 'Not allowed expert profile!'}).code(403);
-        // }
+        if(account.account_type !== 'expert') {
+          return response.response({status:'err', err: 'Not allowed expert profile!'}).code(403);
+        }
         console.log(account);
 
         const data = request.payload;
@@ -87,6 +91,7 @@ export let expertRoute = [
           resume: data["resume"],
           profile_links: data["profile_links"],
           linkedin: data["linkedin"],
+          education: data["education"],
         };
 
         // const expert = await Expert.findOneAndUpdate(
@@ -94,6 +99,15 @@ export let expertRoute = [
         //   { $set: expertField },
         //   { new: true, upsert: true, setDefaultsOnInsert: true }
         // );
+
+        const expertExist = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        });
+
+        if (expertExist)
+          return response
+            .response({ status: "err", err: "already exists" })
+            .code(403);
 
         const expert = new Expert(expertField);
         await expert.save();
@@ -200,18 +214,30 @@ export let expertRoute = [
             },
           }
         );
-        await expert.save();
+        // await expert.save();
 
-        const responseData = await expert.populate("account", [
-          "first_name",
-          "last_name",
-          "email",
-        ]);
+        // const responseData = await expert.populate("account", [
+        //   "first_name",
+        //   "last_name",
+        //   "email",
+        // ]);
+
+        // const responseData = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // })
+        //   .populate("account", ["first_name", "last_name", "email"])
+        //   .select("-ongoing_project");
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        }).select("avatar hourly_rate");
+
         console.log(`response data : ${responseData}`);
 
         return response.response({
           status: "ok",
-          data: "Profile updated successfully",
+          // data: "Profile updated successfully",
+          data: responseData,
         });
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);
@@ -259,18 +285,30 @@ export let expertRoute = [
             },
           }
         );
-        await expert.save();
+        // await expert.save();
 
-        const responseData = await expert.populate("account", [
-          "first_name",
-          "last_name",
-          "email",
-        ]);
+        // const responseData = await expert.populate("account", [
+        //   "first_name",
+        //   "last_name",
+        //   "email",
+        // ]);
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        })
+          .populate("account", ["first_name", "last_name", "email"])
+          .select("-ongoing_project");
+
+        // const responseData = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // }).select("summary");
+
         console.log(`response data : ${responseData}`);
 
         return response.response({
           status: "ok",
-          data: "Profile updated successfully",
+          // data: "Profile updated successfully",
+          data: responseData,
         });
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);
@@ -319,18 +357,101 @@ export let expertRoute = [
           }
         );
 
-        await expert.save();
+        // await expert.save();
 
-        const responseData = await expert.populate("account", [
-          "first_name",
-          "last_name",
-          "email",
-        ]);
+        console.log("expert--------------", expert);
+        // const responseData = await expert.populate("account", [
+        //   "first_name",
+        //   "last_name",
+        //   "email",
+        // ]);
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        })
+          .populate("account", ["first_name", "last_name", "email"])
+          .select("-ongoing_project");
+
+        // const responseData = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // }).select("portfolios");
+
         console.log(`response data : ${responseData}`);
 
         return response.response({
           status: "ok",
-          data: "Profile updated successfully",
+          // data: "Profile updated successfully",
+          data: responseData,
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/portfolio/{portfolio_id}",
+    options: {
+      auth: "jwt",
+      description: "Update expert portfolio indiviually",
+      plugins: updatePortfolioItemSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updatePortfolioItemSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/portfolio/${request.params.portfolio_id} from ${request.auth.credentials.email}`
+        );
+
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+
+        console.log("data ----------------->", data);
+        console.log(`portfolio_id : ${request.params.portfolio_id}`);
+
+        // const portfolioItem = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // })
+        //   .select("portfolios");
+        // .findOne({
+        //    "portfolios._id": request.params.portfolio_id
+        // });
+
+        const portfolioItem = await Expert.findOne({
+          "portfolios._id": request.params.portfolio_id,
+        });
+
+        // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
+
+        // console.log('--->>>>', result);
+        console.log(portfolioItem);
+
+        // await portfolioItem.save();
+
+        const responseData = portfolioItem;
+
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          // data: "Profile updated successfully",
+          data: responseData,
         });
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);
@@ -379,18 +500,30 @@ export let expertRoute = [
           }
         );
 
-        await expert.save();
+        // await expert.save();
 
-        const responseData = await expert.populate("account", [
-          "first_name",
-          "last_name",
-          "email",
-        ]);
+        // const responseData = await expert.populate("account", [
+        //   "first_name",
+        //   "last_name",
+        //   "email",
+        // ]);
+
+        // const responseData = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // })
+        //   .populate("account", ["first_name", "last_name", "email"])
+        //   .select("-ongoing_project");
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        }).select("verified_by");
+
         console.log(`response data : ${responseData}`);
 
         return response.response({
           status: "ok",
-          data: "Profile updated successfully",
+          // data: "Profile updated successfully",
+          data: responseData,
         });
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);
@@ -439,18 +572,30 @@ export let expertRoute = [
           }
         );
 
-        await expert.save();
+        // await expert.save();
 
-        const responseData = await expert.populate("account", [
-          "first_name",
-          "last_name",
-          "email",
-        ]);
+        // const responseData = await expert.populate("account", [
+        //   "first_name",
+        //   "last_name",
+        //   "email",
+        // ]);
+
+        // const responseData = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // })
+        //   .populate("account", ["first_name", "last_name", "email"])
+        //   .select("-ongoing_project");
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        }).select("resume");
+
         console.log(`response data : ${responseData}`);
 
         return response.response({
           status: "ok",
-          data: "Profile updated successfully",
+          // data: "Profile updated successfully",
+          data: responseData,
         });
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);
@@ -506,22 +651,97 @@ export let expertRoute = [
         const expert = await Expert.findOneAndUpdate(
           { account: account.id },
           {
-            $set: updateData
+            $set: updateData,
           }
         );
 
-        await expert.save();
+        // await expert.save();
 
-        const responseData = await expert.populate("account", [
-          "first_name",
-          "last_name",
-          "email",
-        ]);
+        // const responseData = await expert.populate("account", [
+        //   "first_name",
+        //   "last_name",
+        //   "email",
+        // ]);
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        })
+          .populate("account", ["first_name", "last_name", "email"])
+          .select("-ongoing_project");
+
+        // const responseData = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // }).select(
+        //   "address post_number languages skills majors reviews active_status profile_links linkedin"
+        // );
+
         console.log(`response data : ${responseData}`);
 
         return response.response({
           status: "ok",
-          data: "Profile updated successfully",
+          // data: "Profile updated successfully",
+          data: responseData,
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/education",
+    options: {
+      auth: "jwt",
+      description: "Update expert education",
+      plugins: updateEducationSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: updateEducationSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/education request from ${request.auth.credentials.email}`
+        );
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+        console.log("data---------------", data);
+
+        const updateData = {
+          education: data["education"],
+        };
+
+        const expert = await Expert.findOneAndUpdate(
+          { account: account.id },
+          {
+            $set: updateData,
+          }
+        );
+
+        const responseData = await Expert.findOne({
+          account: request.auth.credentials.accountId,
+        })
+          .populate("account", ["first_name", "last_name", "email"])
+          .select("-ongoing_project");
+
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          data: responseData,
         });
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);

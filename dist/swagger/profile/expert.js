@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProfileSwagger = exports.updatePersonDetailSwagger = exports.updateResumeSwagger = exports.updateVerifierSwagger = exports.updatePortfolioSwagger = exports.updateSummarySwagger = exports.updateBaseInfoSwagger = exports.getProfileSwagger = exports.ProfileSwagger = void 0;
+exports.deleteProfileSwagger = exports.updateEducationSwagger = exports.updatePersonDetailSwagger = exports.updateResumeSwagger = exports.updateVerifierSwagger = exports.updatePortfolioItemSwagger = exports.updatePortfolioSwagger = exports.updateSummarySwagger = exports.updateBaseInfoSwagger = exports.getProfileSwagger = exports.ProfileSwagger = void 0;
 exports.ProfileSwagger = {
     "hapi-swagger": {
         responses: {
@@ -79,6 +79,21 @@ exports.updatePortfolioSwagger = {
         },
     },
 };
+exports.updatePortfolioItemSwagger = {
+    "hapi-swagger": {
+        responses: {
+            200: {
+                description: "success.",
+            },
+            404: {
+                description: "Profile not found!",
+            },
+            501: {
+                description: "Requeset not implemented.",
+            },
+        },
+    },
+};
 exports.updateVerifierSwagger = {
     "hapi-swagger": {
         responses: {
@@ -119,7 +134,22 @@ exports.updatePersonDetailSwagger = {
                 description: "Profile not found!",
             },
             501: {
-                description: "Requeset not implemented.",
+                description: "Request not implemented.",
+            },
+        },
+    },
+};
+exports.updateEducationSwagger = {
+    "hapi-swagger": {
+        responses: {
+            200: {
+                description: "success.",
+            },
+            404: {
+                description: "Profile not found!",
+            },
+            501: {
+                description: "Request not implemented.",
             },
         },
     },

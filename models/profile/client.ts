@@ -1,11 +1,10 @@
-
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const ClientSchema = new Schema({
   account: {
     type: Schema.Types.ObjectId,
-    ref: 'account'
+    ref: "account",
   },
 
   email: {
@@ -38,7 +37,7 @@ const ClientSchema = new Schema({
 
   address: {
     type: String,
-    required: true
+    required: true,
   },
 
   languages: [
@@ -52,16 +51,21 @@ const ClientSchema = new Schema({
         enum: ["Basic", "Conversational", "Fluent", "Native"],
         default: "Basic",
         required: true,
-      }
-    }
+      },
+    },
   ],
+
+  summary: {
+    type: String,
+    required: true,
+  },
 
   ongoing_project: [
     {
       project: {
-        type: Schema.Types.ObjectId
-      }
-    }
+        type: Schema.Types.ObjectId,
+      },
+    },
   ],
 
   reviews: [
@@ -74,8 +78,8 @@ const ClientSchema = new Schema({
       },
       rate: {
         type: Number,
-      }
-    }
+      },
+    },
   ],
 
   social_media: {
@@ -95,7 +99,7 @@ const ClientSchema = new Schema({
 
   account_status: {
     type: Number,
-    default: 0
+    default: 0,
   },
 
   payment_verify: {
@@ -103,7 +107,15 @@ const ClientSchema = new Schema({
     default: false,
   },
 
+  payment_info: {
+    paypal : {
+      type: String,
+    },
+    creditCard : {
+      type: String,
+    }
+  },
 });
 
-const Client = mongoose.model('client', ClientSchema);
+const Client = mongoose.model("client", ClientSchema);
 export default Client;

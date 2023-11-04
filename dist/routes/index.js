@@ -16,6 +16,7 @@ const config_1 = __importDefault(require("../config"));
 const account_1 = require("./account");
 const expert_1 = require("./profile/expert");
 const client_1 = require("./profile/client");
+const mentor_1 = require("./profile/mentor");
 // const prefix = `/api/${config.apiVersion}`;
 const setRoutes = (server) => __awaiter(void 0, void 0, void 0, function* () {
     server.realm.modifiers.route.prefix = `/api/${config_1.default.apiVersion}/account`;
@@ -24,6 +25,8 @@ const setRoutes = (server) => __awaiter(void 0, void 0, void 0, function* () {
     server.route(expert_1.expertRoute);
     server.realm.modifiers.route.prefix = `/api/${config_1.default.apiVersion}/client`;
     server.route(client_1.clientRoute);
+    server.realm.modifiers.route.prefix = `/api/${config_1.default.apiVersion}/mentor`;
+    server.route(mentor_1.mentorRoute);
 });
 exports.default = setRoutes;
 //# sourceMappingURL=index.js.map

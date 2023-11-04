@@ -30,6 +30,9 @@ exports.ProfileSchema = joi_1.default.object({
     }),
     social_media: joi_1.default.object(),
     payment_verify: joi_1.default.boolean(),
+    professional_info: joi_1.default.object().required().messages({
+        "any.required": "Please provide professional information",
+    }),
 });
 exports.updateSummarySchema = joi_1.default.object({
     summary: joi_1.default.string().required().messages({
@@ -68,4 +71,4 @@ exports.updatePaymentInfoSchema = joi_1.default.object({
         "any.required": "Please provide payment information",
     }),
 });
-//# sourceMappingURL=client.js.map
+//# sourceMappingURL=mentor.js.map

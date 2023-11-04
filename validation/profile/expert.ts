@@ -40,6 +40,10 @@ export const ProfileSchema = Joi.object({
   profile_links: Joi.array<String>(),
 
   linkedin: Joi.string(),
+
+  education: Joi.object().required().messages({
+    "any.required": "Please provide education"
+  })
 });
 
 export const updateBaseInfoSchema = Joi.object({
@@ -61,6 +65,15 @@ export const updateSummarySchema = Joi.object({
 export const updatePortfolioSchema = Joi.object({
   portfolios: Joi.array<Object>().required().messages({
     "any.requird": "Please provide portfolio",
+  }),
+});
+
+export const updatePortfolioItemSchema = Joi.object({
+  content: Joi.string().required().messages({
+    "any.required": "Please provide content",
+  }),
+  text: Joi.string().required().messages({
+    "any.required": "Please provide text",
   }),
 });
 
@@ -86,4 +99,9 @@ export const updatePersonDetailSchema = Joi.object({
   account_status: Joi.number(),
   profile_links: Joi.array<String>(),
   linkedin: Joi.string(),
+});
+export const updateEducationSchema = Joi.object({
+  education: Joi.object().required().messages({
+    "any.required": "Please provide education"
+  })
 });

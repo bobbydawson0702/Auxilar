@@ -1,34 +1,78 @@
 import Joi from "joi";
 
 export const ProfileSchema = Joi.object({
-	avatar: Joi.string(),
+  avatar: Joi.string(),
 
-	birthday: Joi.date().required().messages({
-		'any.required': 'Please provide birthday',
-	}),
+  birthday: Joi.date().required().messages({
+    "any.required": "Please provide birthday",
+  }),
 
-	country: Joi.string().required().messages({
-		'any.required': 'Please provide country',
-	}),
+  country: Joi.string().required().messages({
+    "any.required": "Please provide country",
+  }),
 
-	state: Joi.string().required().messages({
-		'any.required': 'Please provide state',
-	}),
+  state: Joi.string().required().messages({
+    "any.required": "Please provide state",
+  }),
 
-	city: Joi.string().required().messages({
-		'any.required': 'Please provide city',
-	}),
+  city: Joi.string().required().messages({
+    "any.required": "Please provide city",
+  }),
 
-	address: Joi.string().required().messages({
-		"any.required": "Please provide address.",
-	}),
+  address: Joi.string().required().messages({
+    "any.required": "Please provide address.",
+  }),
 
-	languages: Joi.array<Object>().required().messages({
-		"any.required": "Please provide languages",
-	}),
+  languages: Joi.array<Object>().required().messages({
+    "any.required": "Please provide languages",
+  }),
 
-	social_media: Joi.object(),
+  summary: Joi.string().required().messages({
+    "any.required": "Please provide summary",
+  }),
 
-	payment_verify: Joi.boolean(),
+  social_media: Joi.object(),
 
+  payment_verify: Joi.boolean(),
+});
+
+export const updateSummarySchema = Joi.object({
+  summary: Joi.string().required().messages({
+    "any.required": "Please provide summary",
+  }),
+});
+
+export const updateAvatarSchema = Joi.object({
+  avatar: Joi.string().required().messages({
+    "any.required": "Please provide avatar",
+  }),
+});
+export const updatePersonalInfoSchema = Joi.object({
+  country: Joi.string().required().messages({
+    "any.required": "Please provide country",
+  }),
+  state: Joi.string().required().messages({
+    "any.required": "Please provide state",
+  }),
+  city: Joi.string().required().messages({
+    "any.required": "Please provide city",
+  }),
+  address: Joi.string().required().messages({
+    "any.required": "Please provide address",
+  }),
+  languages: Joi.array<Object>().required().messages({
+    "any.required": "Please provide languages",
+  }),
+});
+
+export const updateSocialMediaSchema = Joi.object({
+  social_media: Joi.object().required().messages({
+    "any.required": "Please provide social media",
+  }),
+});
+
+export const updatePaymentInfoSchema = Joi.object({
+	payment_info: Joi.object().required().messages({
+    "any.required": "Please provide payment information",
+  }),
 });

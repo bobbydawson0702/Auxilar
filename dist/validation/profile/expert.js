@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePersonDetailSchema = exports.updateResumeSchema = exports.updateVerifierSchema = exports.updatePortfolioSchema = exports.updateSummarySchema = exports.updateBaseInfoSchema = exports.ProfileSchema = void 0;
+exports.updateEducationSchema = exports.updatePersonDetailSchema = exports.updateResumeSchema = exports.updateVerifierSchema = exports.updatePortfolioItemSchema = exports.updatePortfolioSchema = exports.updateSummarySchema = exports.updateBaseInfoSchema = exports.ProfileSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.ProfileSchema = joi_1.default.object({
     address: joi_1.default.string().required().messages({
@@ -33,6 +33,9 @@ exports.ProfileSchema = joi_1.default.object({
     resume: joi_1.default.string(),
     profile_links: joi_1.default.array(),
     linkedin: joi_1.default.string(),
+    education: joi_1.default.object().required().messages({
+        "any.required": "Please provide education"
+    })
 });
 exports.updateBaseInfoSchema = joi_1.default.object({
     avatar: joi_1.default.string().required().messages({
@@ -50,6 +53,14 @@ exports.updateSummarySchema = joi_1.default.object({
 exports.updatePortfolioSchema = joi_1.default.object({
     portfolios: joi_1.default.array().required().messages({
         "any.requird": "Please provide portfolio",
+    }),
+});
+exports.updatePortfolioItemSchema = joi_1.default.object({
+    content: joi_1.default.string().required().messages({
+        "any.required": "Please provide content",
+    }),
+    text: joi_1.default.string().required().messages({
+        "any.required": "Please provide text",
     }),
 });
 exports.updateVerifierSchema = joi_1.default.object({
@@ -73,5 +84,10 @@ exports.updatePersonDetailSchema = joi_1.default.object({
     account_status: joi_1.default.number(),
     profile_links: joi_1.default.array(),
     linkedin: joi_1.default.string(),
+});
+exports.updateEducationSchema = joi_1.default.object({
+    education: joi_1.default.object().required().messages({
+        "any.required": "Please provide education"
+    })
 });
 //# sourceMappingURL=expert.js.map

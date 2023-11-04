@@ -1,11 +1,10 @@
-
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const MentorSchema = new Schema({
   account: {
     type: Schema.Types.ObjectId,
-    ref: 'account'
+    ref: "account",
   },
 
   email: {
@@ -38,7 +37,7 @@ const MentorSchema = new Schema({
 
   address: {
     type: String,
-    required: true
+    required: true,
   },
 
   languages: [
@@ -52,16 +51,21 @@ const MentorSchema = new Schema({
         enum: ["Basic", "Conversational", "Fluent", "Native"],
         default: "Basic",
         required: true,
-      }
-    }
+      },
+    },
   ],
+
+  summary: {
+    type: String,
+    required: true,
+  },
 
   ongoing_project: [
     {
       project: {
-        type: Schema.Types.ObjectId
-      }
-    }
+        type: Schema.Types.ObjectId,
+      },
+    },
   ],
 
   reviews: [
@@ -74,8 +78,8 @@ const MentorSchema = new Schema({
       },
       rate: {
         type: Number,
-      }
-    }
+      },
+    },
   ],
 
   social_media: {
@@ -95,7 +99,7 @@ const MentorSchema = new Schema({
 
   account_status: {
     type: Number,
-    default: 0
+    default: 0,
   },
 
   payment_verify: {
@@ -103,11 +107,38 @@ const MentorSchema = new Schema({
     default: false,
   },
 
+  payment_info: {
+    paypal: {
+      type: String,
+    },
+    creditCard: {
+      type: String,
+    },
+  },
+
   professional_background: {
     type: String,
-  }
+  },
 
+  professional_info: {
+    major: {
+      type: String,
+      required: true,
+    },
+    university: {
+      type: String,
+      required: true,
+    },
+    degree: {
+      type: String,
+      required: true,
+    },
+    graduate_at: {
+      type: Date,
+      required: true,
+    },
+  },
 });
 
-const Mentor = mongoose.model('mentor', MentorSchema);
+const Mentor = mongoose.model("mentor", MentorSchema);
 export default Mentor;

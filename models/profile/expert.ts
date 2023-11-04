@@ -1,17 +1,15 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const ExpertSchema = new Schema({
-
   account: {
     type: Schema.Types.ObjectId,
-    ref: 'account'
+    ref: "account",
   },
-  
 
   address: {
     type: String,
-    required: true
+    required: true,
   },
 
   post_number: {
@@ -30,12 +28,12 @@ const ExpertSchema = new Schema({
         enum: ["Basic", "Conversational", "Fluent", "Native"],
         default: "Basic",
         required: true,
-      }
-    }
+      },
+    },
   ],
 
   avatar: {
-    type: String
+    type: String,
   },
 
   hourly_rate: {
@@ -48,48 +46,46 @@ const ExpertSchema = new Schema({
     required: true,
   },
 
-  
   verified_by: [
     {
       content: {
-        type: String
+        type: String,
       },
       text: {
         type: String,
         required: true,
-      }
-    }
+      },
+    },
   ],
 
   portfolios: [
     {
       content: {
-        type: String
+        type: String,
       },
       text: {
         type: String,
         required: true,
-      }
-    }
+      },
+    },
   ],
 
   skills: {
-    type: [String]
+    type: [String],
   },
 
   majors: {
-    type: [String]
+    type: [String],
   },
-  
+
   ongoing_project: [
     {
       project: {
-        type: Schema.Types.ObjectId
-      }
-    }
+        type: Schema.Types.ObjectId,
+      },
+    },
   ],
-  
-  
+
   reviews: [
     {
       reviewer: {
@@ -100,8 +96,8 @@ const ExpertSchema = new Schema({
       },
       rate: {
         type: Number,
-      }
-    }
+      },
+    },
   ],
 
   active_status: {
@@ -109,26 +105,43 @@ const ExpertSchema = new Schema({
     default: 1,
   },
 
-
   account_status: {
     type: Number,
-    default: 0
+    default: 0,
   },
-
 
   resume: {
     type: String,
   },
 
   profile_links: {
-    type: [String]
+    type: [String],
   },
 
   linkedin: {
     type: String,
-  }
+  },
 
+  education: {
+    course: {
+      type: String,
+      required: true,
+    },
+
+    university: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    from: {
+      type: Date,
+      required: true,
+    },
+  },
 });
 
-const Expert = mongoose.model('expert', ExpertSchema);
+const Expert = mongoose.model("expert", ExpertSchema);
 export default Expert;

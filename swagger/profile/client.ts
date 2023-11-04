@@ -16,6 +16,98 @@ export const ProfileSwagger = {
     },
   },
 };
+
+export const updateSummarySwagger = {
+  "hapi-swagger": {
+    responses: {
+      201: {
+        description: "Profile created successfully.",
+      },
+      400: {
+        description: "Input Fields Required.",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
+
+export const updateAvatarSwagger = {
+  "hapi-swagger": {
+    responses: {
+      201: {
+        description: "Profile created successfully.",
+      },
+      400: {
+        description: "Input Fields Required.",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
+export const updatePersonalInfoSwagger = {
+  "hapi-swagger": {
+    responses: {
+      201: {
+        description: "Profile created successfully.",
+      },
+      400: {
+        description: "Input Fields Required.",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
+export const updateSocialMediaSwagger = {
+  "hapi-swagger": {
+    responses: {
+      201: {
+        description: "Profile created successfully.",
+      },
+      400: {
+        description: "Input Fields Required.",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
+export const updatePaymentInfoSwagger = {
+  "hapi-swagger": {
+    responses: {
+      201: {
+        description: "Profile created successfully.",
+      },
+      400: {
+        description: "Input Fields Required.",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
 export const getProfileSwagger = {
   "hapi-swagger": {
     responses: {

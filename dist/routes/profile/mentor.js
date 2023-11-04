@@ -12,23 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clientRoute = void 0;
-const client_1 = require("../../swagger/profile/client");
-const client_2 = require("../../validation/profile/client");
+exports.mentorRoute = void 0;
+const mentor_1 = require("../../swagger/profile/mentor");
+const mentor_2 = require("../../validation/profile/mentor");
 const account_1 = __importDefault(require("../../models/account"));
-const client_3 = __importDefault(require("../../models/profile/client"));
+const mentor_3 = __importDefault(require("../../models/profile/mentor"));
 const options = { abortEarly: false, stripUnknown: true };
-exports.clientRoute = [
+exports.mentorRoute = [
     {
         method: "POST",
         path: "/",
         options: {
             auth: "jwt",
-            description: "Create client profile",
-            plugins: client_1.ProfileSwagger,
-            tags: ["api", "client"],
+            description: "Create mentor profile",
+            plugins: mentor_1.ProfileSwagger,
+            tags: ["api", "mentor"],
             validate: {
-                payload: client_2.ProfileSchema,
+                payload: mentor_2.ProfileSchema,
                 options,
                 failAction: (request, h, error) => {
                     const details = error.details.map((d) => {
@@ -39,12 +39,12 @@ exports.clientRoute = [
             },
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-            var _a, _b, _c, _d;
+            var _a, _b, _c, _d, _e;
             try {
-                console.log(`POST api/v1/client request from ${request.auth.credentials.email}`);
+                console.log(`POST api/v1/mentor request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 // Check account type
-                if (account.account_type !== "client") {
+                if (account.account_type !== "mentor") {
                     return response
                         .response({ status: "err", err: "Not allowed" })
                         .code(403);
@@ -54,7 +54,7 @@ exports.clientRoute = [
                 console.log("data---------------------------", data);
                 let birthday = new Date("<yyyy-mm-dd>");
                 birthday = data["birthday"];
-                const clientField = {
+                const mentorField = {
                     account: account.id,
                     email: account.email,
                     avatar: (_a = data["avatar"]) !== null && _a !== void 0 ? _a : null,
@@ -68,23 +68,24 @@ exports.clientRoute = [
                     social_media: (_b = data["social_media"]) !== null && _b !== void 0 ? _b : null,
                     payment_verify: (_c = data["payment_verify"]) !== null && _c !== void 0 ? _c : null,
                     payment_info: (_d = data["payment_info"]) !== null && _d !== void 0 ? _d : null,
+                    professional_info: (_e = data["professional_info"]) !== null && _e !== void 0 ? _e : null,
                 };
-                // const client = await Client.findOneAndUpdate(
+                // const mentor = await Mentor.findOneAndUpdate(
                 //   { account: account.id },
-                //   { $set: clientField },
+                //   { $set: mentorField },
                 //   { new: true, upsert: true, setDefaultOnInsert: true }
                 // );
-                // Check whether client profile already exists
-                const AlreadyClient = yield client_3.default.findOne({
+                // Check whether mentor profile already exists
+                const AlreadyMentor = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 });
-                if (AlreadyClient)
+                if (AlreadyMentor)
                     return response
                         .response({ status: "err", err: "already exists" })
                         .code(403);
-                const client = new client_3.default(clientField);
-                yield client.save();
-                const responseData = yield client.populate("account", [
+                const mentor = new mentor_3.default(mentorField);
+                yield mentor.save();
+                const responseData = yield mentor.populate("account", [
                     "firt_name",
                     "last_name",
                     "email",
@@ -105,23 +106,23 @@ exports.clientRoute = [
         path: "/",
         options: {
             auth: "jwt",
-            description: "Get client profile",
-            plugins: client_1.getProfileSwagger,
-            tags: ["api", "client"],
+            description: "Get mentor profile",
+            plugins: mentor_1.getProfileSwagger,
+            tags: ["api", "mentor"],
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`GET api/v1/client/ request from ${request.auth.credentials.email}`);
-                const client = yield client_3.default.findOne({
+                console.log(`GET api/v1/mentor/ request from ${request.auth.credentials.email}`);
+                const mentor = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 });
-                if (!client) {
+                if (!mentor) {
                     console.log("Profile not found!");
                     return response
                         .response({ status: "err", err: "Profile not found!" })
                         .code(404);
                 }
-                const responseData = yield client.populate("account", [
+                const responseData = yield mentor.populate("account", [
                     "first_name",
                     "last_name",
                 ]);
@@ -141,11 +142,11 @@ exports.clientRoute = [
         path: "/summary",
         options: {
             auth: "jwt",
-            description: "Update client summary",
-            plugins: client_1.updateSummarySwagger,
-            tags: ["api", "client"],
+            description: "Update mentor summary",
+            plugins: mentor_1.updateSummarySwagger,
+            tags: ["api", "mentor"],
             validate: {
-                payload: client_2.updateSummarySchema,
+                payload: mentor_2.updateSummarySchema,
                 options,
                 failAction: (request, h, error) => {
                     const details = error.details.map((d) => {
@@ -157,17 +158,18 @@ exports.clientRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`PUT api/v1/client/summary request from ${request.auth.credentials.email}`);
+                console.log(`PUT api/v1/mentor/summary request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 console.log(account);
                 const data = request.payload;
                 console.log("data---------------", data);
-                const client = yield client_3.default.findOneAndUpdate({ account: account.id }, {
+                const mentor = yield mentor_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: {
                         summary: data["summary"],
                     },
                 });
-                const responseData = yield client_3.default.findOne({
+                console.log("mentor --->>>>>", mentor);
+                const responseData = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 }).populate("account", ["first_name", "last_name", "email"]);
                 console.log(`response data : ${responseData}`);
@@ -187,11 +189,11 @@ exports.clientRoute = [
         path: "/avatar",
         options: {
             auth: "jwt",
-            description: "Update client avatar",
-            plugins: client_1.updateAvatarSwagger,
-            tags: ["api", "client"],
+            description: "Update mentor avatar",
+            plugins: mentor_1.updateAvatarSwagger,
+            tags: ["api", "mentor"],
             validate: {
-                payload: client_2.updateAvatarSchema,
+                payload: mentor_2.updateAvatarSchema,
                 options,
                 failAction: (request, h, error) => {
                     const details = error.details.map((d) => {
@@ -203,17 +205,17 @@ exports.clientRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`PUT api/v1/client/avatar request from ${request.auth.credentials.email}`);
+                console.log(`PUT api/v1/mentor/avatar request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 console.log(account);
                 const data = request.payload;
                 console.log("data---------------", data);
-                const client = yield client_3.default.findOneAndUpdate({ account: account.id }, {
+                const mentor = yield mentor_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: {
                         avatar: data["avatar"],
                     },
                 });
-                const responseData = yield client_3.default.findOne({
+                const responseData = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 }).populate("account", ["first_name", "last_name", "email"]);
                 console.log(`response data : ${responseData}`);
@@ -233,11 +235,11 @@ exports.clientRoute = [
         path: "/personal-info",
         options: {
             auth: "jwt",
-            description: "Update client personal information",
-            plugins: client_1.updatePersonalInfoSwagger,
-            tags: ["api", "client"],
+            description: "Update mentor personal information",
+            plugins: mentor_1.updatePersonalInfoSwagger,
+            tags: ["api", "mentor"],
             validate: {
-                payload: client_2.updatePersonalInfoSchema,
+                payload: mentor_2.updatePersonalInfoSchema,
                 options,
                 failAction: (request, h, error) => {
                     const details = error.details.map((d) => {
@@ -249,7 +251,7 @@ exports.clientRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`PUT api/v1/client/peronal-info request from ${request.auth.credentials.email}`);
+                console.log(`PUT api/v1/mentor/peronal-info request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 console.log(account);
                 const data = request.payload;
@@ -261,10 +263,10 @@ exports.clientRoute = [
                     address: data["address"],
                     languages: data["languages"],
                 };
-                const client = yield client_3.default.findOneAndUpdate({ account: account.id }, {
+                const mentor = yield mentor_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: updateData,
                 });
-                const responseData = yield client_3.default.findOne({
+                const responseData = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 }).populate("account", ["first_name", "last_name", "email"]);
                 console.log(`response data : ${responseData}`);
@@ -284,11 +286,11 @@ exports.clientRoute = [
         path: "/social-media",
         options: {
             auth: "jwt",
-            description: "Update client social media",
-            plugins: client_1.updateSocialMediaSwagger,
-            tags: ["api", "client"],
+            description: "Update mentor social media",
+            plugins: mentor_1.updateSocialMediaSwagger,
+            tags: ["api", "mentor"],
             validate: {
-                payload: client_2.updateSocialMediaSchema,
+                payload: mentor_2.updateSocialMediaSchema,
                 options,
                 failAction: (request, h, error) => {
                     const details = error.details.map((d) => {
@@ -300,7 +302,7 @@ exports.clientRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`PUT api/v1/client/social-media request from ${request.auth.credentials.email}`);
+                console.log(`PUT api/v1/mentor/social-media request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 console.log(account);
                 const data = request.payload;
@@ -308,10 +310,10 @@ exports.clientRoute = [
                 const updateData = {
                     social_media: data["social_media"],
                 };
-                const client = yield client_3.default.findOneAndUpdate({ account: account.id }, {
+                const mentor = yield mentor_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: updateData,
                 });
-                const responseData = yield client_3.default.findOne({
+                const responseData = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 }).populate("account", ["first_name", "last_name", "email"]);
                 console.log(`response data : ${responseData}`);
@@ -331,11 +333,11 @@ exports.clientRoute = [
         path: "/payment-info",
         options: {
             auth: "jwt",
-            description: "Update client payment information",
-            plugins: client_1.updatePaymentInfoSwagger,
-            tags: ["api", "client"],
+            description: "Update mentor payment information",
+            plugins: mentor_1.updatePaymentInfoSwagger,
+            tags: ["api", "mentor"],
             validate: {
-                payload: client_2.updatePaymentInfoSchema,
+                payload: mentor_2.updatePaymentInfoSchema,
                 options,
                 failAction: (request, h, error) => {
                     const details = error.details.map((d) => {
@@ -347,7 +349,7 @@ exports.clientRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`PUT api/v1/client/social-media request from ${request.auth.credentials.email}`);
+                console.log(`PUT api/v1/mentor/social-media request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 console.log(account);
                 const data = request.payload;
@@ -355,10 +357,10 @@ exports.clientRoute = [
                 const updateData = {
                     payment_info: data["payment_info"],
                 };
-                const client = yield client_3.default.findOneAndUpdate({ account: account.id }, {
+                const mentor = yield mentor_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: updateData,
                 });
-                const responseData = yield client_3.default.findOne({
+                const responseData = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 }).populate("account", ["first_name", "last_name", "email"]);
                 console.log(`response data : ${responseData}`);
@@ -378,14 +380,14 @@ exports.clientRoute = [
         path: "/",
         options: {
             auth: "jwt",
-            description: "Delete client profile",
-            plugins: client_1.deleteProfileSwagger,
-            tags: ["api", "client"],
+            description: "Delete mentor profile",
+            plugins: mentor_1.deleteProfileSwagger,
+            tags: ["api", "mentor"],
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`DELETE api/v1/client request from ${request.auth.credentials.email}`);
-                const deleteStatus = yield client_3.default.deleteOne({
+                console.log(`DELETE api/v1/mentor request from ${request.auth.credentials.email}`);
+                const deleteStatus = yield mentor_3.default.deleteOne({
                     account: request.auth.credentials.accountId,
                 });
                 console.log("delete result ----------->", deleteStatus);
@@ -404,4 +406,4 @@ exports.clientRoute = [
         }),
     },
 ];
-//# sourceMappingURL=client.js.map
+//# sourceMappingURL=mentor.js.map

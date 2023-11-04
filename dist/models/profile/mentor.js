@@ -1,19 +1,37 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const ExpertSchema = new Schema({
+const MentorSchema = new Schema({
     account: {
         type: Schema.Types.ObjectId,
-        ref: "account",
+        ref: 'account'
+    },
+    email: {
+        type: String,
+    },
+    avatar: {
+        type: String,
+    },
+    birthday: {
+        type: Date,
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true,
+    },
+    state: {
+        type: String,
+        required: true,
+    },
+    city: {
+        type: String,
+        required: true,
     },
     address: {
         type: String,
-        required: true,
-    },
-    post_number: {
-        type: String,
-        required: true,
+        required: true
     },
     languages: [
         {
@@ -26,54 +44,19 @@ const ExpertSchema = new Schema({
                 enum: ["Basic", "Conversational", "Fluent", "Native"],
                 default: "Basic",
                 required: true,
-            },
-        },
+            }
+        }
     ],
-    avatar: {
-        type: String,
-    },
-    hourly_rate: {
-        type: String,
-        required: true,
-    },
     summary: {
         type: String,
         required: true,
     },
-    verified_by: [
-        {
-            content: {
-                type: String,
-            },
-            text: {
-                type: String,
-                required: true,
-            },
-        },
-    ],
-    portfolios: [
-        {
-            content: {
-                type: String,
-            },
-            text: {
-                type: String,
-                required: true,
-            },
-        },
-    ],
-    skills: {
-        type: [String],
-    },
-    majors: {
-        type: [String],
-    },
     ongoing_project: [
         {
             project: {
-                type: Schema.Types.ObjectId,
-            },
-        },
+                type: Schema.Types.ObjectId
+            }
+        }
     ],
     reviews: [
         {
@@ -85,28 +68,36 @@ const ExpertSchema = new Schema({
             },
             rate: {
                 type: Number,
-            },
-        },
+            }
+        }
     ],
-    active_status: {
-        type: Boolean,
-        default: 1,
+    social_media: {
+        twitter: {
+            type: String,
+        },
+        youtube: {
+            type: String,
+        },
+        linkedin: {
+            type: String,
+        },
+        instagram: {
+            type: String,
+        },
     },
     account_status: {
         type: Number,
-        default: 0,
+        default: 0
     },
-    resume: {
+    payment_verify: {
+        type: Boolean,
+        default: false,
+    },
+    professional_background: {
         type: String,
     },
-    profile_links: {
-        type: [String],
-    },
-    linkedin: {
-        type: String,
-    },
-    education: {
-        course: {
+    professional_info: {
+        major: {
             type: String,
             required: true,
         },
@@ -114,16 +105,16 @@ const ExpertSchema = new Schema({
             type: String,
             required: true,
         },
-        location: {
+        degree: {
             type: String,
             required: true,
         },
-        from: {
+        graduate_at: {
             type: Date,
             required: true,
         },
-    },
+    }
 });
-const Expert = mongoose.model("expert", ExpertSchema);
-exports.default = Expert;
-//# sourceMappingURL=expert.js.map
+const Mentor = mongoose.model('mentor', MentorSchema);
+exports.default = Mentor;
+//# sourceMappingURL=mentor.js.map
