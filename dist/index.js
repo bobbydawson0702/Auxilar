@@ -55,9 +55,9 @@ const path = process_1.default.cwd();
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, dbConnect_1.default)();
     const server = new hapi.Server({
-        port: 3030,
+        port: 3050,
         routes: { cors: { origin: ["*"] } },
-        host: "192.168.142.181",
+        host: "192.168.142.45",
     });
     yield server.register(inert_1.default);
     yield server.register(vision_1.default);
@@ -65,7 +65,7 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         plugin: hapi_swagger_1.default,
         options: {
             info: {
-                title: "ShipFinex Backend API",
+                title: "Auxilar Backend API",
                 version: "1.0.0",
             },
             securityDefinitions: {

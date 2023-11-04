@@ -50,6 +50,7 @@ export let accountRoute = [
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
+        console.log(`POST api/v1/account/register request from ...`);
         const email = request.payload["email"];
         const account = await Account.findOne({ email });
         if (account) {
@@ -156,6 +157,10 @@ export let accountRoute = [
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
+        console.log(
+          `GET api/v1/account/verify-email/${request.params.token} request from ...`
+        );
+
         // console.log(request.params.token);
         // console.log(request.auth.credentials.accountId);
         // const account = await Account.findById(request.auth.credentials.accountId);
@@ -222,6 +227,10 @@ export let accountRoute = [
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
+        console.log(
+          `POST api/v1/account/signin request from ${request.payload["email"]}`
+        );
+
         const email = request.payload["email"];
         const password = request.payload["password"];
         const account = await Account.findOne({ email });
@@ -268,6 +277,9 @@ export let accountRoute = [
 
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
+        console.log(
+          `GET api/v1/account/me request from ${request.auth.credentials.email}`
+        );
         console.log(request.auth.credentials.email);
         const account = await Account.findOne({
           email: request.auth.credentials.email,
@@ -312,6 +324,9 @@ export let accountRoute = [
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
+        console.log(
+          `POST api/v1/account/change-password request from ${request.auth.credentials.email}`
+        );
         const new_Password = request.payload["new_password"];
         const account = await Account.findById(
           request.auth.credentials.accountId
@@ -356,6 +371,7 @@ export let accountRoute = [
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
+        console.log(`POST api/v1/account/forgot-password request from ...`);
         const account = await Account.findOne({
           email: request.payload["email"],
         });
@@ -416,12 +432,12 @@ export let accountRoute = [
     },
   },
   {
-    method: 'POST',
-    path: '/reset-password',
+    method: "POST",
+    path: "/reset-password",
     options: {
-      description: 'Reset password',
+      description: "Reset password",
       plugins: resetAccountPasswordSwagger,
-      tags: ['api', 'account'],
+      tags: ["api", "account"],
       validate: {
         payload: resetAccountPasswordSchema,
         options,
@@ -432,10 +448,11 @@ export let accountRoute = [
             };
           });
           return h.response(details).code(400).takeover();
-        }
-      }
+        },
+      },
     },
     handler: async (request: Request, response: ResponseToolkit) => {
+      console.log(`POST api/v1/account/reset-password request from ...`);
       const email = request.payload["email"];
       const code = request.payload["passcode"];
       // const {email, code, new_password} = request.payload
@@ -448,9 +465,8 @@ export let accountRoute = [
         return response.response({ err: "Passcode incorrect!" }).code(404);
       }
 
-      return response.response({ msg: 'Reset your password' }).code(200);
-    }
-
+      return response.response({ msg: "Reset your password" }).code(200);
+    },
   },
 
   {
@@ -477,13 +493,14 @@ export let accountRoute = [
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
+        console.log(`POST api/v1/account/update-password request from ...`);
         // const decoded = Jwt.decode(request.params.token);
         console.log(request.payload);
         const email = request.payload["email"];
         const new_Password = request.payload["new_password"];
         const account = await Account.findOne({ email });
         if (!account) {
-          return response.response({ err: 'Account not found!' }).code(404);
+          return response.response({ err: "Account not found!" }).code(404);
         }
         const hash = await bcrypt.hash(new_Password, 10);
         account.password = hash;

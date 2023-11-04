@@ -24,9 +24,9 @@ const path = process.cwd();
 const init = async () => {
   await connectDB();
   const server: hapi.Server = new hapi.Server({
-    port: 3030,
+    port: 3050,
     routes: { cors: { origin: ["*"] } },
-    host: "192.168.142.181",
+    host: "192.168.142.45",
   });
   await server.register(Inert);
   await server.register(Vision);
@@ -34,7 +34,7 @@ const init = async () => {
     plugin: HapiSwagger,
     options: {
       info: {
-        title: "ShipFinex Backend API",
+        title: "Auxilar Backend API",
         version: "1.0.0",
       },
       securityDefinitions: {
