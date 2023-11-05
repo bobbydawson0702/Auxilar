@@ -12,6 +12,7 @@ import Account from "../../models/account";
 import {
   ProfileSwagger,
   addPortfolioItemSwagger,
+  deletePortfolioItemSwagger,
   deleteProfileSwagger,
   getProfileSwagger,
   updateBaseInfoSwagger,
@@ -483,6 +484,77 @@ export let expertRoute = [
   },
 
   {
+    method: "DELETE",
+    path: "/portfolio/{portfolio_id}",
+    options: {
+      auth: "jwt",
+      description: "Delete expert portfolio indiviually",
+      plugins: deletePortfolioItemSwagger,
+      tags: ["api", "expert"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `DELETE api/v1/expert/portfolio/${request.params.portfolio_id} from ${request.auth.credentials.email}`
+        );
+
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+
+        console.log("data ----------------->", data);
+        console.log(`portfolio_id : ${request.params.portfolio_id}`);
+
+        // const portfolioItem = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // })
+        //   .select("portfolios");
+        // .findOne({
+        //    "portfolios._id": request.params.portfolio_id
+        // });
+
+        await Expert.findOneAndUpdate(
+          {
+            account: account.id,
+          },
+          // {
+          //   $unset: {
+          //     "portfolios.$._id": request.params.portfolio_id,
+          //   },
+          // }
+          { $pull: { portfolios: { _id: request.params.portfolio_id } } }
+        ).then((res) => {
+          console.log("Updated data", res);
+        });
+
+        // .findOne({ "portfolios._id": request.params.portfolio_id });
+
+        // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
+
+        // console.log('--->>>>', result);
+        // console.log(portfolioItem);
+
+        // await portfolioItem.save();
+
+        const responseData = await Expert.findOne({ account: account.id });
+
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          // data: "Profile updated successfully",
+          data: responseData,
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
     method: "PUT",
     path: "/portfolio/additem",
     options: {
@@ -531,7 +603,7 @@ export let expertRoute = [
           },
           {
             $addToSet: {
-              "portfolios": {
+              portfolios: {
                 content: data["content"],
                 text: data["text"],
               },

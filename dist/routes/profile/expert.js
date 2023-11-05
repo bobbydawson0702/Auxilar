@@ -351,20 +351,150 @@ exports.expertRoute = [
                 // .findOne({
                 //    "portfolios._id": request.params.portfolio_id
                 // });
-                const portfolioItem = yield expert_3.default.update({
+                yield expert_3.default.findOneAndUpdate({
+                    account: account.id,
                     "portfolios._id": request.params.portfolio_id,
+                }, {
+                    $set: {
+                        "portfolios.$.text": data["text"],
+                        "portfolios.$.content": data["content"],
+                    },
+                }, {
+                    new: true,
+                    useFindAndModify: false,
+                }).then((res) => {
+                    console.log("Updated data", res);
                 });
                 // .findOne({ "portfolios._id": request.params.portfolio_id });
                 // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
                 // console.log('--->>>>', result);
                 // console.log(portfolioItem);
                 // await portfolioItem.save();
-                // const responseData = portfolioItem;
-                // console.log(`response data : ${responseData}`);
+                const responseData = yield expert_3.default.findOne({ account: account.id });
+                console.log(`response data : ${responseData}`);
                 return response.response({
                     status: "ok",
                     // data: "Profile updated successfully",
-                    data: "responseData",
+                    data: responseData,
+                });
+            }
+            catch (error) {
+                return response.response({ status: "err", err: error }).code(501);
+            }
+        }),
+    },
+    {
+        method: "DELETE",
+        path: "/portfolio/{portfolio_id}",
+        options: {
+            auth: "jwt",
+            description: "Delete expert portfolio indiviually",
+            plugins: expert_1.deletePortfolioItemSwagger,
+            tags: ["api", "expert"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                console.log(`DELETE api/v1/expert/portfolio/${request.params.portfolio_id} from ${request.auth.credentials.email}`);
+                const account = yield account_1.default.findById(request.auth.credentials.accountId);
+                console.log(account);
+                const data = request.payload;
+                console.log("data ----------------->", data);
+                console.log(`portfolio_id : ${request.params.portfolio_id}`);
+                // const portfolioItem = await Expert.findOne({
+                //   account: request.auth.credentials.accountId,
+                // })
+                //   .select("portfolios");
+                // .findOne({
+                //    "portfolios._id": request.params.portfolio_id
+                // });
+                yield expert_3.default.findOneAndUpdate({
+                    account: account.id,
+                }, {
+                    $unset: {
+                        portfolios: {
+                            "portfolios._id": request.params.portfolio_id,
+                        },
+                    },
+                }).then((res) => {
+                    console.log("Updated data", res);
+                });
+                // .findOne({ "portfolios._id": request.params.portfolio_id });
+                // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
+                // console.log('--->>>>', result);
+                // console.log(portfolioItem);
+                // await portfolioItem.save();
+                const responseData = yield expert_3.default.findOne({ account: account.id });
+                console.log(`response data : ${responseData}`);
+                return response.response({
+                    status: "ok",
+                    // data: "Profile updated successfully",
+                    data: responseData,
+                });
+            }
+            catch (error) {
+                return response.response({ status: "err", err: error }).code(501);
+            }
+        }),
+    },
+    {
+        method: "PUT",
+        path: "/portfolio/additem",
+        options: {
+            auth: "jwt",
+            description: "Update expert portfolio indiviually",
+            plugins: expert_1.addPortfolioItemSwagger,
+            tags: ["api", "expert"],
+            validate: {
+                payload: expert_2.addPortfolioItemSchema,
+                options,
+                failAction: (request, h, error) => {
+                    const details = error.details.map((d) => {
+                        return { err: d.message, path: d.path };
+                    });
+                    return h.response(details).code(400).takeover();
+                },
+            },
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                console.log(`PUT api/v1/expert/portfolio/additem from ${request.auth.credentials.email}`);
+                const account = yield account_1.default.findById(request.auth.credentials.accountId);
+                console.log(account);
+                const data = request.payload;
+                console.log("data ----------------->", data);
+                // const portfolioItem = await Expert.findOne({
+                //   account: request.auth.credentials.accountId,
+                // })
+                //   .select("portfolios");
+                // .findOne({
+                //    "portfolios._id": request.params.portfolio_id
+                // });
+                yield expert_3.default.updateOne({
+                    account: account.id,
+                }, {
+                    $addToSet: {
+                        portfolios: {
+                            content: data["content"],
+                            text: data["text"],
+                        },
+                    },
+                }, {
+                    new: true,
+                    useFindAndModify: false,
+                }).then((res) => {
+                    console.log("Updated data", res);
+                });
+                // .findOne({ "portfolios._id": request.params.portfolio_id });
+                // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
+                // console.log('--->>>>', result);
+                // console.log(portfolioItem);
+                // await portfolioItem.save();
+                const responseData = yield expert_3.default.findOne({ account: account.id });
+                console.log(`response data : ${responseData}`);
+                return response.response({
+                    status: "ok",
+                    // data: "Profile updated successfully",
+                    data: responseData,
                 });
             }
             catch (error) {

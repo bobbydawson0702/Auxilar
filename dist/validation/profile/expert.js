@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateEducationSchema = exports.updatePersonDetailSchema = exports.updateResumeSchema = exports.updateVerifierSchema = exports.updatePortfolioItemSchema = exports.updatePortfolioSchema = exports.updateSummarySchema = exports.updateBaseInfoSchema = exports.ProfileSchema = void 0;
+exports.updateEducationSchema = exports.updatePersonDetailSchema = exports.updateResumeSchema = exports.updateVerifierSchema = exports.addPortfolioItemSchema = exports.updatePortfolioItemSchema = exports.updatePortfolioSchema = exports.updateSummarySchema = exports.updateBaseInfoSchema = exports.ProfileSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.ProfileSchema = joi_1.default.object({
     address: joi_1.default.string().required().messages({
@@ -56,6 +56,14 @@ exports.updatePortfolioSchema = joi_1.default.object({
     }),
 });
 exports.updatePortfolioItemSchema = joi_1.default.object({
+    content: joi_1.default.string().required().messages({
+        "any.required": "Please provide content",
+    }),
+    text: joi_1.default.string().required().messages({
+        "any.required": "Please provide text",
+    }),
+});
+exports.addPortfolioItemSchema = joi_1.default.object({
     content: joi_1.default.string().required().messages({
         "any.required": "Please provide content",
     }),
