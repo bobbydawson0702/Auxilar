@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const MentorSchema = new Schema({
     account: {
         type: Schema.Types.ObjectId,
-        ref: 'account'
+        ref: "account",
     },
     email: {
         type: String,
@@ -31,7 +31,7 @@ const MentorSchema = new Schema({
     },
     address: {
         type: String,
-        required: true
+        required: true,
     },
     languages: [
         {
@@ -44,8 +44,8 @@ const MentorSchema = new Schema({
                 enum: ["Basic", "Conversational", "Fluent", "Native"],
                 default: "Basic",
                 required: true,
-            }
-        }
+            },
+        },
     ],
     summary: {
         type: String,
@@ -54,9 +54,9 @@ const MentorSchema = new Schema({
     ongoing_project: [
         {
             project: {
-                type: Schema.Types.ObjectId
-            }
-        }
+                type: Schema.Types.ObjectId,
+            },
+        },
     ],
     reviews: [
         {
@@ -68,8 +68,8 @@ const MentorSchema = new Schema({
             },
             rate: {
                 type: Number,
-            }
-        }
+            },
+        },
     ],
     social_media: {
         twitter: {
@@ -87,11 +87,19 @@ const MentorSchema = new Schema({
     },
     account_status: {
         type: Number,
-        default: 0
+        default: 0,
     },
     payment_verify: {
         type: Boolean,
         default: false,
+    },
+    payment_info: {
+        paypal: {
+            type: String,
+        },
+        creditCard: {
+            type: String,
+        },
     },
     professional_background: {
         type: String,
@@ -113,8 +121,8 @@ const MentorSchema = new Schema({
             type: Date,
             required: true,
         },
-    }
+    },
 });
-const Mentor = mongoose.model('mentor', MentorSchema);
+const Mentor = mongoose.model("mentor", MentorSchema);
 exports.default = Mentor;
 //# sourceMappingURL=mentor.js.map

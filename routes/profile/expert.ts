@@ -5,10 +5,13 @@ import { Request, ResponseToolkit } from "@hapi/hapi";
 // import { Path } from "mongoose";
 // import process from "process";
 
+import mongoose, { ObjectId, Schema } from "mongoose";
+
 import Account from "../../models/account";
 // import config from '../config';
 import {
   ProfileSwagger,
+  addPortfolioItemSwagger,
   deleteProfileSwagger,
   getProfileSwagger,
   updateBaseInfoSwagger,
@@ -22,6 +25,7 @@ import {
 } from "../../swagger/profile/expert";
 import {
   ProfileSchema,
+  addPortfolioItemSchema,
   updateBaseInfoSchema,
   updateEducationSchema,
   updatePersonDetailSchema,
@@ -68,8 +72,10 @@ export let expertRoute = [
           request.auth.credentials.accountId
         );
         // check account type
-        if(account.account_type !== 'expert') {
-          return response.response({status:'err', err: 'Not allowed expert profile!'}).code(403);
+        if (account.account_type !== "expert") {
+          return response
+            .response({ status: "err", err: "Not allowed expert profile!" })
+            .code(403);
         }
         console.log(account);
 
@@ -433,18 +439,122 @@ export let expertRoute = [
         //    "portfolios._id": request.params.portfolio_id
         // });
 
-        const portfolioItem = await Expert.findOne({
-          "portfolios._id": request.params.portfolio_id,
+        await Expert.findOneAndUpdate(
+          {
+            account: account.id,
+            "portfolios._id": request.params.portfolio_id,
+          },
+          {
+            $set: {
+              "portfolios.$.text": data["text"],
+              "portfolios.$.content": data["content"],
+            },
+          },
+          {
+            new: true,
+            useFindAndModify: false,
+          }
+        ).then((res) => {
+          console.log("Updated data", res);
         });
+
+        // .findOne({ "portfolios._id": request.params.portfolio_id });
 
         // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
 
         // console.log('--->>>>', result);
-        console.log(portfolioItem);
+        // console.log(portfolioItem);
 
         // await portfolioItem.save();
 
-        const responseData = portfolioItem;
+        const responseData = await Expert.findOne({ account: account.id });
+
+        console.log(`response data : ${responseData}`);
+
+        return response.response({
+          status: "ok",
+          // data: "Profile updated successfully",
+          data: responseData,
+        });
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "PUT",
+    path: "/portfolio/additem",
+    options: {
+      auth: "jwt",
+      description: "Update expert portfolio indiviually",
+      plugins: addPortfolioItemSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: addPortfolioItemSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        console.log(
+          `PUT api/v1/expert/portfolio/additem from ${request.auth.credentials.email}`
+        );
+
+        const account = await Account.findById(
+          request.auth.credentials.accountId
+        );
+        console.log(account);
+
+        const data = request.payload;
+
+        console.log("data ----------------->", data);
+
+        // const portfolioItem = await Expert.findOne({
+        //   account: request.auth.credentials.accountId,
+        // })
+        //   .select("portfolios");
+        // .findOne({
+        //    "portfolios._id": request.params.portfolio_id
+        // });
+
+        await Expert.updateOne(
+          {
+            account: account.id,
+          },
+          {
+            $addToSet: {
+              "portfolios": {
+                content: data["content"],
+                text: data["text"],
+              },
+            },
+          },
+          {
+            new: true,
+            useFindAndModify: false,
+          }
+        ).then((res) => {
+          console.log("Updated data", res);
+        });
+
+        // .findOne({ "portfolios._id": request.params.portfolio_id });
+
+        // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
+
+        // console.log('--->>>>', result);
+        // console.log(portfolioItem);
+
+        // await portfolioItem.save();
+
+        const responseData = await Expert.findOne({ account: account.id });
 
         console.log(`response data : ${responseData}`);
 

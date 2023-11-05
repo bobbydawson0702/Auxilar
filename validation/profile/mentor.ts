@@ -34,7 +34,7 @@ export const ProfileSchema = Joi.object({
   social_media: Joi.object(),
 
   payment_verify: Joi.boolean(),
-  payment_info: Joi.string(),
+  payment_info: Joi.object(),
 
   professional_info: Joi.object().required().messages({
     "any.required": "Please provide professional information",

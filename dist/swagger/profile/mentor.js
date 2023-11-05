@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProfileSwagger = exports.getProfileSwagger = exports.updatePaymentInfoSwagger = exports.updateSocialMediaSwagger = exports.updatePersonalInfoSwagger = exports.updateAvatarSwagger = exports.updateSummarySwagger = exports.ProfileSwagger = void 0;
+exports.deleteProfileSwagger = exports.getProfileSwagger = exports.updateProfessionalInfoSwagger = exports.updatePaymentInfoSwagger = exports.updateSocialMediaSwagger = exports.updatePersonalInfoSwagger = exports.updateAvatarSwagger = exports.updateSummarySwagger = exports.ProfileSwagger = void 0;
 exports.ProfileSwagger = {
     "hapi-swagger": {
         responses: {
@@ -92,6 +92,24 @@ exports.updateSocialMediaSwagger = {
     },
 };
 exports.updatePaymentInfoSwagger = {
+    "hapi-swagger": {
+        responses: {
+            201: {
+                description: "Profile created successfully.",
+            },
+            400: {
+                description: "Input Fields Required.",
+            },
+            403: {
+                description: "Forbidden request",
+            },
+            501: {
+                description: "Requeset not implemented.",
+            },
+        },
+    },
+};
+exports.updateProfessionalInfoSwagger = {
     "hapi-swagger": {
         responses: {
             201: {

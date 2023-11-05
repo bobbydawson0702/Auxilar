@@ -13,11 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expertRoute = void 0;
-// import Jwt from 'jsonwebtoken';
-// import bcrypt from 'bcrypt';
-// import fs from 'fs';
-// import { Path } from "mongoose";
-// import process from "process";
 const account_1 = __importDefault(require("../../models/account"));
 // import config from '../config';
 const expert_1 = require("../../swagger/profile/expert");
@@ -54,9 +49,11 @@ exports.expertRoute = [
                 console.log(`POST api/v1/expert request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
                 // check account type
-                // if(account.account_type !== 'expert') {
-                //   return response.response({status:'err', err: 'Not allowed expert profile!'}).code(403);
-                // }
+                if (account.account_type !== "expert") {
+                    return response
+                        .response({ status: "err", err: "Not allowed expert profile!" })
+                        .code(403);
+                }
                 console.log(account);
                 const data = request.payload;
                 console.log("data---------------", data);
@@ -82,6 +79,13 @@ exports.expertRoute = [
                 //   { $set: expertField },
                 //   { new: true, upsert: true, setDefaultsOnInsert: true }
                 // );
+                const expertExist = yield expert_3.default.findOne({
+                    account: request.auth.credentials.accountId,
+                });
+                if (expertExist)
+                    return response
+                        .response({ status: "err", err: "already exists" })
+                        .code(403);
                 const expert = new expert_3.default(expertField);
                 yield expert.save();
                 const responseData = yield expert.populate("account", [
@@ -347,19 +351,20 @@ exports.expertRoute = [
                 // .findOne({
                 //    "portfolios._id": request.params.portfolio_id
                 // });
-                const portfolioItem = yield expert_3.default.findOne({
+                const portfolioItem = yield expert_3.default.update({
                     "portfolios._id": request.params.portfolio_id,
                 });
+                // .findOne({ "portfolios._id": request.params.portfolio_id });
                 // const result = portfolioItem.portfolios.map((item) => String(item._id) === String(request.params.portfolio_id));
                 // console.log('--->>>>', result);
-                console.log(portfolioItem);
+                // console.log(portfolioItem);
                 // await portfolioItem.save();
-                const responseData = portfolioItem;
-                console.log(`response data : ${responseData}`);
+                // const responseData = portfolioItem;
+                // console.log(`response data : ${responseData}`);
                 return response.response({
                     status: "ok",
                     // data: "Profile updated successfully",
-                    data: responseData,
+                    data: "responseData",
                 });
             }
             catch (error) {

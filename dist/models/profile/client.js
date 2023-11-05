@@ -94,7 +94,12 @@ const ClientSchema = new Schema({
         default: false,
     },
     payment_info: {
-        type: String,
+        paypal: {
+            type: String,
+        },
+        creditCard: {
+            type: String,
+        }
     },
 });
 const Client = mongoose.model("client", ClientSchema);

@@ -77,6 +77,15 @@ export const updatePortfolioItemSchema = Joi.object({
   }),
 });
 
+export const addPortfolioItemSchema = Joi.object({
+  content: Joi.string().required().messages({
+    "any.required": "Please provide content",
+  }),
+  text: Joi.string().required().messages({
+    "any.required": "Please provide text",
+  }),
+});
+
 export const updateVerifierSchema = Joi.object({
   verified_by: Joi.array<Object>().required().messages({
     "any.requird": "Please provide verifier",

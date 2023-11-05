@@ -91,6 +91,21 @@ export const updatePortfolioItemSwagger = {
     },
   },
 };
+export const addPortfolioItemSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "success.",
+      },
+      404: {
+        description: "Profile not found!",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
 export const updateVerifierSwagger = {
   "hapi-swagger": {
     responses: {

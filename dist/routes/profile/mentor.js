@@ -76,10 +76,10 @@ exports.mentorRoute = [
                 //   { new: true, upsert: true, setDefaultOnInsert: true }
                 // );
                 // Check whether mentor profile already exists
-                const AlreadyMentor = yield mentor_3.default.findOne({
+                const mentorExist = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 });
-                if (AlreadyMentor)
+                if (mentorExist)
                     return response
                         .response({ status: "err", err: "already exists" })
                         .code(403);
@@ -168,7 +168,6 @@ exports.mentorRoute = [
                         summary: data["summary"],
                     },
                 });
-                console.log("mentor --->>>>>", mentor);
                 const responseData = yield mentor_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 }).populate("account", ["first_name", "last_name", "email"]);
@@ -356,6 +355,53 @@ exports.mentorRoute = [
                 console.log("data---------------", data);
                 const updateData = {
                     payment_info: data["payment_info"],
+                };
+                const mentor = yield mentor_3.default.findOneAndUpdate({ account: account.id }, {
+                    $set: updateData,
+                });
+                const responseData = yield mentor_3.default.findOne({
+                    account: request.auth.credentials.accountId,
+                }).populate("account", ["first_name", "last_name", "email"]);
+                console.log(`response data : ${responseData}`);
+                return response.response({
+                    status: "ok",
+                    // data: "Profile updated successfully",
+                    data: responseData,
+                });
+            }
+            catch (error) {
+                return response.response({ status: "err", err: error }).code(501);
+            }
+        }),
+    },
+    {
+        method: "PUT",
+        path: "/professional-info",
+        options: {
+            auth: "jwt",
+            description: "Update mentor professional information",
+            plugins: mentor_1.updateProfessionalInfoSwagger,
+            tags: ["api", "mentor"],
+            validate: {
+                payload: mentor_2.updateProfessionalInfoSchema,
+                options,
+                failAction: (request, h, error) => {
+                    const details = error.details.map((d) => {
+                        return { err: d.message, path: d.path };
+                    });
+                    return h.response(details).code(400).takeover();
+                },
+            },
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                console.log(`PUT api/v1/mentor/social-media request from ${request.auth.credentials.email}`);
+                const account = yield account_1.default.findById(request.auth.credentials.accountId);
+                console.log(account);
+                const data = request.payload;
+                console.log("data---------------", data);
+                const updateData = {
+                    professional_info: data["professional_info"],
                 };
                 const mentor = yield mentor_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: updateData,

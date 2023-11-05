@@ -64,7 +64,7 @@ exports.updateSocialMediaSchema = joi_1.default.object({
     }),
 });
 exports.updatePaymentInfoSchema = joi_1.default.object({
-    payment_info: joi_1.default.string().required().messages({
+    payment_info: joi_1.default.object().required().messages({
         "any.required": "Please provide payment information",
     }),
 });

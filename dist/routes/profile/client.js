@@ -75,10 +75,10 @@ exports.clientRoute = [
                 //   { new: true, upsert: true, setDefaultOnInsert: true }
                 // );
                 // Check whether client profile already exists
-                const AlreadyClient = yield client_3.default.findOne({
+                const clientExist = yield client_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 });
-                if (AlreadyClient)
+                if (clientExist)
                     return response
                         .response({ status: "err", err: "already exists" })
                         .code(403);
