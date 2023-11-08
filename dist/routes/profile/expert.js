@@ -409,13 +409,13 @@ exports.expertRoute = [
                 // });
                 yield expert_3.default.findOneAndUpdate({
                     account: account.id,
-                }, {
-                    $unset: {
-                        portfolios: {
-                            "portfolios._id": request.params.portfolio_id,
-                        },
-                    },
-                }).then((res) => {
+                }, 
+                // {
+                //   $unset: {
+                //     "portfolios.$._id": request.params.portfolio_id,
+                //   },
+                // }
+                { $pull: { portfolios: { _id: request.params.portfolio_id } } }).then((res) => {
                     console.log("Updated data", res);
                 });
                 // .findOne({ "portfolios._id": request.params.portfolio_id });

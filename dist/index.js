@@ -57,7 +57,7 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
     const server = new hapi.Server({
         port: 3050,
         routes: { cors: { origin: ["*"] } },
-        host: "192.168.142.45",
+        host: "0.0.0.0",
     });
     yield server.register(inert_1.default);
     yield server.register(vision_1.default);

@@ -82,16 +82,36 @@ exports.updateResumeSchema = joi_1.default.object({
     }),
 });
 exports.updatePersonDetailSchema = joi_1.default.object({
-    address: joi_1.default.string(),
-    post_number: joi_1.default.string(),
-    languages: joi_1.default.array(),
-    skills: joi_1.default.array(),
-    majors: joi_1.default.array(),
-    reviews: joi_1.default.array(),
-    active_status: joi_1.default.boolean(),
-    account_status: joi_1.default.number(),
-    profile_links: joi_1.default.array(),
-    linkedin: joi_1.default.string(),
+    address: joi_1.default.string().required().messages({
+        "any.required": "Please provde address"
+    }),
+    post_number: joi_1.default.string().required().messages({
+        "any.required": "Please provde post_number"
+    }),
+    languages: joi_1.default.array().required().messages({
+        "any.required": "Please provde languages"
+    }),
+    skills: joi_1.default.array().required().messages({
+        "any.required": "Please provde skills"
+    }),
+    majors: joi_1.default.array().required().messages({
+        "any.required": "Please provde majors"
+    }),
+    reviews: joi_1.default.array().required().messages({
+        "any.required": "Please provde reviews"
+    }),
+    active_status: joi_1.default.boolean().required().messages({
+        "any.required": "Please provde active_status"
+    }),
+    account_status: joi_1.default.number().required().messages({
+        "any.required": "Please provde account_status"
+    }),
+    profile_links: joi_1.default.array().required().messages({
+        "any.required": "Please provde profile_links"
+    }),
+    linkedin: joi_1.default.string().required().messages({
+        "any.required": "Please provde linkedin"
+    }),
 });
 exports.updateEducationSchema = joi_1.default.object({
     education: joi_1.default.object().required().messages({

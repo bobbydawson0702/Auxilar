@@ -19,6 +19,7 @@ const job_2 = require("../validation/job");
 // import config from "../config";
 const account_1 = __importDefault(require("../models/account"));
 const job_3 = __importDefault(require("../models/job"));
+const client_1 = __importDefault(require("../models/profile/client"));
 // require('dotenv').config();
 const options = { abortEarly: false, stripUnknown: true };
 exports.jobRoute = [
@@ -43,15 +44,19 @@ exports.jobRoute = [
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`POST api/v1/job request from ${request.auth.credentials.email}`);
-                const account = yield account_1.default.findOne({ email: request.auth.credentials.email });
-                // check whether account is client
-                if (account.account_type !== 'client') {
-                    return response.response({ status: 'err', err: 'Forbidden requeset!' }).code(403);
-                }
-                // Todo check whether profile exist
                 const data = request.payload;
                 const currentDate = new Date().toUTCString();
+                console.log(`POST api/v1/job request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                // check whether account is client
+                const account = yield account_1.default.findOne({ email: request.auth.credentials.email });
+                if (account.account_type !== 'client') {
+                    return response.response({ status: 'err', err: 'Forbidden request!' }).code(403);
+                }
+                // check whether profile exist
+                const client = yield client_1.default.findOne({ account: account.id });
+                if (!client) {
+                    return response.response({ status: 'err', err: 'Your profile does not exist' }).code(406);
+                }
                 // check job already posted by current account
                 const alreadyPostedJob = yield job_3.default.findOne({ client_email: account.email, title: data['title'] });
                 if (alreadyPostedJob) {
@@ -67,6 +72,7 @@ exports.jobRoute = [
                     skill_set: data['skill_set'],
                     job_type: data['job_type'],
                     pub_date: currentDate,
+                    invited_expert: data['invited_expert']
                 };
                 const newJob = new job_3.default(jobField
                 // { client_email: account.email },
@@ -75,7 +81,7 @@ exports.jobRoute = [
                 );
                 yield newJob.save();
                 console.log('job posted successfully!', newJob);
-                return response.response({ status: 'ok', data: 'Job post successfully' }).code(201);
+                return response.response({ status: 'ok', data: newJob }).code(201);
             }
             catch (error) {
                 return response.response({ err: error }).code(501);

@@ -13,6 +13,9 @@ exports.JobSwagger = {
             403: {
                 description: "Forbidden request.",
             },
+            406: {
+                description: "Not acceptable request.",
+            },
             409: {
                 description: "Job already posted.",
             },

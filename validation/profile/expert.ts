@@ -98,16 +98,36 @@ export const updateResumeSchema = Joi.object({
   }),
 });
 export const updatePersonDetailSchema = Joi.object({
-  address: Joi.string(),
-  post_number: Joi.string(),
-  languages: Joi.array<Object>(),
-  skills: Joi.array<String>(),
-  majors: Joi.array<String>(),
-  reviews: Joi.array<Object>(),
-  active_status: Joi.boolean(),
-  account_status: Joi.number(),
-  profile_links: Joi.array<String>(),
-  linkedin: Joi.string(),
+  address: Joi.string().required().messages({
+    "any.required": "Please provde address"
+  }),
+  post_number: Joi.string().required().messages({
+    "any.required": "Please provde post_number"
+  }),
+  languages: Joi.array<Object>().required().messages({
+    "any.required": "Please provde languages"
+  }),
+  skills: Joi.array<String>().required().messages({
+    "any.required": "Please provde skills"
+  }),
+  majors: Joi.array<String>().required().messages({
+    "any.required": "Please provde majors"
+  }),
+  reviews: Joi.array<Object>().required().messages({
+    "any.required": "Please provde reviews"
+  }),
+  active_status: Joi.boolean().required().messages({
+    "any.required": "Please provde active_status"
+  }),
+  account_status: Joi.number().required().messages({
+    "any.required": "Please provde account_status"
+  }),
+  profile_links: Joi.array<String>().required().messages({
+    "any.required": "Please provde profile_links"
+  }),
+  linkedin: Joi.string().required().messages({
+    "any.required": "Please provde linkedin"
+  }),
 });
 export const updateEducationSchema = Joi.object({
   education: Joi.object().required().messages({

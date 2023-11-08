@@ -24,9 +24,9 @@ exports.JobSchema = joi_1.default.object({
     skill_set: joi_1.default.array().required().messages({
         "any.required": "Please provide skill_set"
     }),
-    job_type: joi_1.default.string().required().messages({
+    job_type: joi_1.default.string().required().valid("public", "private").messages({
         "any.required": "Please provdie job_type",
     }),
-    // file: Joi.any().meta({ swaggerType: "file" })
+    invited_expert: joi_1.default.array(),
 });
 //# sourceMappingURL=job.js.map

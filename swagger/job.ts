@@ -10,6 +10,9 @@ export const JobSwagger = {
       403: {
         description: "Forbidden request.",
       },
+      406: {
+        description: "Not acceptable request.",
+      },
       409: {
         description: "Job already posted.",
       },
@@ -48,11 +51,17 @@ export const getAllJobSwagger = {
       200: {
         description: "Receive posted job successfully!",
       },
+      204: {
+        description: "No Content",
+      },
+      403: {
+        description: "Forbidden request.",
+      },
       404: {
         description: "Posted job not found!",
       },
       501: {
-        description: "Requeset not implemented.",
+        description: "Request not implemented.",
       },
     },
   },

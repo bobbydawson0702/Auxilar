@@ -26,7 +26,7 @@ const init = async () => {
   const server: hapi.Server = new hapi.Server({
     port: 3050,
     routes: { cors: { origin: ["*"] } },
-    host: "192.168.142.45",
+    host: "0.0.0.0",
   });
   await server.register(Inert);
   await server.register(Vision);
