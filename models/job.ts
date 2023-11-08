@@ -86,11 +86,15 @@ const JobSchema = new Schema({
 
   proposals: [
     {
+      expert_email: {
+        type: String,
+        required: true,
+      },
       cover_letter: {
         type: String,
         required: true,
       },
-      attached_files: {
+      attached_file: {
         type: String,
       },
       viewed_by_client: {
@@ -100,10 +104,6 @@ const JobSchema = new Schema({
       proposal_status: {
         type: Number,
         default: 0,
-      },
-      expert_mail: {
-        type: String,
-        required: true,
       },
       pub_date: {
         type: Date,
@@ -131,7 +131,7 @@ const JobSchema = new Schema({
             type: String,
             required: true,
           },
-          amount: {
+          ammount: {
             type: Number,
             required: true,
           },

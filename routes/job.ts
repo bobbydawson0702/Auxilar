@@ -341,7 +341,7 @@ export let jobRoute = [
             client_email: account.email,
           });
           return response
-            .response({ status: "ok", data: "successfuly deleted!" })
+            .response({ status: "ok", data: "successfully deleted!" })
             .code(200);
         } catch (error) {
           return response

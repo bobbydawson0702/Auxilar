@@ -53,34 +53,34 @@ const JobSchema = new Schema({
         enum: ["public", "private"],
         default: "public",
     },
-    // invited_expert: [
-    //   {
-    //     first_name: {
-    //       type: string,
-    //     },
-    //     last_name: {
-    //       type: string,
-    //     },
-    //     email: {
-    //       type: string,
-    //     },
-    //     mentors: [
-    //       {
-    //         mentor: {
-    //           first_name: {
-    //             type: string,
-    //           },
-    //           last_name: {
-    //             type: string,
-    //           },
-    //           email: {
-    //             type: string,
-    //           },
-    //         },
-    //       },
-    //     ],
-    //   },
-    // ],
+    invited_expert: [
+        {
+            first_name: {
+                type: String,
+            },
+            last_name: {
+                type: String,
+            },
+            email: {
+                type: String,
+            },
+            mentors: [
+                {
+                    mentor: {
+                        first_name: {
+                            type: String,
+                        },
+                        last_name: {
+                            type: String,
+                        },
+                        email: {
+                            type: String,
+                        },
+                    },
+                },
+            ],
+        },
+    ],
     proposals: [
         {
             cover_letter: {

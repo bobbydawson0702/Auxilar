@@ -24,13 +24,13 @@ const client_1 = __importDefault(require("../models/profile/client"));
 const options = { abortEarly: false, stripUnknown: true };
 exports.jobRoute = [
     {
-        method: 'POST',
-        path: '/',
+        method: "POST",
+        path: "/",
         options: {
-            auth: 'jwt',
-            description: 'Post job',
+            auth: "jwt",
+            description: "Post job",
             plugins: job_1.JobSwagger,
-            tags: ['api', 'job'],
+            tags: ["api", "job"],
             validate: {
                 payload: job_2.JobSchema,
                 options,
@@ -39,40 +39,52 @@ exports.jobRoute = [
                         return { err: d.message, path: d.path };
                     });
                     return h.response(details).code(400).takeover();
-                }
+                },
             },
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                const data = request.payload;
                 const currentDate = new Date().toUTCString();
                 console.log(`POST api/v1/job request from ${request.auth.credentials.email} Time: ${currentDate}`);
                 // check whether account is client
-                const account = yield account_1.default.findOne({ email: request.auth.credentials.email });
-                if (account.account_type !== 'client') {
-                    return response.response({ status: 'err', err: 'Forbidden request!' }).code(403);
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request!" })
+                        .code(403);
                 }
                 // check whether profile exist
                 const client = yield client_1.default.findOne({ account: account.id });
                 if (!client) {
-                    return response.response({ status: 'err', err: 'Your profile does not exist' }).code(406);
+                    return response
+                        .response({ status: "err", err: "Your profile does not exist" })
+                        .code(406);
                 }
+                const data = request.payload;
                 // check job already posted by current account
-                const alreadyPostedJob = yield job_3.default.findOne({ client_email: account.email, title: data['title'] });
+                const alreadyPostedJob = yield job_3.default.findOne({
+                    client_email: account.email,
+                    title: data["title"],
+                });
                 if (alreadyPostedJob) {
-                    return response.response({ status: 'err', err: "Job already posted" }).code(409);
+                    return response
+                        .response({ status: "err", err: "Job already posted" })
+                        .code(409);
                 }
+                // Todo check expert list
                 const jobField = {
                     client_email: account.email,
-                    title: data['title'],
-                    description: data['description'],
-                    budget_type: data['budget_type'],
-                    budget_amount: data['budget_amount'],
-                    end_date: data['end_date'],
-                    skill_set: data['skill_set'],
-                    job_type: data['job_type'],
+                    title: data["title"],
+                    description: data["description"],
+                    budget_type: data["budget_type"],
+                    budget_amount: data["budget_amount"],
+                    end_date: data["end_date"],
+                    skill_set: data["skill_set"],
+                    job_type: data["job_type"],
                     pub_date: currentDate,
-                    invited_expert: data['invited_expert']
+                    invited_expert: data["invited_expert"],
                 };
                 const newJob = new job_3.default(jobField
                 // { client_email: account.email },
@@ -80,180 +92,244 @@ exports.jobRoute = [
                 // { new: true, upsert: true, setDefaultsOnInsert: true }
                 );
                 yield newJob.save();
-                console.log('job posted successfully!', newJob);
-                return response.response({ status: 'ok', data: newJob }).code(201);
+                console.log("job posted successfully!", newJob);
+                return response.response({ status: "ok", data: newJob }).code(201);
             }
             catch (error) {
                 return response.response({ err: error }).code(501);
             }
-        })
+        }),
     },
     {
-        method: 'PUT',
-        path: '/{jobId}',
+        method: "PUT",
+        path: "/{jobId}",
         options: {
-            auth: 'jwt',
-            description: 'Update posted job',
+            auth: "jwt",
+            description: "Update posted job",
             plugins: job_1.updateJobSwagger,
-            tags: ['api', 'job'],
+            tags: ["api", "job"],
             validate: {
-                payload: job_2.JobSchema,
+                payload: job_2.updateJobSchema,
                 options,
                 failAction: (request, h, error) => {
                     const details = error.details.map((d) => {
                         return { err: d.message, path: d.path };
                     });
                     return h.response(details).code(400).takeover();
-                }
+                },
             },
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`POST api/v1/job/${request.params.jobId} request from ${request.auth.credentials.email}`);
-                const account = yield account_1.default.findOne({ email: request.auth.credentials.email });
+                const currentDate = new Date().toUTCString();
+                console.log(`PUT api/v1/job/${request.params.jobId} request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
                 // check whether account is client
-                if (account.account_type !== 'client') {
-                    return response.response({ status: 'err', err: 'Forbidden requeset!' }).code(403);
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden requeset!" })
+                        .code(403);
                 }
-                // check whether posted job is exist
-                console.log('request api is api/v1/job/', request.params.jobId);
-                let job = yield job_3.default.findOne({ _id: request.params.jobId, client_email: account.email });
-                if (!job) {
-                    return response.response({ status: 'err', err: 'Posted job not found!' }).code(404);
+                // check whether job exist
+                try {
+                    yield job_3.default.findById(request.params.jobId);
                 }
-                console.log(`this is founded job ${job}`);
+                catch (error) {
+                    return response
+                        .response({ status: "err", err: "Posted Job not found!" })
+                        .code(404);
+                }
                 const data = request.payload;
-                // const currentDate = new Date().toUTCString();
                 const jobField = {
-                    client_email: account.email,
-                    title: data['title'],
-                    description: data['description'],
-                    budget_type: data['budget_type'],
-                    budget_amount: data['budget_amount'],
-                    end_date: data['end_date'],
-                    skill_set: data['skill_set'],
-                    job_type: data['job_type'],
-                    // pub_date: currentDate,
+                    title: data["title"],
+                    description: data["description"],
+                    budget_type: data["budget_type"],
+                    budget_amount: data["budget_amount"],
+                    end_date: data["end_date"],
+                    state: data["state"],
+                    skill_set: data["skill_set"],
+                    job_type: data["job_type"],
                 };
-                // job = { ...job, ...jobField };
-                job.client_email = jobField.client_email;
-                job.title = jobField.title;
-                job.description = jobField.description;
-                job.budget_type = jobField.budget_type;
-                job.budget_amount = jobField.budget_amount;
-                job.end_date = jobField.end_date;
-                job.skill_set = jobField.skill_set;
-                job.job_type = jobField.job_type;
-                yield job.save();
-                console.log('job updated successfully!', job);
-                return response.response({ status: 'ok', data: 'Job updated successfully' }).code(201);
+                data["invited_expert"]
+                    ? (jobField["invitied_expert"] = data["invited_expert"])
+                    : null;
+                const job = yield job_3.default.findOneAndUpdate({ _id: request.params.jobId, client_email: account.email }, {
+                    $set: jobField,
+                }, { new: true });
+                // await job.save();
+                console.log("job updated successfully!", job);
+                return response
+                    .response({ status: "ok", data: "Job updated successfully" })
+                    .code(201);
             }
             catch (error) {
-                return response.response({ err: error }).code(501);
+                return response.response({ status: "err", err: error }).code(501);
             }
-        })
+        }),
     },
     {
-        method: 'GET',
-        path: '/',
+        method: "GET",
+        path: "/",
         options: {
-            auth: 'jwt',
-            description: 'Get all posted job',
+            auth: "jwt",
+            description: "Get all posted job",
             plugins: job_1.getAllJobSwagger,
-            tags: ['api', 'job'],
+            tags: ["api", "job"],
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`GET api/v1/job request from ${request.auth.credentials.email}`);
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/job request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                // check whether account is expert
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "expert") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request" })
+                        .code(403);
+                }
                 const allJobs = yield job_3.default.find().sort({ pub_date: -1 });
-                return response.response({ status: 'ok', data: allJobs }).code(200);
+                const responseData = {
+                    length: allJobs.length,
+                    allJobs,
+                };
+                return response
+                    .response({ status: "ok", data: responseData })
+                    .code(200);
             }
             catch (error) {
-                return response.response({ status: 'err', err: 'Request not implemented!' }).code(501);
+                return response
+                    .response({ status: "err", err: "Request not implemented!" })
+                    .code(501);
             }
-        })
+        }),
     },
     {
-        method: 'GET',
-        path: '/myjob',
+        method: "GET",
+        path: "/myjob",
         options: {
-            auth: 'jwt',
-            description: 'Get my all posted job',
+            auth: "jwt",
+            description: "Get my all posted job",
             plugins: job_1.getMyAllJobSwagger,
-            tags: ['api', 'job'],
+            tags: ["api", "job"],
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`GET api/v1/job/myjob request from ${request.auth.credentials.email}`);
-                // Check account whether it's client
-                const account = yield account_1.default.findOne({ email: request.auth.credentials.email });
-                if (account.account_type !== 'client') {
-                    return response.response({ status: 'err', err: 'Forbidden request!' }).code(403);
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/job/myjob request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                // Check whether account is client
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request!" })
+                        .code(403);
                 }
-                const allJobs = yield job_3.default.find({ client_email: account.email }).sort({ pub_date: -1 });
-                if (!allJobs) {
-                    return response.response({ status: 'err', err: 'Posted job not found!' }).code(404);
+                const allMyJobs = yield job_3.default.find({
+                    client_email: account.email,
+                }).sort({
+                    pub_date: -1,
+                });
+                if (allMyJobs.length === 0) {
+                    return response
+                        .response({ status: "err", err: "Posted job not found!" })
+                        .code(404);
                 }
-                return response.response({ status: 'ok', data: allJobs }).code(200);
+                const responseData = {
+                    length: allMyJobs.length,
+                    allMyJobs,
+                };
+                return response
+                    .response({ status: "ok", data: responseData })
+                    .code(200);
             }
             catch (error) {
-                return response.response({ status: 'err', err: 'Request not implemented!' }).code(501);
+                return response
+                    .response({ status: "err", err: "Request not implemented!" })
+                    .code(501);
             }
-        })
+        }),
     },
     {
-        method: 'GET',
-        path: '/{jobId}',
+        method: "GET",
+        path: "/{jobId}",
         options: {
-            auth: 'jwt',
-            description: 'Get posted job',
+            auth: "jwt",
+            description: "Get posted job",
             plugins: job_1.getJobSwagger,
-            tags: ['api', 'job'],
+            tags: ["api", "job"],
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
-                console.log(`GET api/v1/job/${request.params.jobId} request from ${request.auth.credentials.email}`);
-                const job = yield job_3.default.find({ _id: request.params.jobId });
-                if (!job) {
-                    return response.response({ status: 'err', err: 'Posted job not found!' }).code(404);
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/job/${request.params.jobId} request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                try {
+                    const job = yield job_3.default.find({
+                        _id: request.params.jobId,
+                        client_email: request.auth.credentials.email,
+                    });
+                    return response.response({ status: "ok", data: job }).code(200);
                 }
-                return response.response({ status: 'ok', data: job }).code(200);
+                catch (error) {
+                    return response
+                        .response({ status: "err", err: "Posted job not found!" })
+                        .code(404);
+                }
             }
             catch (error) {
-                return response.response({ status: 'err', err: 'Request not implemented!' }).code(501);
+                return response
+                    .response({ status: "err", err: "Request not implemented!" })
+                    .code(501);
             }
-        })
+        }),
     },
     {
-        method: 'DELETE',
-        path: '/{jobId}',
+        method: "DELETE",
+        path: "/{jobId}",
         options: {
-            auth: 'jwt',
-            description: 'Delete posted job',
+            auth: "jwt",
+            description: "Delete posted job",
             plugins: job_1.deleteJobSwagger,
-            tags: ['api', 'job'],
+            tags: ["api", "job"],
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 console.log(`DELETE api/v1/job/${request.params.jobId} request from ${request.auth.credentials.email}`);
                 // Check account whether it's client
-                const account = yield account_1.default.findOne({ email: request.auth.credentials.email });
-                if (account.account_type !== 'client') {
-                    return response.response({ status: 'err', err: 'Forbidden request!' }).code(403);
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request!" })
+                        .code(403);
                 }
-                const deleteStatus = yield job_3.default.deleteOne({ _id: request.params.jobId, client_email: account.email });
-                if (deleteStatus.deletedCount) {
-                    return response.response({ status: 'ok', data: "successfuly deleted!" }).code(200);
+                try {
+                    yield job_3.default.deleteOne({
+                        _id: request.params.jobId,
+                        client_email: account.email,
+                    });
+                    return response
+                        .response({ status: "ok", data: "successfuly deleted!" })
+                        .code(200);
                 }
-                else {
-                    return response.response({ status: 'err', err: 'Posted job not found!' }).code(404);
+                catch (error) {
+                    return response
+                        .response({ status: "err", err: "Posted job not found!" })
+                        .code(404);
                 }
             }
             catch (error) {
-                return response.response({ status: 'err', err: 'Request not implemented!' }).code(501);
+                return response
+                    .response({ status: "err", err: "Request not implemented!" })
+                    .code(501);
             }
-        })
-    }
+        }),
+    },
     // {
     //   method: 'POST',
     //   path: '/proposal',

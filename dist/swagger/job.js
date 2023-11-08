@@ -52,11 +52,17 @@ exports.getAllJobSwagger = {
             200: {
                 description: "Receive posted job successfully!",
             },
+            204: {
+                description: "No Content",
+            },
+            403: {
+                description: "Forbidden request.",
+            },
             404: {
                 description: "Posted job not found!",
             },
             501: {
-                description: "Requeset not implemented.",
+                description: "Request not implemented.",
             },
         },
     },
