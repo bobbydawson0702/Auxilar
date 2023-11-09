@@ -81,6 +81,7 @@ exports.jobRoute = [
                     budget_type: data["budget_type"],
                     budget_amount: data["budget_amount"],
                     end_date: data["end_date"],
+                    expire_date: data["expire_date"],
                     skill_set: data["skill_set"],
                     job_type: data["job_type"],
                     pub_date: currentDate,
@@ -148,6 +149,7 @@ exports.jobRoute = [
                     budget_type: data["budget_type"],
                     budget_amount: data["budget_amount"],
                     end_date: data["end_date"],
+                    expire_date: data["expire_date"],
                     state: data["state"],
                     skill_set: data["skill_set"],
                     job_type: data["job_type"],
@@ -314,7 +316,7 @@ exports.jobRoute = [
                         client_email: account.email,
                     });
                     return response
-                        .response({ status: "ok", data: "successfuly deleted!" })
+                        .response({ status: "ok", data: "successfully deleted!" })
                         .code(200);
                 }
                 catch (error) {

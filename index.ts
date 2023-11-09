@@ -93,8 +93,8 @@ const init = async () => {
   await Skill.deleteMany({});
   await Major.deleteMany({});
   for (let index = 1; index <= 20; index++) {
-    await Skill.create({ name: "skill " + index });
-    await Major.create({ name: "major " + index });
+    await Skill.create({ name: "skill" + index });
+    await Major.create({ name: "major" + index });
   }
 
   return server;

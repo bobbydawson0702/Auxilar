@@ -54,6 +54,12 @@ const JobSchema = new Schema({
     enum: ["public", "private"],
     default: "public",
   },
+  hours_per_week: {
+    type: String,
+    required: true,
+    enum: ["more", "less"],
+    default: "more",
+  },
 
   invited_expert: [
     {

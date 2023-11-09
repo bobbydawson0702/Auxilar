@@ -2,12 +2,17 @@ import { Request, ResponseToolkit } from "@hapi/hapi";
 import {
   JobSwagger,
   deleteJobSwagger,
+  findPostedJobSwagger,
   getAllJobSwagger,
   getJobSwagger,
   getMyAllJobSwagger,
   updateJobSwagger,
 } from "../swagger/job";
-import { JobSchema, updateJobSchema } from "../validation/job";
+import {
+  JobSchema,
+  findPostedJobSchema,
+  updateJobSchema,
+} from "../validation/job";
 import multer from "multer";
 import { GridFsStorage } from "multer-gridfs-storage";
 // import mongoose from "mongoose";
@@ -15,6 +20,7 @@ import { GridFsStorage } from "multer-gridfs-storage";
 import Account from "../models/account";
 import Job from "../models/job";
 import Client from "../models/profile/client";
+import Expert from "../models/profile/expert";
 // require('dotenv').config();
 
 const options = { abortEarly: false, stripUnknown: true };
@@ -86,6 +92,7 @@ export let jobRoute = [
           budget_type: data["budget_type"],
           budget_amount: data["budget_amount"],
           end_date: data["end_date"],
+          expire_date: data["expire_date"],
           skill_set: data["skill_set"],
           job_type: data["job_type"],
           pub_date: currentDate,
@@ -160,6 +167,7 @@ export let jobRoute = [
           budget_type: data["budget_type"],
           budget_amount: data["budget_amount"],
           end_date: data["end_date"],
+          expire_date: data["expire_date"],
           state: data["state"],
           skill_set: data["skill_set"],
           job_type: data["job_type"],
@@ -356,6 +364,192 @@ export let jobRoute = [
     },
   },
 
+  {
+    method: "POST",
+    path: "/findjobs",
+    options: {
+      auth: "jwt",
+      description: "Find Posted Jobs",
+      plugins: findPostedJobSwagger,
+      tags: ["api", "job"],
+      validate: {
+        payload: findPostedJobSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(
+          `POST api/v1/job/findjobs request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        // Check whether account is expert
+        const account = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+        if (account.account_type !== "expert") {
+          return response
+            .response({ status: "err", err: "Forbidden request!" })
+            .code(403);
+        }
+
+        // check whether profile exist
+        const expert = await Expert.findOne({ account: account.id });
+        if (!expert) {
+          return response
+            .response({ status: "err", err: "Your profile does not exist" })
+            .code(406);
+        }
+
+        const data = request.payload;
+        const filter = {};
+
+        data["skill_set"] ? (filter["skill_set"] = data["skill_set"]) : null;
+        data["title"] ? (filter["title"] = data["title"]) : null;
+
+        data["budget_type"]?.["hourly"] ? (filter["hourly"] = true) : null;
+        data["budget_type"]?.["hourly"]?.["min_value"]
+          ? (filter["hourly_min_value"] =
+              data["budget_type"]["hourly"]["min_value"])
+          : null;
+        data["budget_type"]?.["hourly"]?.["max_value"]
+          ? (filter["hourly_max_value"] =
+              data["budget_type"]["hourly"]["max_value"])
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]
+          ? (filter["fixed_budget"] = true)
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]?.["lessthan100"]
+          ? (filter["lessthan100"] = 100)
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]?.["between100and500"]
+          ? (filter["between100and500"] = 500)
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]?.["between500and1000"]
+          ? (filter["between500and1000"] = 1000)
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]?.["between1000and5000"]
+          ? (filter["between1000and5000"] = 5000)
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]?.["morethan5000"]
+          ? (filter["morethan5000"] = 5000)
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]?.["min_max"]?.["min_value"]
+          ? (filter["fixed_min_value"] =
+              data["budget_type"]["fixed_budget"]["min_max"]["min_value"])
+          : null;
+
+        data["budget_type"]?.["fixed_budget"]?.["min_max"]?.["max_value"]
+          ? (filter["fixed_max_value"] =
+              data["budget_type"]["fixed_budget"]["min_max"]["max_value"])
+          : null;
+
+        data["number_of_proposals"]?.["lessthan5"]
+          ? (filter["proposal_lessthan5"] = 5)
+          : null;
+
+        data["number_of_proposals"]?.["between5and10"]
+          ? (filter["proposal_between5and10"] = 10)
+          : null;
+
+        data["number_of_proposals"]?.["between10and15"]
+          ? (filter["proposal_between10and15"] = 15)
+          : null;
+
+        data["number_of_proposals"]?.["between15and20"]
+          ? (filter["proposal_between15and20"] = 20)
+          : null;
+
+        data["number_of_proposals"]?.["between20and50"]
+          ? (filter["proposal_between20and50"] = 50)
+          : null;
+
+        data["client_info"]?.["payment_verified"]
+          ? (filter["payment_verified"] = true)
+          : null;
+
+        data["hours_per_week"]?.["lessthan30"]
+          ? (filter["lessthan30"] = 30)
+          : null;
+
+        data["hours_per_week"]?.["morethan30"]
+          ? (filter["morethan30"] = 30)
+          : null;
+
+        data["jobs_per_page"]
+          ? (filter["jobs_per_page"] = data["jobs_per_page"])
+          : null;
+
+        data["page_index"] ? (filter["page_index"] = data["page_index"]) : null;
+
+        const query_skillandtitle = {};
+        filter["skill_set"]
+          ? (query_skillandtitle["skill_set"] = { $in: data["skill_set"] })
+          : null;
+        filter["title"] ? (query_skillandtitle["title"] = data["title"]) : null;
+        console.log(
+          "-------------------------->>>>>>>>>>>",
+          filter["fixed_budget"]
+        );
+        const query_budget_type = {};
+        filter["hourly"] ? (query_budget_type["budget_type"] = 1) : null;
+        filter["hourly_min_value"]
+          ? (query_budget_type["budget_amount"] = {
+              $lt: filter["hourly_min_value"],
+            })
+          : null;
+        filter["hourly_max_value"]
+          ? (query_budget_type["budget_amount"] = {
+              $gt: filter["hourly_max_value"],
+            })
+          : null;
+        filter["hourly_min_value"] && filter["hourly_max_value"]
+          ? (query_budget_type["budget_amount"] = {
+              $lt: filter["hourly_min_value"],
+              $gt: filter["hourly_max_value"],
+            })
+          : null;
+
+        const query_fixed_budget = {};
+        filter["fixed_budget"] ? (query_fixed_budget["budget_type"] = 0) : null;
+        filter["lessthan100"]
+          ? (query_fixed_budget["budget_amount"] = {
+              $lt: filter["lessthan100"],
+            })
+          : null;
+        filter["between100and500"]
+          ? (query_fixed_budget["budget_amount"] = {
+              $lt: filter["lessthan100"],
+              $gt: filter["between100and500"],
+            })
+          : null;
+
+        console.log("-------------------->>>>>>>>>>>>>", query_budget_type);
+
+        const findedjobs = await Job.find({
+          $or: [query_skillandtitle],
+        });
+
+        return response.response({ status: "ok", data: findedjobs }).code(200);
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
 
   // {
   //   method: 'POST',

@@ -18,6 +18,7 @@ const expert_1 = require("./profile/expert");
 const client_1 = require("./profile/client");
 const mentor_1 = require("./profile/mentor");
 const job_1 = require("./job");
+const proposal_1 = require("./proposal");
 // const prefix = `/api/${config.apiVersion}`;
 const setRoutes = (server) => __awaiter(void 0, void 0, void 0, function* () {
     server.realm.modifiers.route.prefix = `/api/${config_1.default.apiVersion}/account`;
@@ -30,6 +31,8 @@ const setRoutes = (server) => __awaiter(void 0, void 0, void 0, function* () {
     server.route(mentor_1.mentorRoute);
     server.realm.modifiers.route.prefix = `/api/${config_1.default.apiVersion}/job`;
     server.route(job_1.jobRoute);
+    server.realm.modifiers.route.prefix = `/api/${config_1.default.apiVersion}/proposal`;
+    server.route(proposal_1.proposalRoute);
 });
 exports.default = setRoutes;
 //# sourceMappingURL=index.js.map

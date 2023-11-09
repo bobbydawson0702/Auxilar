@@ -45,6 +45,31 @@ export const updateJobSwagger = {
   },
 };
 
+export const findPostedJobSwagger = {
+  "hapi-swagger": {
+    responses: {
+      201: {
+        description: "Find Posted Job successfully.",
+      },
+      400: {
+        description: "Input Fields Required.",
+      },
+      403: {
+        description: "Forbidden request.",
+      },
+      404: {
+        description: "Posted job not found!",
+      },
+      406: {
+        description: "Not acceptable request.",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
+
 export const getAllJobSwagger = {
   "hapi-swagger": {
     responses: {
