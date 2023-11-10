@@ -4,6 +4,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const JobSchema = new Schema({
+  client: {
+    type: Schema.Types.ObjectId,
+    ref: "client",
+  },
   client_email: {
     type: String,
     required: true,

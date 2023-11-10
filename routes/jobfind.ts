@@ -487,11 +487,11 @@ export let jobRoute = [
           : null;
 
         data["hours_per_week"]?.["lessthan30"]
-          ? (filter["lessthan30"] = "less")
+          ? (filter["lessthan30"] = 30)
           : null;
 
         data["hours_per_week"]?.["morethan30"]
-          ? (filter["morethan30"] = "more")
+          ? (filter["morethan30"] = 30)
           : null;
 
         data["jobs_per_page"]
@@ -506,16 +506,11 @@ export let jobRoute = [
           : null;
         filter["title"] ? (query_skillandtitle["title"] = data["title"]) : null;
 
-        console.log(
-          "query_skillandtitle---------------------->>>>>>>>>>>>>>",
-          query_skillandtitle
-        );
-
         let query_hourly_budget = {};
         filter["hourly"] ? (query_hourly_budget["budget_type"] = 1) : null;
         filter["hourly_min_value"]
           ? (query_hourly_budget["budget_amount"] = {
-              $gte: filter["hourly_min_value"],
+              $gt: filter["hourly_min_value"],
             })
           : null;
         filter["hourly_max_value"]
@@ -525,9 +520,13 @@ export let jobRoute = [
           : null;
         filter["hourly_min_value"] && filter["hourly_max_value"]
           ? (query_hourly_budget["budget_amount"] = {
-              $gte: filter["hourly_min_value"],
+              $gt: filter["hourly_min_value"],
               $lt: filter["hourly_max_value"],
             })
+          : null;
+
+        Object.keys(query_hourly_budget).length === 0
+          ? (query_hourly_budget = { query_hourly_budget })
           : null;
 
         console.log(
@@ -537,6 +536,10 @@ export let jobRoute = [
 
         let query_fixed_budget = {};
         filter["fixed_budget"] ? (query_fixed_budget["budget_type"] = 0) : null;
+
+        Object.keys(query_fixed_budget).length === 0
+          ? (query_fixed_budget = { query_fixed_budget })
+          : null;
 
         const query_fixed: Array<Object> = new Array<Object>();
         filter["lessthan100"]
@@ -551,7 +554,7 @@ export let jobRoute = [
           ? query_fixed.push({
               budget_amount: {
                 $lt: 100,
-                $gte: filter["between100and500"],
+                $gt: filter["between100and500"],
               },
             })
           : null;
@@ -560,7 +563,7 @@ export let jobRoute = [
           ? query_fixed.push({
               budget_amount: {
                 $lt: 500,
-                $gte: filter["between500and1000"],
+                $gt: filter["between500and1000"],
               },
             })
           : null;
@@ -569,7 +572,7 @@ export let jobRoute = [
           ? query_fixed.push({
               budget_amount: {
                 $lt: 1000,
-                $gte: filter["between1000and5000"],
+                $gt: filter["between1000and5000"],
               },
             })
           : null;
@@ -577,7 +580,7 @@ export let jobRoute = [
         filter["morethan5000"]
           ? query_fixed.push({
               budget_amount: {
-                $gte: filter["morethan5000"],
+                $gt: filter["morethan5000"],
               },
             })
           : null;
@@ -585,7 +588,7 @@ export let jobRoute = [
         const query_fixed_min_max = {};
         filter["fixed_min_value"]
           ? (query_fixed_min_max["budget_amount"] = {
-              $gte: filter["fixed_min_value"],
+              $gt: filter["fixed_min_value"],
             })
           : null;
         filter["fixed_max_value"]
@@ -595,13 +598,11 @@ export let jobRoute = [
           : null;
         filter["fixed_min_value"] && filter["fixed_max_value"]
           ? (query_fixed_min_max["budget_amount"] = {
-              $gte: filter["fixed_min_value"],
+              $gt: filter["fixed_min_value"],
               $lt: filter["fixed_max_value"],
             })
           : null;
-        Object.keys(query_fixed_min_max).length !== 0
-          ? query_fixed.push(query_fixed_min_max)
-          : null;
+        query_fixed_min_max ? query_fixed.push(query_fixed_min_max) : null;
 
         console.log(
           "query_fixed-------------------->>>>>>>>>>>>>",
@@ -621,7 +622,7 @@ export let jobRoute = [
           ? query_number_of_proposals.push({
               $expr: {
                 $and: [
-                  { $gte: [{ $size: "$proposals" }, 5] },
+                  { $gt: [{ $size: "$proposals" }, 5] },
                   {
                     $lt: [
                       { $size: "$proposals" },
@@ -637,7 +638,7 @@ export let jobRoute = [
           ? query_number_of_proposals.push({
               $expr: {
                 $and: [
-                  { $gte: [{ $size: "$proposals" }, 10] },
+                  { $gt: [{ $size: "$proposals" }, 10] },
                   {
                     $lt: [
                       { $size: "$proposals" },
@@ -653,7 +654,7 @@ export let jobRoute = [
           ? query_number_of_proposals.push({
               $expr: {
                 $and: [
-                  { $gte: [{ $size: "$proposals" }, 15] },
+                  { $gt: [{ $size: "$proposals" }, 15] },
                   {
                     $lt: [
                       { $size: "$proposals" },
@@ -669,7 +670,7 @@ export let jobRoute = [
           ? query_number_of_proposals.push({
               $expr: {
                 $and: [
-                  { $gte: [{ $size: "$proposals" }, 20] },
+                  { $gt: [{ $size: "$proposals" }, 20] },
                   {
                     $lt: [
                       { $size: "$proposals" },
@@ -681,9 +682,9 @@ export let jobRoute = [
             })
           : null;
 
-        // query_number_of_proposals.length === 0
-        //   ? query_number_of_proposals.push("")
-        //   : null;
+        query_number_of_proposals.length === 0
+          ? query_number_of_proposals.push("")
+          : null;
 
         console.log(
           "query_number_of_proposals----------------------------->>>>>>",
@@ -692,11 +693,11 @@ export let jobRoute = [
 
         const query_client_info = [];
         filter["payment_verified"]
-          ? query_client_info.push({ "clientData.payment_verify": true })
+          ? query_client_info.push({ "client.payment_verify": true })
           : null;
 
         filter["payment_unverified"]
-          ? query_client_info.push({ "clientData.payment_verify": false })
+          ? query_client_info.push({ "client.payment_verify": false })
           : null;
 
         console.log(
@@ -704,98 +705,31 @@ export let jobRoute = [
           query_client_info
         );
 
-        const query_hours_per_week = [];
-        filter["lessthan30"]
-          ? query_hours_per_week.push({ hours_per_week: "less" })
-          : null;
-        filter["morethan30"]
-          ? query_hours_per_week.push({ hours_per_week: "more" })
-          : null;
-
         const queryAll = {
           $and: [
             query_skillandtitle,
-            // {
-            //   $or: [
-            //     query_hourly_budget,
-            //     // {
-            //     // $and: [
-            //     // query_fixed_budget,
-            //     // {
-            //     //   $or: query_fixed,
-            //     // },
-            //     // ],
-            //     // },
-            //     {
-            //       $or: query_number_of_proposals,
-            //     },
-            //     {
-            //       $or: query_client_info,
-            //     },
-            //     {
-            //       $or: query_hours_per_week,
-            //     },
-            //   ],
-            // },
+            {
+              $or: [
+                query_hourly_budget,
+                {
+                  $and: [
+                    query_fixed_budget,
+                    {
+                      $or: query_fixed,
+                    },
+                  ],
+                },
+              ],
+            },
           ],
         };
 
-        if (Object.keys(query_hourly_budget).length !== 0) {
-          queryAll.$and[1]
-            ? queryAll.$and[1]["$or"].push(query_hourly_budget)
-            : queryAll.$and.push({ $or: [query_hourly_budget] });
-          console.log(
-            "query_hourly_budget-------------------<<<<<<<<>>>>>>>>>>",
-            queryAll.$and[1]
-          );
-        }
-
-        if (Object.keys(query_fixed_budget).length !== 0) {
-          if (queryAll.$and[1]) {
-            if (query_fixed.length !== 0) {
-              queryAll.$and[1]["$or"].push({
-                $and: [query_fixed_budget, { $or: query_fixed }],
-              });
-            } else {
-              queryAll.$and[1]["$or"].push({ $and: [query_fixed_budget] });
-            }
-          } else {
-            if (query_fixed.length !== 0) {
-              queryAll.$and.push({
-                $or: [{ $and: [query_fixed_budget, { $or: query_fixed }] }],
-              });
-            } else {
-              queryAll.$and.push({ $or: [{ $and: [query_fixed_budget] }] });
-            }
-          }
-          console.log(
-            "queryAll.and[1]----------------------->>>>>>>>>>>",
-            queryAll.$and[1]["$or"][0]
-          );
-        }
-
         if (query_number_of_proposals.length !== 0) {
-          queryAll.$and[1]
-            ? queryAll.$and[1]["$or"].push({ $or: query_number_of_proposals })
-            : queryAll.$and.push({ $or: [{ $or: query_number_of_proposals }] });
+          queryAll.$and[1]["$or"].push({ $or: query_number_of_proposals });
         }
-
-        if (query_client_info.length !== 0) {
-          queryAll.$and[1]
-            ? queryAll.$and[1]["$or"].push({ $or: query_client_info })
-            : queryAll.$and.push({ $or: [{ $or: query_client_info }] });
-        }
-
-        if (query_hours_per_week.length !== 0) {
-          queryAll.$and[1]
-            ? queryAll.$and[1]["$or"].push({ $or: query_hours_per_week })
-            : queryAll.$and.push({ $or: [{ $or: query_hours_per_week }] });
-        }
-
         // if (query_client_info.length !== 0) {
         //   queryAll.$and[1]["$or"].push({ $or: query_client_info });
         // }
-
         console.log(
           "queryAll-------------------------------->>>>>>>>>>",
           queryAll
@@ -804,32 +738,21 @@ export let jobRoute = [
           "query_client_info------------------->>>>>>>>>>>",
           query_client_info
         );
-        const findedjobs = await Job.aggregate([
-          {
-            $lookup: {
-              from: "clients",
-              localField: "client",
-              foreignField: "_id",
-              as: "clientData",
-              pipeline: [
-                {
-                  $project: {
-                    payment_verify: 1,
-                  },
-                },
-              ],
-            },
-          },
-          {
-            $match: queryAll,
-          },
-          {
-            $skip: filter["jobs_per_page"] * (filter["page_index"] - 1),
-          },
-          {
-            $limit: filter["jobs_per_page"],
-          },
-        ]);
+
+        const findedjobs = await Job.aggregate(
+          // {$lookup: {
+          //   from: 'client',
+          //   localField: 'client',
+          //   foreignField: '_id'
+          // }},
+          // {$project: {payment_verify: 1}},
+          {$match: queryAll}
+          );
+          // .populate({
+          //   path: "client",
+          //   match: { payment_verify: { $equals: false } },
+          // });
+        // .find({ "$elemMatch": {"client.payment_verify": true} });
 
         return response.response({ status: "ok", data: findedjobs }).code(200);
       } catch (error) {

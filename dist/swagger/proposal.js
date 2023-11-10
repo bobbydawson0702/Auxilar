@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteJobSwagger = exports.getJobSwagger = exports.getMyAllJobSwagger = exports.getAllJobSwagger = exports.findPostedJobSwagger = exports.updateJobSwagger = exports.JobSwagger = void 0;
-exports.JobSwagger = {
+exports.deleteProposalSwagger = exports.getProposalSwagger = exports.getMyAllProposalSwagger = exports.getAllProposalSwagger = exports.updateProposalSwagger = exports.ProposalSwagger = void 0;
+exports.ProposalSwagger = {
     "hapi-swagger": {
         responses: {
             201: {
-                description: "Job post successfully.",
+                description: "Apply proposal success.",
             },
             400: {
                 description: "Input Fields Required.",
@@ -17,7 +17,7 @@ exports.JobSwagger = {
                 description: "Not acceptable request.",
             },
             409: {
-                description: "Job already posted.",
+                description: "Proposal already applyed.",
             },
             501: {
                 description: "Requeset not implemented.",
@@ -25,11 +25,11 @@ exports.JobSwagger = {
         },
     },
 };
-exports.updateJobSwagger = {
+exports.updateProposalSwagger = {
     "hapi-swagger": {
         responses: {
             201: {
-                description: "Job post successfully.",
+                description: "Proposal post successfully.",
             },
             400: {
                 description: "Input Fields Required.",
@@ -38,7 +38,7 @@ exports.updateJobSwagger = {
                 description: "Forbidden request.",
             },
             404: {
-                description: "Posted job not found!",
+                description: "Posted Proposal not found!",
             },
             501: {
                 description: "Requeset not implemented.",
@@ -46,35 +46,11 @@ exports.updateJobSwagger = {
         },
     },
 };
-exports.findPostedJobSwagger = {
-    "hapi-swagger": {
-        responses: {
-            201: {
-                description: "Find Posted Job successfully.",
-            },
-            400: {
-                description: "Input Fields Required.",
-            },
-            403: {
-                description: "Forbidden request.",
-            },
-            404: {
-                description: "Posted job not found!",
-            },
-            406: {
-                description: "Not acceptable request.",
-            },
-            501: {
-                description: "Requeset not implemented.",
-            },
-        },
-    },
-};
-exports.getAllJobSwagger = {
+exports.getAllProposalSwagger = {
     "hapi-swagger": {
         responses: {
             200: {
-                description: "Receive posted job successfully!",
+                description: "Receive posted Proposal successfully!",
             },
             204: {
                 description: "No Content",
@@ -83,7 +59,7 @@ exports.getAllJobSwagger = {
                 description: "Forbidden request.",
             },
             404: {
-                description: "Posted job not found!",
+                description: "Posted Proposal not found!",
             },
             501: {
                 description: "Request not implemented.",
@@ -91,17 +67,17 @@ exports.getAllJobSwagger = {
         },
     },
 };
-exports.getMyAllJobSwagger = {
+exports.getMyAllProposalSwagger = {
     "hapi-swagger": {
         responses: {
             200: {
-                description: "Receive posted job successfully!",
+                description: "Receive posted Proposal successfully!",
             },
             403: {
                 description: "Forbidden request.",
             },
             404: {
-                description: "Posted job not found!",
+                description: "Posted Proposal not found!",
             },
             501: {
                 description: "Requeset not implemented.",
@@ -109,14 +85,14 @@ exports.getMyAllJobSwagger = {
         },
     },
 };
-exports.getJobSwagger = {
+exports.getProposalSwagger = {
     "hapi-swagger": {
         responses: {
             200: {
-                description: "Receive posted job successfully!",
+                description: "Receive posted Proposal successfully!",
             },
             404: {
-                description: "Posted job not found!",
+                description: "Posted Proposal not found!",
             },
             501: {
                 description: "Requeset not implemented.",
@@ -124,17 +100,17 @@ exports.getJobSwagger = {
         },
     },
 };
-exports.deleteJobSwagger = {
+exports.deleteProposalSwagger = {
     "hapi-swagger": {
         responses: {
             200: {
-                description: "Receive posted job successfully!",
+                description: "Receive posted Proposal successfully!",
             },
             403: {
                 description: "Forbidden request",
             },
             404: {
-                description: "Posted job not found!",
+                description: "Posted Proposal not found!",
             },
             501: {
                 description: "Requeset not implemented.",
@@ -142,4 +118,4 @@ exports.deleteJobSwagger = {
         },
     },
 };
-//# sourceMappingURL=job.js.map
+//# sourceMappingURL=proposal.js.map

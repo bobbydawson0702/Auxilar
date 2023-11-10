@@ -26,7 +26,7 @@ export const JobSchema = Joi.object({
   job_type: Joi.string().required().valid("public", "private").messages({
     "any.required": "Please provdie job_type",
   }),
-  hours_per_week: Joi.string().required().valid("more", "less").messages({
+  hours_per_week: Joi.string().valid("more", "less").messages({
     "any.required": "Please provide hours per week",
   }),
   invited_expert: Joi.array<Object>(),
@@ -60,7 +60,7 @@ export const updateJobSchema = Joi.object({
   job_type: Joi.string().required().valid("public", "private").messages({
     "any.required": "Please provdie job_type",
   }),
-  hours_per_week: Joi.string().required().valid("more", "less").messages({
+  hours_per_week: Joi.string().valid("more", "less").messages({
     "any.required": "Please provide hours per week",
   }),
   invited_expert: Joi.array<Object>(),
@@ -104,6 +104,7 @@ export const findPostedJobSchema = Joi.object({
 
   client_info: Joi.object({
     payment_verified: Joi.boolean(),
+    payment_unverified: Joi.boolean(),
   }),
 
   hours_per_week: Joi.object({
