@@ -228,7 +228,7 @@ exports.accountRoute = [
                     return response.response({ err: "Password incorrect." }).code(405);
                 }
                 const token = jsonwebtoken_1.default.sign({ accountId: account.id, email: account.email }, config_1.default.jwtSecret, {
-                    expiresIn: "1h",
+                    expiresIn: "1d",
                 });
                 const currentDate = new Date().toUTCString();
                 account.last_logged_in = currentDate;

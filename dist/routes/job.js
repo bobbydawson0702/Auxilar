@@ -19,6 +19,8 @@ const account_1 = __importDefault(require("../models/account"));
 const job_3 = __importDefault(require("../models/job"));
 const client_1 = __importDefault(require("../models/profile/client"));
 const expert_1 = __importDefault(require("../models/profile/expert"));
+const cateogory_1 = require("../swagger/cateogory");
+const category_1 = __importDefault(require("../models/category"));
 const options = { abortEarly: false, stripUnknown: true };
 exports.jobRoute = [
     {
@@ -603,6 +605,34 @@ exports.jobRoute = [
                     },
                 ]);
                 return response.response({ status: "ok", data: findedjobs }).code(200);
+            }
+            catch (error) {
+                return response.response({ status: "err", err: error }).code(501);
+            }
+        }),
+    },
+    {
+        method: "GET",
+        path: "/all-categories",
+        options: {
+            auth: "jwt",
+            description: "Get all recorded Categories",
+            plugins: cateogory_1.getAllCategories,
+            tags: ["api", "expert"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/expert/all-categories request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                const allCategories = yield category_1.default.find();
+                if (!allCategories) {
+                    return response
+                        .response({ status: "err", err: "Recorded category not found!" })
+                        .code(404);
+                }
+                return response
+                    .response({ status: "ok", data: allCategories })
+                    .code(200);
             }
             catch (error) {
                 return response.response({ status: "err", err: error }).code(501);

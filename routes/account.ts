@@ -246,11 +246,13 @@ export let accountRoute = [
         if (!isMatch) {
           return response.response({ err: "Password incorrect." }).code(405);
         }
+
+
         const token = Jwt.sign(
           { accountId: account.id, email: account.email },
           config.jwtSecret,
           {
-            expiresIn: "1h",
+            expiresIn: "1d",
           }
         );
         const currentDate = new Date().toUTCString();

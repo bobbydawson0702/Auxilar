@@ -18,6 +18,8 @@ import Account from "../models/account";
 import Job from "../models/job";
 import Client from "../models/profile/client";
 import Expert from "../models/profile/expert";
+import { getAllCategories } from "../swagger/cateogory";
+import Category from "../models/category";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -694,6 +696,37 @@ export let jobRoute = [
         ]);
 
         return response.response({ status: "ok", data: findedjobs }).code(200);
+      } catch (error) {
+        return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "GET",
+    path: "/all-categories",
+    options: {
+      auth: "jwt",
+      description: "Get all recorded Categories",
+      plugins: getAllCategories,
+      tags: ["api", "job"],
+    },
+
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(
+          `GET api/v1/job/all-categories request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+        const allCategories = await Category.find();
+        if (!allCategories) {
+          return response
+            .response({ status: "err", err: "Recorded category not found!" })
+            .code(404);
+        }
+        return response
+          .response({ status: "ok", data: allCategories })
+          .code(200);
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);
       }
