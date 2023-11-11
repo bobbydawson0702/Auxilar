@@ -86,10 +86,7 @@ export let jobRoute = [
         // Todo check expert list
 
         const jobField = {
-<<<<<<< HEAD
           client: client.id,
-=======
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
           client_email: account.email,
           title: data["title"],
           description: data["description"],
@@ -97,15 +94,10 @@ export let jobRoute = [
           budget_amount: data["budget_amount"],
           end_date: data["end_date"],
           expire_date: data["expire_date"],
-<<<<<<< HEAD
           category: data["category"],
           skill_set: data["skill_set"],
           job_type: data["job_type"],
           project_duration: data["project_duration"],
-=======
-          skill_set: data["skill_set"],
-          job_type: data["job_type"],
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
           pub_date: currentDate,
           invited_expert: data["invited_expert"],
         };
@@ -180,16 +172,11 @@ export let jobRoute = [
           end_date: data["end_date"],
           expire_date: data["expire_date"],
           state: data["state"],
-<<<<<<< HEAD
           category: data["category"],
           skill_set: data["skill_set"],
           job_type: data["job_type"],
           project_duration: data["project_duration"],
           hours_per_week: data["hours_per_week"],
-=======
-          skill_set: data["skill_set"],
-          job_type: data["job_type"],
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
         };
 
         data["invited_expert"]
@@ -323,11 +310,6 @@ export let jobRoute = [
         try {
           const job = await Job.find({
             _id: request.params.jobId,
-<<<<<<< HEAD
-            // client_email: request.auth.credentials.email,
-=======
-            client_email: request.auth.credentials.email,
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
           });
           return response.response({ status: "ok", data: job }).code(200);
         } catch (error) {
@@ -435,10 +417,7 @@ export let jobRoute = [
         const filter = {};
 
         data["skill_set"] ? (filter["skill_set"] = data["skill_set"]) : null;
-<<<<<<< HEAD
         data["category"] ? (filter["category"] = data["category"]) : null;
-=======
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
         data["title"] ? (filter["title"] = data["title"]) : null;
 
         data["budget_type"]?.["hourly"] ? (filter["hourly"] = true) : null;
@@ -508,7 +487,6 @@ export let jobRoute = [
         data["client_info"]?.["payment_verified"]
           ? (filter["payment_verified"] = true)
           : null;
-<<<<<<< HEAD
         data["client_info"]?.["payment_unverified"]
           ? (filter["payment_unverified"] = true)
           : null;
@@ -543,7 +521,7 @@ export let jobRoute = [
 
         data["project_duration"]?.["morethan6months"]
           ? (filter["morethan6months"] = "true")
-=======
+          : null;
 
         data["hours_per_week"]?.["lessthan30"]
           ? (filter["lessthan30"] = 30)
@@ -551,7 +529,6 @@ export let jobRoute = [
 
         data["hours_per_week"]?.["morethan30"]
           ? (filter["morethan30"] = 30)
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
           : null;
 
         data["jobs_per_page"]
@@ -562,7 +539,6 @@ export let jobRoute = [
 
         const query_skillandtitle = {};
         filter["skill_set"]
-<<<<<<< HEAD
           ? (query_skillandtitle["skill_set"] = { $in: filter["skill_set"] })
           : null;
 
@@ -797,11 +773,15 @@ export let jobRoute = [
           : null;
 
         filter["between1and3months"]
-          ? query_project_duration.push({ project_duration: "between1and3months" })
+          ? query_project_duration.push({
+              project_duration: "between1and3months",
+            })
           : null;
 
         filter["between3and6months"]
-          ? query_project_duration.push({ project_duration: "between3and6months" })
+          ? query_project_duration.push({
+              project_duration: "between3and6months",
+            })
           : null;
 
         filter["morethan6months"]
@@ -928,53 +908,6 @@ export let jobRoute = [
             $limit: filter["jobs_per_page"],
           },
         ]);
-=======
-          ? (query_skillandtitle["skill_set"] = { $in: data["skill_set"] })
-          : null;
-        filter["title"] ? (query_skillandtitle["title"] = data["title"]) : null;
-        console.log(
-          "-------------------------->>>>>>>>>>>",
-          filter["fixed_budget"]
-        );
-        const query_budget_type = {};
-        filter["hourly"] ? (query_budget_type["budget_type"] = 1) : null;
-        filter["hourly_min_value"]
-          ? (query_budget_type["budget_amount"] = {
-              $lt: filter["hourly_min_value"],
-            })
-          : null;
-        filter["hourly_max_value"]
-          ? (query_budget_type["budget_amount"] = {
-              $gt: filter["hourly_max_value"],
-            })
-          : null;
-        filter["hourly_min_value"] && filter["hourly_max_value"]
-          ? (query_budget_type["budget_amount"] = {
-              $lt: filter["hourly_min_value"],
-              $gt: filter["hourly_max_value"],
-            })
-          : null;
-
-        const query_fixed_budget = {};
-        filter["fixed_budget"] ? (query_fixed_budget["budget_type"] = 0) : null;
-        filter["lessthan100"]
-          ? (query_fixed_budget["budget_amount"] = {
-              $lt: filter["lessthan100"],
-            })
-          : null;
-        filter["between100and500"]
-          ? (query_fixed_budget["budget_amount"] = {
-              $lt: filter["lessthan100"],
-              $gt: filter["between100and500"],
-            })
-          : null;
-
-        console.log("-------------------->>>>>>>>>>>>>", query_budget_type);
-
-        const findedjobs = await Job.find({
-          $or: [query_skillandtitle],
-        });
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
 
         return response.response({ status: "ok", data: findedjobs }).code(200);
       } catch (error) {

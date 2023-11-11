@@ -15,10 +15,7 @@ import setRoutes from "./routes";
 
 import Major from "./models/major";
 import Skill from "./models/skill";
-<<<<<<< HEAD
 import Category from "./models/category";
-=======
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
 
 const vadliateAccount = async (decoded, request, h) => {
   return { isValid: true, accountId: decoded.accountId };
@@ -96,17 +93,11 @@ const init = async () => {
   // ----------------------------------------------------- Initialize Skill, Major database -------------------------------------------------------------------//
   await Skill.deleteMany({});
   await Major.deleteMany({});
-<<<<<<< HEAD
   await Category.deleteMany({});
   for (let index = 1; index <= 20; index++) {
     await Skill.create({ name: "skill" + index });
     await Major.create({ name: "major" + index });
     await Category.create({ name: "category" + index });
-=======
-  for (let index = 1; index <= 20; index++) {
-    await Skill.create({ name: "skill" + index });
-    await Major.create({ name: "major" + index });
->>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
   }
 
   return server;
