@@ -5,9 +5,10 @@ export const ProfileSchema = Joi.object({
     "any.required": "Please provide address.",
   }),
 
-  post_number: Joi.string().required().messages({
-    "any.required": "Please provide post_number.",
-  }),
+  // post_number: Joi.string().required().messages({
+  //   "any.required": "Please provide post_number.",
+  // }),
+  post_number: Joi.string(),
 
   languages: Joi.array<String>().required().messages({
     "any.required": "Please provide languages",
