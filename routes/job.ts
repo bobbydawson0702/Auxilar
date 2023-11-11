@@ -13,15 +13,11 @@ import {
   findPostedJobSchema,
   updateJobSchema,
 } from "../validation/job";
-import multer from "multer";
-import { GridFsStorage } from "multer-gridfs-storage";
-// import mongoose from "mongoose";
-// import config from "../config";
+
 import Account from "../models/account";
 import Job from "../models/job";
 import Client from "../models/profile/client";
 import Expert from "../models/profile/expert";
-// require('dotenv').config();
 
 const options = { abortEarly: false, stripUnknown: true };
 
