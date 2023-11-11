@@ -9,10 +9,15 @@ exports.ProfileSchema = joi_1.default.object({
     address: joi_1.default.string().required().messages({
         "any.required": "Please provide address.",
     }),
-    // post_number: Joi.string().required().messages({
-    //   "any.required": "Please provide post_number.",
-    // }),
-    post_number: joi_1.default.string(),
+    country: joi_1.default.string().required().messages({
+        "any.required": "Please provide country",
+    }),
+    state: joi_1.default.string().required().messages({
+        "any.required": "Please provide state",
+    }),
+    city: joi_1.default.string().required().messages({
+        "any.required": "Please provide city",
+    }),
     languages: joi_1.default.array().required().messages({
         "any.required": "Please provide languages",
     }),

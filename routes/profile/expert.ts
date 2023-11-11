@@ -86,7 +86,9 @@ export let expertRoute = [
         const expertField = {
           account: account.id,
           address: data["address"],
-          post_number: data["post_number"],
+          country: data["country"],
+          state: data["state"],
+          city: data["city"],
           languages: data["languages"],
           avatar: data["avatar"] ?? null,
           hourly_rate: data["hourly_rate"],
@@ -819,7 +821,9 @@ export let expertRoute = [
 
         const updateData = {
           address: data["address"] ?? null,
-          post_number: data["post_number"] ?? null,
+          country: data["country"] ?? null,
+          state: data["state"] ?? null,
+          city: data["city"] ?? null,
           languages: data["languages"] ?? null,
           skills: data["skills"] ?? null,
           majors: data["majors"] ?? null,

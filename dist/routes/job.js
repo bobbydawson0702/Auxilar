@@ -15,13 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.jobRoute = void 0;
 const job_1 = require("../swagger/job");
 const job_2 = require("../validation/job");
-// import mongoose from "mongoose";
-// import config from "../config";
 const account_1 = __importDefault(require("../models/account"));
 const job_3 = __importDefault(require("../models/job"));
 const client_1 = __importDefault(require("../models/profile/client"));
 const expert_1 = __importDefault(require("../models/profile/expert"));
-// require('dotenv').config();
 const options = { abortEarly: false, stripUnknown: true };
 exports.jobRoute = [
     {

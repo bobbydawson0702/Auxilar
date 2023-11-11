@@ -11,7 +11,15 @@ const ExpertSchema = new Schema({
         type: String,
         required: true,
     },
-    post_number: {
+    country: {
+        type: String,
+        required: true,
+    },
+    state: {
+        type: String,
+        required: true,
+    },
+    city: {
         type: String,
         required: true,
     },

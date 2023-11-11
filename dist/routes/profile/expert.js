@@ -60,7 +60,9 @@ exports.expertRoute = [
                 const expertField = {
                     account: account.id,
                     address: data["address"],
-                    post_number: data["post_number"],
+                    country: data["country"],
+                    state: data["state"],
+                    city: data["city"],
                     languages: data["languages"],
                     avatar: (_a = data["avatar"]) !== null && _a !== void 0 ? _a : null,
                     hourly_rate: data["hourly_rate"],
@@ -636,7 +638,7 @@ exports.expertRoute = [
             },
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-            var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+            var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
             try {
                 console.log(`PUT api/v1/expert/person-detail request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
@@ -645,15 +647,17 @@ exports.expertRoute = [
                 console.log("data---------------", data);
                 const updateData = {
                     address: (_b = data["address"]) !== null && _b !== void 0 ? _b : null,
-                    post_number: (_c = data["post_number"]) !== null && _c !== void 0 ? _c : null,
-                    languages: (_d = data["languages"]) !== null && _d !== void 0 ? _d : null,
-                    skills: (_e = data["skills"]) !== null && _e !== void 0 ? _e : null,
-                    majors: (_f = data["majors"]) !== null && _f !== void 0 ? _f : null,
-                    reviews: (_g = data["reviews"]) !== null && _g !== void 0 ? _g : null,
-                    active_status: (_h = data["active_status"]) !== null && _h !== void 0 ? _h : null,
-                    account_status: (_j = data["account_status"]) !== null && _j !== void 0 ? _j : null,
-                    profile_links: (_k = data["profile_links"]) !== null && _k !== void 0 ? _k : null,
-                    linkedin: (_l = data["linkedin"]) !== null && _l !== void 0 ? _l : null,
+                    country: (_c = data["country"]) !== null && _c !== void 0 ? _c : null,
+                    state: (_d = data["state"]) !== null && _d !== void 0 ? _d : null,
+                    city: (_e = data["city"]) !== null && _e !== void 0 ? _e : null,
+                    languages: (_f = data["languages"]) !== null && _f !== void 0 ? _f : null,
+                    skills: (_g = data["skills"]) !== null && _g !== void 0 ? _g : null,
+                    majors: (_h = data["majors"]) !== null && _h !== void 0 ? _h : null,
+                    reviews: (_j = data["reviews"]) !== null && _j !== void 0 ? _j : null,
+                    active_status: (_k = data["active_status"]) !== null && _k !== void 0 ? _k : null,
+                    account_status: (_l = data["account_status"]) !== null && _l !== void 0 ? _l : null,
+                    profile_links: (_m = data["profile_links"]) !== null && _m !== void 0 ? _m : null,
+                    linkedin: (_o = data["linkedin"]) !== null && _o !== void 0 ? _o : null,
                 };
                 const expert = yield expert_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: updateData,
