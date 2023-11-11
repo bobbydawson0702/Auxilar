@@ -1,4 +1,4 @@
-import Joi from "joi";
+import Joi, { array, number, object } from "joi";
 import Account from "../models/account";
 
 export const JobSchema = Joi.object({
@@ -33,12 +33,23 @@ export const JobSchema = Joi.object({
   job_type: Joi.string().required().valid("public", "private").messages({
     "any.required": "Please provdie job_type",
   }),
-  project_duration: Joi.string().required().valid("lessthan1month", "between1and3months", "between3and6months", "morethan6months").messages({
-    "any.required": "Please provdie project duration",
-  }),
-  hours_per_week: Joi.string().required().valid("lessthan10", "between10and20", "between20and30", "morethan30").messages({
-    "any.required": "Please provide hours per week",
-  }),
+  project_duration: Joi.string()
+    .required()
+    .valid(
+      "lessthan1month",
+      "between1and3months",
+      "between3and6months",
+      "morethan6months"
+    )
+    .messages({
+      "any.required": "Please provdie project duration",
+    }),
+  hours_per_week: Joi.string()
+    .required()
+    .valid("lessthan10", "between10and20", "between20and30", "morethan30")
+    .messages({
+      "any.required": "Please provide hours per week",
+    }),
   invited_expert: Joi.array<Object>(),
 });
 
@@ -75,50 +86,69 @@ export const updateJobSchema = Joi.object({
   job_type: Joi.string().required().valid("public", "private").messages({
     "any.required": "Please provdie job_type",
   }),
-  project_duration: Joi.string().required().valid("lessthan1month", "between1and3months", "between3and6months", "morethan6months").messages({
-    "any.required": "Please provdie project duration",
-  }),
-  hours_per_week: Joi.string().required().valid("lessthan10", "between10and20", "between20and30", "morethan30").messages({
-    "any.required": "Please provide hours per week",
-  }),
+  project_duration: Joi.string()
+    .required()
+    .valid(
+      "lessthan1month",
+      "between1and3months",
+      "between3and6months",
+      "morethan6months"
+    )
+    .messages({
+      "any.required": "Please provdie project duration",
+    }),
+  hours_per_week: Joi.string()
+    .required()
+    .valid("lessthan10", "between10and20", "between20and30", "morethan30")
+    .messages({
+      "any.required": "Please provide hours per week",
+    }),
   invited_expert: Joi.array<Object>(),
 });
 
+interface min_max_object {
+  min_value: number;
+  max_value: number;
+}
+
 export const findPostedJobSchema = Joi.object({
   // and
-  skill_set: Joi.array<String>(),
-  category: Joi.array<String>(),
-  title: Joi.string(),
+  skill_set: Joi.array<String>().required().messages({
+    "any.required": "Please provide skill set",
+  }),
+  category: Joi.array<String>().required().messages({
+    "any.required": "Please provide category",
+  }),
+  title: Joi.string().required().messages({
+    "any.required": "Please provide title",
+  }),
 
   // or
   budget_type: Joi.object({
     hourly: Joi.object({
-      min_value: Joi.number(),
-      max_value: Joi.number(),
-    }),
-    fixed_budget: Joi.object({
-      lessthan100: Joi.boolean(),
-      between100and500: Joi.boolean(),
-      between500and1000: Joi.boolean(),
-      between1000and5000: Joi.boolean(),
-      morethan5000: Joi.boolean(),
-      min_max: Joi.object({
-        min_value: Joi.number().required().messages({
-          "any.required": "Please provide min value",
-        }),
-        max_value: Joi.number().required().messages({
-          "any.required": "Please provide max value",
-        }),
+      ishourly: Joi.boolean().required().messages({
+        "any.required": "Please provide ishourly",
+      }),
+      hourly_range: Joi.array<min_max_object>().required().messages({
+        "any.required": "Please provide hourly range",
       }),
     }),
-  }),
+    fixed: Joi.object({
+      isfixed: Joi.boolean().required().messages({
+        "any.required": "Please provide isfixed",
+      }),
+      fixed_range: Joi.array<min_max_object>().required().messages({
+        "any.required": "Please provide fixed range",
+      }),
+    }),
+  })
+    .required()
+    .messages({
+      "any.required": "Please provide budget_type",
+    }),
 
-  number_of_proposals: Joi.object({
-    lessthan5: Joi.boolean(),
-    between5and10: Joi.boolean(),
-    between10and15: Joi.boolean(),
-    between15and20: Joi.boolean(),
-    between20and50: Joi.boolean(),
+  number_of_proposals: Joi.array<min_max_object>().required().messages({
+    "any.required": "Please provide range of number of proposals",
   }),
 
   client_info: Joi.object({
@@ -126,18 +156,12 @@ export const findPostedJobSchema = Joi.object({
     payment_unverified: Joi.boolean(),
   }),
 
-  hours_per_week: Joi.object({
-    lessthan10: Joi.boolean(),
-    between10and20: Joi.boolean(),
-    between20and30: Joi.boolean(),
-    morethan30: Joi.boolean(),
+  hours_per_week: Joi.array<string>().required().messages({
+    "any.required": "Please provide range hours per week",
   }),
 
-  project_duration: Joi.object({
-    lessthan1month: Joi.boolean(),
-    between1and3months: Joi.boolean(),
-    between3and6months: Joi.boolean(),
-    morethan6months: Joi.boolean(),
+  project_duration: Joi.array<string>().required().messages({
+    "any.required": "Please provide range of project_duration",
   }),
 
   jobs_per_page: Joi.number().required().messages({

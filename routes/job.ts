@@ -416,126 +416,17 @@ export let jobRoute = [
         const data = request.payload;
         const filter = {};
 
-        data["skill_set"] ? (filter["skill_set"] = data["skill_set"]) : null;
-        data["category"] ? (filter["category"] = data["category"]) : null;
-        data["title"] ? (filter["title"] = data["title"]) : null;
+        data["skill_set"].length !== 0
+          ? (filter["skill_set"] = data["skill_set"])
+          : null;
+        data["category"].length !== 0
+          ? (filter["category"] = data["category"])
+          : null;
+        data["title"] !== "emptystringtitle"
+          ? (filter["title"] = data["title"])
+          : null;
 
         data["budget_type"]?.["hourly"] ? (filter["hourly"] = true) : null;
-        data["budget_type"]?.["hourly"]?.["min_value"]
-          ? (filter["hourly_min_value"] =
-              data["budget_type"]["hourly"]["min_value"])
-          : null;
-        data["budget_type"]?.["hourly"]?.["max_value"]
-          ? (filter["hourly_max_value"] =
-              data["budget_type"]["hourly"]["max_value"])
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]
-          ? (filter["fixed_budget"] = true)
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]?.["lessthan100"]
-          ? (filter["lessthan100"] = 100)
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]?.["between100and500"]
-          ? (filter["between100and500"] = 500)
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]?.["between500and1000"]
-          ? (filter["between500and1000"] = 1000)
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]?.["between1000and5000"]
-          ? (filter["between1000and5000"] = 5000)
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]?.["morethan5000"]
-          ? (filter["morethan5000"] = 5000)
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]?.["min_max"]?.["min_value"]
-          ? (filter["fixed_min_value"] =
-              data["budget_type"]["fixed_budget"]["min_max"]["min_value"])
-          : null;
-
-        data["budget_type"]?.["fixed_budget"]?.["min_max"]?.["max_value"]
-          ? (filter["fixed_max_value"] =
-              data["budget_type"]["fixed_budget"]["min_max"]["max_value"])
-          : null;
-
-        data["number_of_proposals"]?.["lessthan5"]
-          ? (filter["proposal_lessthan5"] = 5)
-          : null;
-
-        data["number_of_proposals"]?.["between5and10"]
-          ? (filter["proposal_between5and10"] = 10)
-          : null;
-
-        data["number_of_proposals"]?.["between10and15"]
-          ? (filter["proposal_between10and15"] = 15)
-          : null;
-
-        data["number_of_proposals"]?.["between15and20"]
-          ? (filter["proposal_between15and20"] = 20)
-          : null;
-
-        data["number_of_proposals"]?.["between20and50"]
-          ? (filter["proposal_between20and50"] = 50)
-          : null;
-
-        data["client_info"]?.["payment_verified"]
-          ? (filter["payment_verified"] = true)
-          : null;
-        data["client_info"]?.["payment_unverified"]
-          ? (filter["payment_unverified"] = true)
-          : null;
-
-        data["hours_per_week"]?.["lessthan10"]
-          ? (filter["lessthan10"] = "true")
-          : null;
-
-        data["hours_per_week"]?.["between10and20"]
-          ? (filter["between10and20"] = "true")
-          : null;
-
-        data["hours_per_week"]?.["between20and30"]
-          ? (filter["between20and30"] = "true")
-          : null;
-
-        data["hours_per_week"]?.["morethan30"]
-          ? (filter["morethan30"] = "true")
-          : null;
-
-        data["project_duration"]?.["lessthan1month"]
-          ? (filter["lessthan1month"] = "true")
-          : null;
-
-        data["project_duration"]?.["between1and3months"]
-          ? (filter["between1and3months"] = "true")
-          : null;
-
-        data["project_duration"]?.["between3and6months"]
-          ? (filter["between3and6months"] = "true")
-          : null;
-
-        data["project_duration"]?.["morethan6months"]
-          ? (filter["morethan6months"] = "true")
-          : null;
-
-        data["hours_per_week"]?.["lessthan30"]
-          ? (filter["lessthan30"] = 30)
-          : null;
-
-        data["hours_per_week"]?.["morethan30"]
-          ? (filter["morethan30"] = 30)
-          : null;
-
-        data["jobs_per_page"]
-          ? (filter["jobs_per_page"] = data["jobs_per_page"])
-          : null;
-
-        data["page_index"] ? (filter["page_index"] = data["page_index"]) : null;
 
         const query_skillandtitle = {};
         filter["skill_set"]
@@ -557,243 +448,126 @@ export let jobRoute = [
           query_skillandtitle
         );
 
-        let query_hourly_budget = {};
-        filter["hourly"] ? (query_hourly_budget["budget_type"] = 1) : null;
-        filter["hourly_min_value"]
-          ? (query_hourly_budget["budget_amount"] = {
-              $gte: filter["hourly_min_value"],
-            })
-          : null;
-        filter["hourly_max_value"]
-          ? (query_hourly_budget["budget_amount"] = {
-              $lt: filter["hourly_max_value"],
-            })
-          : null;
-        filter["hourly_min_value"] && filter["hourly_max_value"]
-          ? (query_hourly_budget["budget_amount"] = {
-              $gte: filter["hourly_min_value"],
-              $lt: filter["hourly_max_value"],
-            })
-          : null;
+        // ----------------------------- query for budget type is hourly ---------------------------
 
+        let query_hourly_budget = {};
+        const query_hourly = [];
+        if (data["budget_type"]?.["hourly"]?.["ishourly"] === true) {
+          query_hourly_budget = {
+            budget_type: 1,
+          };
+        }
+        if (data["budget_type"]?.["hourly"]?.["hourly_range"].length !== 0) {
+          data["budget_type"]?.["hourly"]?.["hourly_range"].forEach((item) => {
+            query_hourly.push({
+              $and: [
+                { budget_amount: { $gte: item.min_value } },
+                { budget_amount: { $lt: item.max_value } },
+              ],
+            });
+          });
+        }
         console.log(
           "query_hourly_budget-------------------->>>>>>>>>>>>>",
           query_hourly_budget
         );
+        console.log(
+          "query_hourly-------------------->>>>>>>>>>>>>",
+          query_hourly
+        );
 
+        // ------------------------------- query for budget type is fixed --------------------------
         let query_fixed_budget = {};
-        filter["fixed_budget"] ? (query_fixed_budget["budget_type"] = 0) : null;
+        const query_fixed = [];
 
-        const query_fixed: Array<Object> = new Array<Object>();
-        filter["lessthan100"]
-          ? query_fixed.push({
-              budget_amount: {
-                $lt: filter["lessthan100"],
-              },
-            })
-          : null;
+        if (data["budget_type"]?.["fixed"]?.["isfixed"] === true) {
+          query_fixed_budget = {
+            budget_type: 0,
+          };
+        }
+        if (data["budget_type"]?.["fixed"]?.["fixed_range"].length !== 0) {
+          data["budget_type"]?.["fixed"]?.["fixed_range"].forEach((item) => {
+            query_fixed.push({
+              $and: [
+                { budget_amount: { $gte: item.min_value } },
+                { budget_amount: { $lt: item.max_value } },
+              ],
+            });
+          });
+        }
 
-        filter["between100and500"]
-          ? query_fixed.push({
-              budget_amount: {
-                $lt: 100,
-                $gte: filter["between100and500"],
-              },
-            })
-          : null;
-
-        filter["between500and1000"]
-          ? query_fixed.push({
-              budget_amount: {
-                $lt: 500,
-                $gte: filter["between500and1000"],
-              },
-            })
-          : null;
-
-        filter["between1000and5000"]
-          ? query_fixed.push({
-              budget_amount: {
-                $lt: 1000,
-                $gte: filter["between1000and5000"],
-              },
-            })
-          : null;
-
-        filter["morethan5000"]
-          ? query_fixed.push({
-              budget_amount: {
-                $gte: filter["morethan5000"],
-              },
-            })
-          : null;
-
-        const query_fixed_min_max = {};
-        filter["fixed_min_value"]
-          ? (query_fixed_min_max["budget_amount"] = {
-              $gte: filter["fixed_min_value"],
-            })
-          : null;
-        filter["fixed_max_value"]
-          ? (query_fixed_min_max["budget_amount"] = {
-              $lt: filter["fixed_max_value"],
-            })
-          : null;
-        filter["fixed_min_value"] && filter["fixed_max_value"]
-          ? (query_fixed_min_max["budget_amount"] = {
-              $gte: filter["fixed_min_value"],
-              $lt: filter["fixed_max_value"],
-            })
-          : null;
-        Object.keys(query_fixed_min_max).length !== 0
-          ? query_fixed.push(query_fixed_min_max)
-          : null;
-
+        console.log(
+          "query_fixed_budget-------------------->>>>>>>>>>>>>",
+          query_fixed_budget
+        );
         console.log(
           "query_fixed-------------------->>>>>>>>>>>>>",
           query_fixed
         );
 
         const query_number_of_proposals = [];
-        filter["proposal_lessthan5"]
-          ? query_number_of_proposals.push({
-              $expr: {
-                $lt: [{ $size: "$proposals" }, filter["proposal_lessthan5"]],
-              },
-            })
-          : null;
-
-        filter["proposal_between5and10"]
-          ? query_number_of_proposals.push({
+        if (data["number_of_proposals"].length !== 0) {
+          data["number_of_proposals"].forEach((item) => {
+            query_number_of_proposals.push({
               $expr: {
                 $and: [
-                  { $gte: [{ $size: "$proposals" }, 5] },
-                  {
-                    $lt: [
-                      { $size: "$proposals" },
-                      filter["proposal_between5and10"],
-                    ],
-                  },
+                  { $gte: [{ $size: "$proposals" }, item.min_value] },
+                  { $lt: [{ $size: "$proposals" }, item.max_value] },
                 ],
               },
-            })
-          : null;
-
-        filter["proposal_between10and15"]
-          ? query_number_of_proposals.push({
-              $expr: {
-                $and: [
-                  { $gte: [{ $size: "$proposals" }, 10] },
-                  {
-                    $lt: [
-                      { $size: "$proposals" },
-                      filter["proposal_between10and15"],
-                    ],
-                  },
-                ],
-              },
-            })
-          : null;
-
-        filter["proposal_between15and20"]
-          ? query_number_of_proposals.push({
-              $expr: {
-                $and: [
-                  { $gte: [{ $size: "$proposals" }, 15] },
-                  {
-                    $lt: [
-                      { $size: "$proposals" },
-                      filter["proposal_between15and20"],
-                    ],
-                  },
-                ],
-              },
-            })
-          : null;
-
-        filter["proposal_between20and50"]
-          ? query_number_of_proposals.push({
-              $expr: {
-                $and: [
-                  { $gte: [{ $size: "$proposals" }, 20] },
-                  {
-                    $lt: [
-                      { $size: "$proposals" },
-                      filter["proposal_between20and50"],
-                    ],
-                  },
-                ],
-              },
-            })
-          : null;
-
-        // query_number_of_proposals.length === 0
-        //   ? query_number_of_proposals.push("")
-        //   : null;
-
+            });
+          });
+        }
         console.log(
-          "query_number_of_proposals----------------------------->>>>>>",
+          "query_number_of_proposals-------------------->>>>>>>>>>>>>",
           query_number_of_proposals
         );
 
         const query_client_info = [];
-        filter["payment_verified"]
-          ? query_client_info.push({ "clientData.payment_verify": true })
-          : null;
-
-        filter["payment_unverified"]
-          ? query_client_info.push({ "clientData.payment_verify": false })
-          : null;
+        if (data["client_info"]?.["payment_verified"])
+          query_client_info.push({ "clientData.payment_verify": true });
+        if (data["client_info"]?.["payment_unverified"])
+          query_client_info.push({ "clientData.payment_verify": false });
 
         console.log(
-          "query_client_info ------------------------>>>>>>>>",
+          "query_client_info ------------------>>>>>>>>>>>>>",
           query_client_info
         );
 
         const query_hours_per_week = [];
-        filter["lessthan10"]
-          ? query_hours_per_week.push({ hours_per_week: "lessthan10" })
-          : null;
-
-        filter["between10and20"]
-          ? query_hours_per_week.push({ hours_per_week: "between10and20" })
-          : null;
-
-        filter["between20and30"]
-          ? query_hours_per_week.push({ hours_per_week: "between20and30" })
-          : null;
-
-        filter["morethan30"]
-          ? query_hours_per_week.push({ hours_per_week: "morethan30" })
-          : null;
+        if (data["hours_per_week"].length !== 0) {
+          data["hours_per_week"].forEach((item) => {
+            query_hours_per_week.push({ hours_per_week: item });
+          });
+        }
+        console.log(
+          "query_hours_per_week ------------------>>>>>>>>>>",
+          query_hours_per_week
+        );
 
         const query_project_duration = [];
-        filter["lessthan1month"]
-          ? query_project_duration.push({ project_duration: "lessthan1month" })
+        if (data["project_duration"].length !== 0) {
+          data["project_duration"].forEach((item) => {
+            query_project_duration.push({ project_duration: item });
+          });
+        }
+        console.log(
+          "query_project_duration ------------------>>>>>>>>>>",
+          query_project_duration
+        );
+
+        data["jobs_per_page"]
+          ? (filter["jobs_per_page"] = data["jobs_per_page"])
           : null;
 
-        filter["between1and3months"]
-          ? query_project_duration.push({
-              project_duration: "between1and3months",
-            })
-          : null;
-
-        filter["between3and6months"]
-          ? query_project_duration.push({
-              project_duration: "between3and6months",
-            })
-          : null;
-
-        filter["morethan6months"]
-          ? query_project_duration.push({ project_duration: "morethan6months" })
-          : null;
+        data["page_index"] ? (filter["page_index"] = data["page_index"]) : null;
 
         const queryAll = {
           $and: [
             query_skillandtitle,
             // {
             //   $or: [
-            //     query_hourly_budget,
+            // query_hourly_budget,
             //     // {
             //     // $and: [
             //     // query_fixed_budget,
@@ -817,12 +591,26 @@ export let jobRoute = [
         };
 
         if (Object.keys(query_hourly_budget).length !== 0) {
-          queryAll.$and[1]
-            ? queryAll.$and[1]["$or"].push(query_hourly_budget)
-            : queryAll.$and.push({ $or: [query_hourly_budget] });
+          if (queryAll.$and[1]) {
+            if (query_hourly.length !== 0) {
+              queryAll.$and[1]["$or"].push({
+                $and: [query_hourly_budget, { $or: query_hourly }],
+              });
+            } else {
+              queryAll.$and[1]["$or"].push({ $and: [query_hourly_budget] });
+            }
+          } else {
+            if (query_hourly.length !== 0) {
+              queryAll.$and.push({
+                $or: [{ $and: [query_hourly_budget, { $or: query_hourly }] }],
+              });
+            } else {
+              queryAll.$and.push({ $or: [{ $and: [query_hourly_budget] }] });
+            }
+          }
           console.log(
-            "query_hourly_budget-------------------<<<<<<<<>>>>>>>>>>",
-            queryAll.$and[1]
+            "queryAll.and[1]----------------------->>>>>>>>>>>",
+            queryAll.$and[1]["$or"][0]
           );
         }
 
@@ -878,10 +666,10 @@ export let jobRoute = [
           "queryAll-------------------------------->>>>>>>>>>",
           queryAll
         );
-        console.log(
-          "query_client_info------------------->>>>>>>>>>>",
-          query_client_info
-        );
+        // console.log(
+        //   "query_client_info------------------->>>>>>>>>>>",
+        //   query_client_info
+        // );
         const findedjobs = await Job.aggregate([
           {
             $lookup: {
