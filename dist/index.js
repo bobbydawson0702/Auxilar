@@ -117,8 +117,13 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
     yield skill_1.default.deleteMany({});
     yield major_1.default.deleteMany({});
     for (let index = 1; index <= 20; index++) {
+<<<<<<< HEAD
         yield skill_1.default.create({ name: "skill" + index });
         yield major_1.default.create({ name: "major" + index });
+=======
+        yield skill_1.default.create({ name: "skill " + index });
+        yield major_1.default.create({ name: "major " + index });
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
     }
     return server;
 });

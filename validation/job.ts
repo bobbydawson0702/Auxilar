@@ -127,7 +127,7 @@ export const findPostedJobSchema = Joi.object({
   }),
 
   hours_per_week: Joi.object({
-    lessthan30: Joi.boolean(),
+    lessthan10: Joi.boolean(),
     between10and20: Joi.boolean(),
     between20and30: Joi.boolean(),
     morethan30: Joi.boolean(),

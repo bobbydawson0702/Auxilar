@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 exports.deleteJobSwagger = exports.getJobSwagger = exports.getMyAllJobSwagger = exports.getAllJobSwagger = exports.findPostedJobSwagger = exports.updateJobSwagger = exports.JobSwagger = void 0;
+=======
+exports.deleteJobSwagger = exports.getJobSwagger = exports.getMyAllJobSwagger = exports.getAllJobSwagger = exports.updateJobSwagger = exports.JobSwagger = void 0;
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
 exports.JobSwagger = {
     "hapi-swagger": {
         responses: {
@@ -46,6 +50,7 @@ exports.updateJobSwagger = {
         },
     },
 };
+<<<<<<< HEAD
 exports.findPostedJobSwagger = {
     "hapi-swagger": {
         responses: {
@@ -70,6 +75,8 @@ exports.findPostedJobSwagger = {
         },
     },
 };
+=======
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
 exports.getAllJobSwagger = {
     "hapi-swagger": {
         responses: {

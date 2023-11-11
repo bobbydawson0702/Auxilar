@@ -3,10 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const JobSchema = new Schema({
+<<<<<<< HEAD
     client: {
         type: Schema.Types.ObejctId,
         ref: "client",
     },
+=======
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
     client_email: {
         type: String,
         required: true,
@@ -57,12 +60,15 @@ const JobSchema = new Schema({
         enum: ["public", "private"],
         default: "public",
     },
+<<<<<<< HEAD
     hours_per_week: {
         type: String,
         required: true,
         enum: ["more", "less"],
         default: "more",
     },
+=======
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
     invited_expert: [
         {
             first_name: {

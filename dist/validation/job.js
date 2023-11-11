@@ -3,7 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 exports.findPostedJobSchema = exports.updateJobSchema = exports.JobSchema = void 0;
+=======
+exports.updateJobSchema = exports.JobSchema = void 0;
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
 const joi_1 = __importDefault(require("joi"));
 exports.JobSchema = joi_1.default.object({
     title: joi_1.default.string().required().messages({
@@ -19,6 +23,7 @@ exports.JobSchema = joi_1.default.object({
         "any.required": "Please provide budget_amount",
     }),
     end_date: joi_1.default.date().required().messages({
+<<<<<<< HEAD
         "any.required": "Please provide end_date of proposal",
     }),
     expire_date: joi_1.default.date().required().messages({
@@ -26,13 +31,25 @@ exports.JobSchema = joi_1.default.object({
     }),
     skill_set: joi_1.default.array().required().messages({
         "any.required": "Please provide skill_set",
+=======
+        'any.required': 'Please provide end_date of proposal',
+    }),
+    expire_date: joi_1.default.date().required().messages({
+        'any.required': 'Please provide expire_date of proposal',
+    }),
+    skill_set: joi_1.default.array().required().messages({
+        "any.required": "Please provide skill_set"
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
     }),
     job_type: joi_1.default.string().required().valid("public", "private").messages({
         "any.required": "Please provdie job_type",
     }),
+<<<<<<< HEAD
     hours_per_week: joi_1.default.string().required().valid("more", "less").messages({
         "any.required": "Please provide hours per week",
     }),
+=======
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
     invited_expert: joi_1.default.array(),
 });
 exports.updateJobSchema = joi_1.default.object({
@@ -49,6 +66,7 @@ exports.updateJobSchema = joi_1.default.object({
         "any.required": "Please provide budget_amount",
     }),
     end_date: joi_1.default.date().required().messages({
+<<<<<<< HEAD
         "any.required": "Please provide end_date of proposal",
     }),
     expire_date: joi_1.default.date().required().messages({
@@ -59,10 +77,23 @@ exports.updateJobSchema = joi_1.default.object({
     }),
     skill_set: joi_1.default.array().required().messages({
         "any.required": "Please provide skill_set",
+=======
+        'any.required': 'Please provide end_date of proposal',
+    }),
+    expire_date: joi_1.default.date().required().messages({
+        'any.required': 'Please provide expire_date of proposal',
+    }),
+    state: joi_1.default.number().required().messages({
+        "any.required": "Please provide state"
+    }),
+    skill_set: joi_1.default.array().required().messages({
+        "any.required": "Please provide skill_set"
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
     }),
     job_type: joi_1.default.string().required().valid("public", "private").messages({
         "any.required": "Please provdie job_type",
     }),
+<<<<<<< HEAD
     hours_per_week: joi_1.default.string().required().valid("more", "less").messages({
         "any.required": "Please provide hours per week",
     }),
@@ -116,4 +147,8 @@ exports.findPostedJobSchema = joi_1.default.object({
         "any.required": "Please provide page index",
     }),
 });
+=======
+    invited_expert: joi_1.default.array(),
+});
+>>>>>>> c0fac13a95db9fa562724f2fd60dbfe3f4b7a9b6
 //# sourceMappingURL=job.js.map
