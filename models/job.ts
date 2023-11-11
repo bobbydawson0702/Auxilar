@@ -48,6 +48,12 @@ const JobSchema = new Schema({
     type: Number,
     default: 0,
   },
+
+  category: {
+    type: [String],
+    required: true
+  },
+
   skill_set: {
     type: [String],
     required: true,
@@ -61,8 +67,15 @@ const JobSchema = new Schema({
   hours_per_week: {
     type: String,
     required: true,
-    enum: ["more", "less"],
-    default: "more",
+    enum: ["lessthan10", "between10and20", "between20and30", "morethan30"],
+    default: "morethan30",
+  },
+  
+  project_duration: {
+    type: String,
+    required: true,
+    enum: ["lessthan1month", "between1and3months", "between3and6months", "morethan6months"],
+    default: "morethan6months",
   },
 
   invited_expert: [

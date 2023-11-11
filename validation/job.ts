@@ -5,6 +5,7 @@ export const JobSchema = Joi.object({
   title: Joi.string().required().messages({
     "any.required": "Please provide title.",
   }),
+
   description: Joi.string().required().messages({
     "any.required": "Please provide description.",
   }),
@@ -20,13 +21,22 @@ export const JobSchema = Joi.object({
   expire_date: Joi.date().required().messages({
     "any.required": "Please provide expire_date of proposal",
   }),
+
+  category: Joi.array<string>().required().messages({
+    "any.required": "Please provide category",
+  }),
+
   skill_set: Joi.array<string>().required().messages({
     "any.required": "Please provide skill_set",
   }),
+
   job_type: Joi.string().required().valid("public", "private").messages({
     "any.required": "Please provdie job_type",
   }),
-  hours_per_week: Joi.string().valid("more", "less").messages({
+  project_duration: Joi.string().required().valid("lessthan1month", "between1and3months", "between3and6months", "morethan6months").messages({
+    "any.required": "Please provdie project duration",
+  }),
+  hours_per_week: Joi.string().required().valid("lessthan10", "between10and20", "between20and30", "morethan30").messages({
     "any.required": "Please provide hours per week",
   }),
   invited_expert: Joi.array<Object>(),
@@ -54,13 +64,21 @@ export const updateJobSchema = Joi.object({
   state: Joi.number().required().messages({
     "any.required": "Please provide state",
   }),
+  category: Joi.array<string>().required().messages({
+    "any.required": "Please provide category",
+  }),
+
   skill_set: Joi.array<string>().required().messages({
     "any.required": "Please provide skill_set",
   }),
+
   job_type: Joi.string().required().valid("public", "private").messages({
     "any.required": "Please provdie job_type",
   }),
-  hours_per_week: Joi.string().valid("more", "less").messages({
+  project_duration: Joi.string().required().valid("lessthan1month", "between1and3months", "between3and6months", "morethan6months").messages({
+    "any.required": "Please provdie project duration",
+  }),
+  hours_per_week: Joi.string().required().valid("lessthan10", "between10and20", "between20and30", "morethan30").messages({
     "any.required": "Please provide hours per week",
   }),
   invited_expert: Joi.array<Object>(),
@@ -69,6 +87,7 @@ export const updateJobSchema = Joi.object({
 export const findPostedJobSchema = Joi.object({
   // and
   skill_set: Joi.array<String>(),
+  category: Joi.array<String>(),
   title: Joi.string(),
 
   // or
@@ -109,7 +128,16 @@ export const findPostedJobSchema = Joi.object({
 
   hours_per_week: Joi.object({
     lessthan30: Joi.boolean(),
+    between10and20: Joi.boolean(),
+    between20and30: Joi.boolean(),
     morethan30: Joi.boolean(),
+  }),
+
+  project_duration: Joi.object({
+    lessthan1month: Joi.boolean(),
+    between1and3months: Joi.boolean(),
+    between3and6months: Joi.boolean(),
+    morethan6months: Joi.boolean(),
   }),
 
   jobs_per_page: Joi.number().required().messages({

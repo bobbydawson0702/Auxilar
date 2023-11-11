@@ -94,8 +94,10 @@ export let jobRoute = [
           budget_amount: data["budget_amount"],
           end_date: data["end_date"],
           expire_date: data["expire_date"],
+          category: data["category"],
           skill_set: data["skill_set"],
           job_type: data["job_type"],
+          project_duration: data["project_duration"],
           pub_date: currentDate,
           invited_expert: data["invited_expert"],
         };
@@ -170,8 +172,11 @@ export let jobRoute = [
           end_date: data["end_date"],
           expire_date: data["expire_date"],
           state: data["state"],
+          category: data["category"],
           skill_set: data["skill_set"],
           job_type: data["job_type"],
+          project_duration: data["project_duration"],
+          hours_per_week: data["hours_per_week"],
         };
 
         data["invited_expert"]
@@ -305,7 +310,7 @@ export let jobRoute = [
         try {
           const job = await Job.find({
             _id: request.params.jobId,
-            client_email: request.auth.credentials.email,
+            // client_email: request.auth.credentials.email,
           });
           return response.response({ status: "ok", data: job }).code(200);
         } catch (error) {
@@ -413,6 +418,7 @@ export let jobRoute = [
         const filter = {};
 
         data["skill_set"] ? (filter["skill_set"] = data["skill_set"]) : null;
+        data["category"] ? (filter["category"] = data["category"]) : null;
         data["title"] ? (filter["title"] = data["title"]) : null;
 
         data["budget_type"]?.["hourly"] ? (filter["hourly"] = true) : null;
@@ -486,12 +492,36 @@ export let jobRoute = [
           ? (filter["payment_unverified"] = true)
           : null;
 
-        data["hours_per_week"]?.["lessthan30"]
-          ? (filter["lessthan30"] = "less")
+        data["hours_per_week"]?.["lessthan10"]
+          ? (filter["lessthan10"] = "true")
+          : null;
+
+        data["hours_per_week"]?.["between10and20"]
+          ? (filter["between10and20"] = "true")
+          : null;
+
+        data["hours_per_week"]?.["between20and30"]
+          ? (filter["between20and30"] = "true")
           : null;
 
         data["hours_per_week"]?.["morethan30"]
-          ? (filter["morethan30"] = "more")
+          ? (filter["morethan30"] = "true")
+          : null;
+
+        data["project_duration"]?.["lessthan1month"]
+          ? (filter["lessthan1month"] = "true")
+          : null;
+
+        data["project_duration"]?.["between1and3months"]
+          ? (filter["between1and3months"] = "true")
+          : null;
+
+        data["project_duration"]?.["between3and6months"]
+          ? (filter["between3and6months"] = "true")
+          : null;
+
+        data["project_duration"]?.["morethan6months"]
+          ? (filter["morethan6months"] = "true")
           : null;
 
         data["jobs_per_page"]
@@ -502,9 +532,18 @@ export let jobRoute = [
 
         const query_skillandtitle = {};
         filter["skill_set"]
-          ? (query_skillandtitle["skill_set"] = { $in: data["skill_set"] })
+          ? (query_skillandtitle["skill_set"] = { $in: filter["skill_set"] })
           : null;
-        filter["title"] ? (query_skillandtitle["title"] = data["title"]) : null;
+
+        filter["category"]
+          ? (query_skillandtitle["category"] = { $in: filter["category"] })
+          : null;
+
+        filter["title"]
+          ? (query_skillandtitle["title"] = {
+              $regex: new RegExp("^" + filter["title"].toLowerCase(), "i"),
+            })
+          : null;
 
         console.log(
           "query_skillandtitle---------------------->>>>>>>>>>>>>>",
@@ -705,11 +744,37 @@ export let jobRoute = [
         );
 
         const query_hours_per_week = [];
-        filter["lessthan30"]
-          ? query_hours_per_week.push({ hours_per_week: "less" })
+        filter["lessthan10"]
+          ? query_hours_per_week.push({ hours_per_week: "lessthan10" })
           : null;
+
+        filter["between10and20"]
+          ? query_hours_per_week.push({ hours_per_week: "between10and20" })
+          : null;
+
+        filter["between20and30"]
+          ? query_hours_per_week.push({ hours_per_week: "between20and30" })
+          : null;
+
         filter["morethan30"]
-          ? query_hours_per_week.push({ hours_per_week: "more" })
+          ? query_hours_per_week.push({ hours_per_week: "morethan30" })
+          : null;
+
+        const query_project_duration = [];
+        filter["lessthan1month"]
+          ? query_project_duration.push({ project_duration: "lessthan1month" })
+          : null;
+
+        filter["between1and3months"]
+          ? query_project_duration.push({ project_duration: "between1and3months" })
+          : null;
+
+        filter["between3and6months"]
+          ? query_project_duration.push({ project_duration: "between3and6months" })
+          : null;
+
+        filter["morethan6months"]
+          ? query_project_duration.push({ project_duration: "morethan6months" })
           : null;
 
         const queryAll = {
@@ -792,9 +857,11 @@ export let jobRoute = [
             : queryAll.$and.push({ $or: [{ $or: query_hours_per_week }] });
         }
 
-        // if (query_client_info.length !== 0) {
-        //   queryAll.$and[1]["$or"].push({ $or: query_client_info });
-        // }
+        if (query_project_duration.length !== 0) {
+          queryAll.$and[1]
+            ? queryAll.$and[1]["$or"].push({ $or: query_project_duration })
+            : queryAll.$and.push({ $or: [{ $or: query_project_duration }] });
+        }
 
         console.log(
           "queryAll-------------------------------->>>>>>>>>>",
