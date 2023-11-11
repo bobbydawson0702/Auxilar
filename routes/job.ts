@@ -70,16 +70,16 @@ export let jobRoute = [
 
         const data = request.payload;
 
-        // check job already posted by current account
-        const alreadyPostedJob = await Job.findOne({
-          client_email: account.email,
-          title: data["title"],
-        });
-        if (alreadyPostedJob) {
-          return response
-            .response({ status: "err", err: "Job already posted" })
-            .code(409);
-        }
+        // // check job already posted by current account
+        // const alreadyPostedJob = await Job.findOne({
+        //   client_email: account.email,
+        //   title: data["title"],
+        // });
+        // if (alreadyPostedJob) {
+        //   return response
+        //     .response({ status: "err", err: "Job already posted" })
+        //     .code(409);
+        // }
 
         // Todo check expert list
 
