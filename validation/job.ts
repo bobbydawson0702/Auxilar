@@ -69,9 +69,9 @@ export const updateJobSchema = Joi.object({
   end_date: Joi.date().required().messages({
     "any.required": "Please provide end_date of proposal",
   }),
-  expire_date: Joi.date().required().messages({
-    "any.required": "Please provide expire_date of proposal",
-  }),
+  // expire_date: Joi.date().required().messages({
+  //   "any.required": "Please provide expire_date of proposal",
+  // }),
   state: Joi.number().required().messages({
     "any.required": "Please provide state",
   }),

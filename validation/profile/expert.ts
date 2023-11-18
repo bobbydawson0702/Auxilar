@@ -111,9 +111,9 @@ export const updatePersonDetailSchema = Joi.object({
   address: Joi.string().required().messages({
     "any.required": "Please provde address"
   }),
-  post_number: Joi.string().required().messages({
-    "any.required": "Please provde post_number"
-  }),
+  // post_number: Joi.string().required().messages({
+  //   "any.required": "Please provde post_number"
+  // }),
   languages: Joi.array<Object>().required().messages({
     "any.required": "Please provde languages"
   }),

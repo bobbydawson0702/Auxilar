@@ -92,9 +92,9 @@ exports.updatePersonDetailSchema = joi_1.default.object({
     address: joi_1.default.string().required().messages({
         "any.required": "Please provde address"
     }),
-    post_number: joi_1.default.string().required().messages({
-        "any.required": "Please provde post_number"
-    }),
+    // post_number: Joi.string().required().messages({
+    //   "any.required": "Please provde post_number"
+    // }),
     languages: joi_1.default.array().required().messages({
         "any.required": "Please provde languages"
     }),

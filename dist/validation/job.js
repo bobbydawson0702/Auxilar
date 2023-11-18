@@ -63,9 +63,9 @@ exports.updateJobSchema = joi_1.default.object({
     end_date: joi_1.default.date().required().messages({
         "any.required": "Please provide end_date of proposal",
     }),
-    expire_date: joi_1.default.date().required().messages({
-        "any.required": "Please provide expire_date of proposal",
-    }),
+    // expire_date: Joi.date().required().messages({
+    //   "any.required": "Please provide expire_date of proposal",
+    // }),
     state: joi_1.default.number().required().messages({
         "any.required": "Please provide state",
     }),
