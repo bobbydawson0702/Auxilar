@@ -87,22 +87,24 @@ export let expertRoute = [
           account: account.id,
           address: data["address"],
           country: data["country"],
-          state: data["state"],
-          city: data["city"],
+
           languages: data["languages"],
-          avatar: data["avatar"] ?? null,
+          avatar: data["avatar"],
           hourly_rate: data["hourly_rate"],
           summary: data["summary"],
           verified_by: data["verified_by"],
           portfolios: data["portfolios"],
           skills: data["skills"],
           majors: data["majors"],
-          notification_preferences: data['notification_preferences'] ?? null,
+          // notification_preferences: data['notification_preferences'] ?? null,
           resume: data["resume"],
           profile_links: data["profile_links"],
           linkedin: data["linkedin"],
           education: data["education"],
         };
+
+        data["state"] ? (expertField["state"] = data["state"]) : null;
+        data["city"] ? (expertField["city"] = data["city"]) : null;
 
         // const expert = await Expert.findOneAndUpdate(
         //   { account: account.id },
@@ -821,20 +823,21 @@ export let expertRoute = [
         console.log("data---------------", data);
 
         const updateData = {
-          address: data["address"] ?? null,
-          country: data["country"] ?? null,
-          state: data["state"] ?? null,
-          city: data["city"] ?? null,
-          languages: data["languages"] ?? null,
-          skills: data["skills"] ?? null,
-          majors: data["majors"] ?? null,
-          notification_preferences: data["notification_preferences"] ?? null,
-          reviews: data["reviews"] ?? null,
-          active_status: data["active_status"] ?? null,
-          account_status: data["account_status"] ?? null,
-          profile_links: data["profile_links"] ?? null,
-          linkedin: data["linkedin"] ?? null,
+          address: data["address"],
+          country: data["country"],
+          languages: data["languages"],
+          skills: data["skills"],
+          majors: data["majors"],
+          // notification_preferences: data["notification_preferences"] ?? null,
+          // reviews: data["reviews"] ?? null,
+          active_status: data["active_status"],
+          // account_status: data["account_status"] ?? null,
+          // profile_links: data["profile_links"] ?? null,
+          // linkedin: data["linkedin"] ?? null,
         };
+
+        data["state"] ? (updateData["state"] = data["state"]) : null;
+        data["city"] ? (updateData["city"] = data["city"]) : null;
 
         const expert = await Expert.findOneAndUpdate(
           { account: account.id },

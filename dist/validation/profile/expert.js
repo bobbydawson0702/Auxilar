@@ -12,16 +12,20 @@ exports.ProfileSchema = joi_1.default.object({
     country: joi_1.default.string().required().messages({
         "any.required": "Please provide country",
     }),
-    state: joi_1.default.string().required().messages({
-        "any.required": "Please provide state",
-    }),
-    city: joi_1.default.string().required().messages({
-        "any.required": "Please provide city",
-    }),
+    // state: Joi.string().required().messages({
+    //   "any.required": "Please provide state",
+    // }),
+    // city: Joi.string().required().messages({
+    //   "any.required": "Please provide city",
+    // }),
+    state: joi_1.default.string(),
+    city: joi_1.default.string(),
     languages: joi_1.default.array().required().messages({
         "any.required": "Please provide languages",
     }),
-    avatar: joi_1.default.string(),
+    avatar: joi_1.default.string().required().messages({
+        "any.required": "Please provide avatar",
+    }),
     hourly_rate: joi_1.default.string().required().messages({
         "any.required": "Please provide hourly_rate.",
     }),
@@ -41,8 +45,8 @@ exports.ProfileSchema = joi_1.default.object({
     profile_links: joi_1.default.array(),
     linkedin: joi_1.default.string(),
     education: joi_1.default.object().required().messages({
-        "any.required": "Please provide education"
-    })
+        "any.required": "Please provide education",
+    }),
 });
 exports.updateBaseInfoSchema = joi_1.default.object({
     avatar: joi_1.default.string().required().messages({
@@ -90,42 +94,40 @@ exports.updateResumeSchema = joi_1.default.object({
 });
 exports.updatePersonDetailSchema = joi_1.default.object({
     address: joi_1.default.string().required().messages({
-        "any.required": "Please provde address"
+        "any.required": "Please provide address",
     }),
-    // post_number: Joi.string().required().messages({
-    //   "any.required": "Please provde post_number"
-    // }),
+    country: joi_1.default.string().required().messages({
+        "any.required": "Please provide country",
+    }),
+    state: joi_1.default.string(),
+    city: joi_1.default.string(),
     languages: joi_1.default.array().required().messages({
-        "any.required": "Please provde languages"
+        "any.required": "Please provide languages",
     }),
     skills: joi_1.default.array().required().messages({
-        "any.required": "Please provde skills"
+        "any.required": "Please provide skills",
     }),
     majors: joi_1.default.array().required().messages({
-        "any.required": "Please provde majors"
+        "any.required": "Please provide majors",
     }),
-    notification_preferences: joi_1.default.array().required().messages({
-        "any.required": "Please provde notification_preferences"
-    }),
-    reviews: joi_1.default.array().required().messages({
-        "any.required": "Please provde reviews"
-    }),
+    // notification_preferences: Joi.array<String>(),
+    // reviews: Joi.array<Object>(),
     active_status: joi_1.default.boolean().required().messages({
-        "any.required": "Please provde active_status"
+        "any.required": "Please provide active_status",
     }),
-    account_status: joi_1.default.number().required().messages({
-        "any.required": "Please provde account_status"
-    }),
-    profile_links: joi_1.default.array().required().messages({
-        "any.required": "Please provde profile_links"
-    }),
-    linkedin: joi_1.default.string().required().messages({
-        "any.required": "Please provde linkedin"
-    }),
+    // account_status: Joi.number().required().messages({
+    // "any.required": "Please provide account_status"
+    // }),
+    // profile_links: Joi.array<String>().required().messages({
+    //   "any.required": "Please provide profile_links"
+    // }),
+    // linkedin: Joi.string().required().messages({
+    //   "any.required": "Please provide linkedin"
+    // }),
 });
 exports.updateEducationSchema = joi_1.default.object({
     education: joi_1.default.object().required().messages({
-        "any.required": "Please provide education"
-    })
+        "any.required": "Please provide education",
+    }),
 });
 //# sourceMappingURL=expert.js.map

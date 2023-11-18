@@ -9,19 +9,24 @@ export const ProfileSchema = Joi.object({
     "any.required": "Please provide country",
   }),
 
-  state: Joi.string().required().messages({
-    "any.required": "Please provide state",
-  }),
+  // state: Joi.string().required().messages({
+  //   "any.required": "Please provide state",
+  // }),
 
-  city: Joi.string().required().messages({
-    "any.required": "Please provide city",
-  }),
+  // city: Joi.string().required().messages({
+  //   "any.required": "Please provide city",
+  // }),
+
+  state: Joi.string(),
+  city: Joi.string(),
 
   languages: Joi.array<String>().required().messages({
     "any.required": "Please provide languages",
   }),
 
-  avatar: Joi.string(),
+  avatar: Joi.string().required().messages({
+    "any.required": "Please provide avatar",
+  }),
 
   hourly_rate: Joi.string().required().messages({
     "any.required": "Please provide hourly_rate.",
@@ -52,8 +57,8 @@ export const ProfileSchema = Joi.object({
   linkedin: Joi.string(),
 
   education: Joi.object().required().messages({
-    "any.required": "Please provide education"
-  })
+    "any.required": "Please provide education",
+  }),
 });
 
 export const updateBaseInfoSchema = Joi.object({
@@ -109,41 +114,39 @@ export const updateResumeSchema = Joi.object({
 });
 export const updatePersonDetailSchema = Joi.object({
   address: Joi.string().required().messages({
-    "any.required": "Please provde address"
+    "any.required": "Please provide address",
   }),
-  // post_number: Joi.string().required().messages({
-  //   "any.required": "Please provde post_number"
-  // }),
+  country: Joi.string().required().messages({
+    "any.required": "Please provide country",
+  }),
+  state: Joi.string(),
+  city: Joi.string(),
   languages: Joi.array<Object>().required().messages({
-    "any.required": "Please provde languages"
+    "any.required": "Please provide languages",
   }),
   skills: Joi.array<String>().required().messages({
-    "any.required": "Please provde skills"
+    "any.required": "Please provide skills",
   }),
   majors: Joi.array<String>().required().messages({
-    "any.required": "Please provde majors"
+    "any.required": "Please provide majors",
   }),
-  notification_preferences: Joi.array<String>().required().messages({
-    "any.required": "Please provde notification_preferences"
-  }),
-  reviews: Joi.array<Object>().required().messages({
-    "any.required": "Please provde reviews"
-  }),
+  // notification_preferences: Joi.array<String>(),
+  // reviews: Joi.array<Object>(),
   active_status: Joi.boolean().required().messages({
-    "any.required": "Please provde active_status"
+    "any.required": "Please provide active_status",
   }),
-  account_status: Joi.number().required().messages({
-    "any.required": "Please provde account_status"
-  }),
-  profile_links: Joi.array<String>().required().messages({
-    "any.required": "Please provde profile_links"
-  }),
-  linkedin: Joi.string().required().messages({
-    "any.required": "Please provde linkedin"
-  }),
+  // account_status: Joi.number().required().messages({
+  // "any.required": "Please provide account_status"
+  // }),
+  // profile_links: Joi.array<String>().required().messages({
+  //   "any.required": "Please provide profile_links"
+  // }),
+  // linkedin: Joi.string().required().messages({
+  //   "any.required": "Please provide linkedin"
+  // }),
 });
 export const updateEducationSchema = Joi.object({
   education: Joi.object().required().messages({
-    "any.required": "Please provide education"
-  })
+    "any.required": "Please provide education",
+  }),
 });

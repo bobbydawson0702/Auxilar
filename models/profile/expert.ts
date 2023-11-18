@@ -19,12 +19,12 @@ const ExpertSchema = new Schema({
 
   state: {
     type: String,
-    required: true,
+    // required: true,
   },
 
   city: {
     type: String,
-    required: true,
+    // required: true,
   },
 
 
@@ -89,6 +89,10 @@ const ExpertSchema = new Schema({
     type: [String],
   },
 
+  notification_preferences: {
+    type: [String]
+  },
+
   ongoing_project: [
     {
       project: {
@@ -102,7 +106,7 @@ const ExpertSchema = new Schema({
       reviewer: {
         type: String,
       },
-      reviewe: {
+      review: {
         type: String,
       },
       rate: {

@@ -17,11 +17,11 @@ const ExpertSchema = new Schema({
     },
     state: {
         type: String,
-        required: true,
+        // required: true,
     },
     city: {
         type: String,
-        required: true,
+        // required: true,
     },
     languages: [
         {
@@ -76,6 +76,9 @@ const ExpertSchema = new Schema({
     majors: {
         type: [String],
     },
+    notification_preferences: {
+        type: [String]
+    },
     ongoing_project: [
         {
             project: {
@@ -88,7 +91,7 @@ const ExpertSchema = new Schema({
             reviewer: {
                 type: String,
             },
-            reviewe: {
+            review: {
                 type: String,
             },
             rate: {
