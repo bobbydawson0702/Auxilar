@@ -36,6 +36,7 @@ exports.ProfileSchema = joi_1.default.object({
     majors: joi_1.default.array().required().messages({
         "any.requird": "Please provide majors",
     }),
+    notification_preferences: joi_1.default.array(),
     resume: joi_1.default.string(),
     profile_links: joi_1.default.array(),
     linkedin: joi_1.default.string(),
@@ -102,6 +103,9 @@ exports.updatePersonDetailSchema = joi_1.default.object({
     }),
     majors: joi_1.default.array().required().messages({
         "any.required": "Please provde majors"
+    }),
+    notification_preferences: joi_1.default.array().required().messages({
+        "any.required": "Please provde notification_preferences"
     }),
     reviews: joi_1.default.array().required().messages({
         "any.required": "Please provde reviews"

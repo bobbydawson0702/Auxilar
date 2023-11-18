@@ -63,16 +63,16 @@ exports.jobRoute = [
                         .code(406);
                 }
                 const data = request.payload;
-                // check job already posted by current account
-                const alreadyPostedJob = yield job_3.default.findOne({
-                    client_email: account.email,
-                    title: data["title"],
-                });
-                if (alreadyPostedJob) {
-                    return response
-                        .response({ status: "err", err: "Job already posted" })
-                        .code(409);
-                }
+                // // check job already posted by current account
+                // const alreadyPostedJob = await Job.findOne({
+                //   client_email: account.email,
+                //   title: data["title"],
+                // });
+                // if (alreadyPostedJob) {
+                //   return response
+                //     .response({ status: "err", err: "Job already posted" })
+                //     .code(409);
+                // }
                 // Todo check expert list
                 const jobField = {
                     client: client.id,
@@ -82,7 +82,7 @@ exports.jobRoute = [
                     budget_type: data["budget_type"],
                     budget_amount: data["budget_amount"],
                     end_date: data["end_date"],
-                    expire_date: data["expire_date"],
+                    // expire_date: data["expire_date"],
                     category: data["category"],
                     skill_set: data["skill_set"],
                     job_type: data["job_type"],
@@ -152,7 +152,7 @@ exports.jobRoute = [
                     budget_type: data["budget_type"],
                     budget_amount: data["budget_amount"],
                     end_date: data["end_date"],
-                    expire_date: data["expire_date"],
+                    // expire_date: data["expire_date"],
                     state: data["state"],
                     category: data["category"],
                     skill_set: data["skill_set"],
@@ -618,12 +618,12 @@ exports.jobRoute = [
             auth: "jwt",
             description: "Get all recorded Categories",
             plugins: cateogory_1.getAllCategories,
-            tags: ["api", "expert"],
+            tags: ["api", "job"],
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 const currentDate = new Date().toUTCString();
-                console.log(`GET api/v1/expert/all-categories request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                console.log(`GET api/v1/job/all-categories request from ${request.auth.credentials.email} Time: ${currentDate}`);
                 const allCategories = yield category_1.default.find();
                 if (!allCategories) {
                     return response

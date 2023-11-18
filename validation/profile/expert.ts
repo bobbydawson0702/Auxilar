@@ -43,6 +43,8 @@ export const ProfileSchema = Joi.object({
     "any.requird": "Please provide majors",
   }),
 
+  notification_preferences: Joi.array<String>(),
+
   resume: Joi.string(),
 
   profile_links: Joi.array<String>(),
@@ -120,6 +122,9 @@ export const updatePersonDetailSchema = Joi.object({
   }),
   majors: Joi.array<String>().required().messages({
     "any.required": "Please provde majors"
+  }),
+  notification_preferences: Joi.array<String>().required().messages({
+    "any.required": "Please provde notification_preferences"
   }),
   reviews: Joi.array<Object>().required().messages({
     "any.required": "Please provde reviews"
