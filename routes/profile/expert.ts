@@ -87,7 +87,8 @@ export let expertRoute = [
           account: account.id,
           address: data["address"],
           country: data["country"],
-
+          state: data["state"] ?? null,
+          city: data["city"] ?? null,
           languages: data["languages"],
           avatar: data["avatar"],
           hourly_rate: data["hourly_rate"],
@@ -103,8 +104,8 @@ export let expertRoute = [
           education: data["education"],
         };
 
-        data["state"] ? (expertField["state"] = data["state"]) : null;
-        data["city"] ? (expertField["city"] = data["city"]) : null;
+        // data["state"] ? (expertField["state"] = data["state"]) : null;
+        // data["city"] ? (expertField["city"] = data["city"]) : null;
 
         // const expert = await Expert.findOneAndUpdate(
         //   { account: account.id },
@@ -828,6 +829,8 @@ export let expertRoute = [
           languages: data["languages"],
           skills: data["skills"],
           majors: data["majors"],
+          state: data["state"] ?? null,
+          city: data["city"] ?? null,
           // notification_preferences: data["notification_preferences"] ?? null,
           // reviews: data["reviews"] ?? null,
           active_status: data["active_status"],
@@ -836,15 +839,20 @@ export let expertRoute = [
           // linkedin: data["linkedin"] ?? null,
         };
 
-        data["state"] ? (updateData["state"] = data["state"]) : null;
-        data["city"] ? (updateData["city"] = data["city"]) : null;
-
         const expert = await Expert.findOneAndUpdate(
           { account: account.id },
           {
             $set: updateData,
-          }
+          },
+          { new: true }
         );
+
+        // data["state"]
+        //   ? (expert["state"] = data["state"])
+        //   : (expert["state"] = null);
+        // data["city"]
+        //   ? (expert["city"] = data["city"])
+        //   : (expert["city"] = null);
 
         // await expert.save();
 

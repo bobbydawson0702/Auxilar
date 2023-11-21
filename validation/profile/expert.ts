@@ -17,8 +17,8 @@ export const ProfileSchema = Joi.object({
   //   "any.required": "Please provide city",
   // }),
 
-  state: Joi.string(),
-  city: Joi.string(),
+  state: Joi.string().allow(null).allow("").optional(),
+  city: Joi.string().allow(null).allow("").optional(),
 
   languages: Joi.array<String>().required().messages({
     "any.required": "Please provide languages",
@@ -119,8 +119,8 @@ export const updatePersonDetailSchema = Joi.object({
   country: Joi.string().required().messages({
     "any.required": "Please provide country",
   }),
-  state: Joi.string(),
-  city: Joi.string(),
+  state: Joi.string().allow(null).allow("").optional(),
+  city: Joi.string().allow(null).allow("").optional(),
   languages: Joi.array<Object>().required().messages({
     "any.required": "Please provide languages",
   }),
