@@ -101,6 +101,14 @@ const ExpertSchema = new Schema({
     },
   ],
 
+  mentors: [
+    {
+      mentor: {
+        type: Schema.Types.ObjectId
+      }
+    }
+  ],
+
   reviews: [
     {
       reviewer: {

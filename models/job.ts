@@ -49,7 +49,7 @@ const JobSchema = new Schema({
 
   category: {
     type: [String],
-    required: true
+    required: true,
   },
 
   skill_set: {
@@ -68,11 +68,16 @@ const JobSchema = new Schema({
     enum: ["lessthan10", "between10and20", "between20and30", "morethan30"],
     default: "morethan30",
   },
-  
+
   project_duration: {
     type: String,
     required: true,
-    enum: ["lessthan1month", "between1and3months", "between3and6months", "morethan6months"],
+    enum: [
+      "lessthan1month",
+      "between1and3months",
+      "between3and6months",
+      "morethan6months",
+    ],
     default: "morethan6months",
   },
 
@@ -116,19 +121,40 @@ const JobSchema = new Schema({
         required: true,
       },
       attached_file: {
-        type: String,
+        name: {
+          type: String
+        },
+        file_id: {
+          type: Schema.Types.ObjectId
+        }
       },
       viewed_by_client: {
         type: Number,
         default: 0,
       },
+      mentor_check: [
+        {
+          mentor: {
+            type: Schema.Types.ObjectId,
+          },
+          checked: {
+            type: Boolean,
+            default: 0, // 0: not check or not apply mentor, 1: mentor check
+          },
+        },
+      ],
       proposal_status: {
         type: Number,
         default: 0,
+        enum: [0, 1, 2], // 0: visible to client, 1: withdraw(deleted), 2: pending status
       },
       pub_date: {
         type: Date,
         default: Date.now,
+      },
+      total_amount: {
+        type: Number,
+        required: true
       },
       milestones: [
         {

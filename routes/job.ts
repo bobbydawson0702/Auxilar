@@ -266,11 +266,48 @@ export let jobRoute = [
             .code(403);
         }
 
-        const allMyJobs: Array<Object> = await Job.find({
-          client_email: account.email,
-        }).sort({
-          pub_date: -1,
-        });
+        // const allMyJobs: Array<Object> = await Job.find({
+        //   client_email: account.email,
+        // }).sort({
+        //   pub_date: -1,
+        // });
+        const allMyJobs = await Job.aggregate([
+          {
+            $match: {
+              client_email: account.email,
+            },
+          },
+          {
+            $project: {
+              client_email: 1,
+              title: 1,
+              description: 1,
+              budget_type: 1,
+              budget_amount: 1,
+              pub_dae: 1,
+              state: 1,
+              category: 1,
+              skill_set: 1,
+              job_type: 1,
+              hours_per_week: 1,
+              project_duration: 1,
+              invited_expert: 1,
+              proposals: {
+                $filter: {
+                  input: "$proposals",
+                  as: "proposal",
+                  cond: {
+                    $eq: ["$$proposal.proposal_status", 1],
+                  },
+                },
+              },
+            },
+          },
+          {
+            $sort: { pub_date: -1 },
+          },
+        ]);
+         
         if (allMyJobs.length === 0) {
           return response
             .response({ status: "err", err: "Posted job not found!" })

@@ -60,6 +60,19 @@ const MentorSchema = new Schema({
     required: true,
   },
 
+  experts: [
+    {
+      expert: {
+        expert_id: {
+          type: Schema.Types.ObjectId
+        },
+        jobs: {
+          type: [Schema.Types.ObjectId]
+        }
+      }
+    }
+  ],
+
   ongoing_project: [
     {
       project: {
