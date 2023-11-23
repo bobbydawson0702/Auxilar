@@ -135,7 +135,7 @@ const JobSchema = new Schema({
       mentor_check: [
         {
           mentor: {
-            type: Schema.Types.ObjectId,
+            type: String,
           },
           checked: {
             type: Boolean,

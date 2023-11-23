@@ -7,9 +7,9 @@ const milestone = Joi.object().keys({
   }),
   from: Joi.date(),
   to: Joi.date(),
-  title: Joi.string().required().messages({
-    "any.required": "Pleas provide title",
-  }),
+  // title: Joi.string().required().messages({
+  //   "any.required": "Pleas provide title",
+  // }),
   description: Joi.string().required().messages({
     "any.required": "Please provide description",
   }),

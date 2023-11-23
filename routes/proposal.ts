@@ -471,13 +471,13 @@ export let proposalRoute = [
             {
               $match: {
                 _id: new ObjectId(request.params.jobId),
-                "proposals.mentor_check.mentor": new ObjectId(account.id),
+                "proposals.mentor_check.mentor": account.email,
               },
             },
             { $unwind: "$proposals" },
             {
               $match: {
-                "proposals.mentor_check.mentor": new ObjectId(account.id),
+                "proposals.mentor_check.mentor": account.email,
               },
             },
           ]);
@@ -649,7 +649,6 @@ export let proposalRoute = [
             .code(403);
         }
         let proposal;
-        const ObjectId = mongoose.Types.ObjectId;
         if (account.account_type === "expert") {
           proposal = await Job.aggregate([
             { $unwind: "$proposals" },
@@ -670,7 +669,7 @@ export let proposalRoute = [
             { $unwind: "$proposals" },
             {
               $match: {
-                "proposals.mentor_check.mentor": new ObjectId(account.id),
+                "proposals.mentor_check.mentor": account.email,
               },
             },
           ]);
