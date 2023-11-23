@@ -2,10 +2,12 @@ import { Request, ResponseToolkit } from "@hapi/hapi";
 import GridFsStorage from "multer-gridfs-storage";
 import multer from "multer";
 import Grid from "gridfs-stream";
+import fs from "fs";
 
 import {
   ProposalSwagger,
   deleteProposalSwagger,
+  downloadProposalSwagger,
   getAllProposalSwagger,
   getProposalSwagger,
   updateProposalSwagger,
@@ -14,7 +16,7 @@ import { ProposalSchema, updateProposalSchema } from "../validation/proposal";
 import Account from "../models/account";
 import Expert from "../models/profile/expert";
 import Job from "../models/job";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -89,7 +91,7 @@ export let proposalRoute = [
           // Check whether already apply proposal
           const existingProposal = await Job.findOne({
             _id: request.params.jobId,
-            "proposals.expert_email": account.email,
+            "proposals.expert.email": account.email,
           });
           console.log(
             "request.params.jobId--------------------",
@@ -102,14 +104,16 @@ export let proposalRoute = [
           }
 
           const proposalField = {
-            expert_email: account.email,
+            expert: { id: account.id, email: account.email },
             cover_letter: data["proposalData"]["cover_letter"],
             total_amount: data["proposalData"]["total_amount"],
             milestones: data["proposalData"]["milestones"],
             proposal_status: 1,
             mentor_check: [],
-            attached_file: {},
+            attached_files: [],
           };
+
+          // Check whether mentors exist
 
           if (data["proposalData"]["mentors"]) {
             const mentor_check = [];
@@ -124,38 +128,108 @@ export let proposalRoute = [
             proposalField["proposal_status"] = 2;
           }
 
-          if (data["attached_file"]) {
-            const bucketdb = mongoose.connection.db;
-            const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
-              bucketName: "file",
-            });
+          console.log(
+            "data[attached_files]------------------------>>>>>>>>>>>>>>",
+            data["attached_files"]
+          );
 
-            const attached_file = data["attached_file"];
-            // console.log(request.payload);
+          if (data["attached_files"]) {
+            // push proposal not add attached_files info
+            await Job.findOneAndUpdate(
+              { _id: request.params.jobId },
+              {
+                $push: {
+                  proposals: proposalField,
+                },
+              },
+              { new: true }
+            );
 
-            console.log(
-              "-------------here-----------",
-              attached_file.hapi.filename
-            );
-            const uploadStream = bucket.openUploadStream(
-              attached_file.hapi.filename
-            );
-            uploadStream.on("finish", async (file) => {
-              proposalField["attached_file"] = {
-                name: attached_file.hapi.filename,
-                file_id: file._id,
-              };
-              const proposal = await Job.findOneAndUpdate(
-                { _id: request.params.jobId },
-                {
-                  $push: {
-                    proposals: proposalField,
+            // get proposal id
+            const ObjectId = mongoose.Types.ObjectId;
+            const proposal = await Job.aggregate([
+              {
+                $match: {
+                  _id: new ObjectId(request.params.jobId),
+                  "proposals.expert.email": account.email,
+                },
+              },
+              {
+                $project: {
+                  proposals: {
+                    $filter: {
+                      input: "$proposals",
+                      as: "proposal",
+                      cond: {
+                        $eq: [
+                          "$$proposal.expert.email",
+                          request.auth.credentials.email,
+                        ],
+                      },
+                    },
                   },
                 },
-                { new: true }
-              ).select("proposals");
+              },
+            ]);
+            console.log(
+              "proposals ---------------------->>>>>>>>>>>>>",
+              proposal
+            );
+            data["attached_files"].forEach(async (fileItem) => {
+              const bucketdb = mongoose.connection.db;
+              const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
+                bucketName: "file",
+              });
+
+              const attached_file = fileItem;
+              // console.log(request.payload);
+
+              console.log(
+                "-------------here-----------",
+                attached_file.hapi.filename
+              );
+              const uploadStream = bucket.openUploadStream(
+                attached_file.hapi.filename
+              );
+              uploadStream.on("finish", async (file) => {
+                // proposalField["attached_files"].push ({
+                //   name: attached_file.hapi.filename,
+                //   file_id: file._id,
+                // });
+                console.log(
+                  "<<<<<<<<<--------attached_file.hapi.filename----------->>>>>>>>>>>>>>>>>>",
+                  attached_file.hapi.filename
+                );
+                console.log(
+                  "<<<<<<<<<--------file._id----------->>>>>>>>>>>>>>>>>>",
+                  file._id
+                );
+                console.log(
+                  "<<<<<<<<<--------proposal._id----------->>>>>>>>>>>>>>>>>>",
+                  proposal[0].proposals[0]._id
+                );
+                const attachedProposal = await Job.findOneAndUpdate(
+                  {
+                    _id: request.params.jobId,
+                    "proposals._id": proposal[0].proposals[0]._id,
+                  },
+                  {
+                    $push: {
+                      "proposals.$.attached_files": {
+                        name: attached_file.hapi.filename,
+                        file_id: file._id,
+                      },
+                    },
+                  },
+                  { new: true }
+                );
+                console.log(
+                  "------------------------attachedProposal--------------------",
+                  attachedProposal
+                );
+              });
+              await attached_file.pipe(uploadStream);
             });
-            await attached_file.pipe(uploadStream);
           } else {
             console.log(
               "----------------------------here-------------------------------------"
@@ -243,34 +317,37 @@ export let proposalRoute = [
             const appliedProposal = await Job.findOne(
               {
                 _id: request.params.jobId,
-                "proposals.expert_email": account.email,
+                "proposals.expert.email": account.email,
               },
               { "proposals.$": 1 }
             );
             console.log(
               "here---------------------->>>>>>>>>>",
-              Object.keys(appliedProposal.proposals[0]["attached_file"])
+              appliedProposal
             );
-            const fileid =
-              appliedProposal.proposals[0]["attached_file"].file_id;
+            const attached_file =
+              appliedProposal.proposals[0]["attached_files"];
 
-            console.log("fileid---------------------->>>>>>>>>>>>", fileid);
-            if (fileid) {
-              console.log(
-                "fileid defined????---------------------->>>>>>>>>>>>",
-                fileid
-              );
-              const bucketdb = mongoose.connection.db;
-              const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
-                bucketName: "file",
+            console.log(
+              "attached_file.length-------------->>>>>>>>>>>>>>",
+              attached_file
+            );
+
+            if (attached_file) {
+              attached_file.forEach((item) => {
+                const bucketdb = mongoose.connection.db;
+                const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
+                  bucketName: "file",
+                });
+                console.log("item---------------->>>>>>>>>>>>>>", item);
+                try {
+                  bucket.delete(item.file_id);
+                } catch (err) {
+                  return response
+                    .response({ status: "err", err: "Not implemented" })
+                    .code(501);
+                }
               });
-              try {
-                bucket.delete(fileid);
-              } catch (err) {
-                return response
-                  .response({ status: "err", err: "Not implemented" })
-                  .code(501);
-              }
             }
           } catch (err) {
             return response
@@ -279,13 +356,13 @@ export let proposalRoute = [
           }
 
           const proposalField = {
-            expert_email: account.email,
+            expert: { id: account.id, email: account.email },
             cover_letter: data["proposalData"]["cover_letter"],
             total_amount: data["proposalData"]["total_amount"],
             milestones: data["proposalData"]["milestones"],
             proposal_status: 1,
             mentor_check: [],
-            attached_file: {},
+            attached_files: [],
           };
 
           if (data["proposalData"]["mentors"].length) {
@@ -305,57 +382,12 @@ export let proposalRoute = [
             proposalField["proposal_status"] = 2;
           }
 
-          if (data["attached_file"]) {
-            const bucketdb = mongoose.connection.db;
-            const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
-              bucketName: "file",
-            });
-
-            const attached_file = data["attached_file"];
-            // console.log(request.payload);
-
-            const uploadStream = bucket.openUploadStream(
-              attached_file.hapi.filename
-            );
-            uploadStream.on("finish", async (file) => {
-              proposalField["attached_file"] = {
-                name: attached_file.hapi.filename,
-                file_id: file._id,
-              };
-              const proposal = await Job.findOneAndUpdate(
-                {
-                  _id: request.params.jobId,
-                  "proposals.expert_email": account.email,
-                },
-                {
-                  $set: {
-                    "proposals.$.cover_letter": proposalField.cover_letter,
-                    "proposals.$.total_amount": proposalField.total_amount,
-                    "proposals.$.milestones": proposalField.milestones,
-                    "proposals.$.proposal_status":
-                      proposalField.proposal_status,
-                    "proposals.$.mentor_check":
-                      proposalField["mentor_check"] ?? null,
-                    "proposals.$.attached_file": proposalField["attached_file"],
-                  },
-                },
-                { new: true }
-              );
-            });
-
-            console.log(
-              "-------------here-----------",
-              attached_file.hapi.filename
-            );
-            await attached_file.pipe(uploadStream);
-          } else {
-            console.log(
-              "----------------------------here-------------------------------------"
-            );
-            const proposal = await Job.findOneAndUpdate(
+          if (data["attached_files"]) {
+            // Update proposal not add attached_files info
+            await Job.findOneAndUpdate(
               {
                 _id: request.params.jobId,
-                "proposals.expert_email": account.email,
+                "proposals.expert.email": account.email,
               },
               {
                 $set: {
@@ -365,7 +397,115 @@ export let proposalRoute = [
                   "proposals.$.proposal_status": proposalField.proposal_status,
                   "proposals.$.mentor_check":
                     proposalField["mentor_check"] ?? null,
-                  "proposals.$.attached_file": null,
+                  "proposals.$.attached_files": [],
+                },
+              },
+              { new: true }
+            );
+
+            // get proposal id
+            const ObjectId = mongoose.Types.ObjectId;
+            const proposal = await Job.aggregate([
+              {
+                $match: {
+                  _id: new ObjectId(request.params.jobId),
+                  "proposals.expert.email": account.email,
+                },
+              },
+              {
+                $project: {
+                  proposals: {
+                    $filter: {
+                      input: "$proposals",
+                      as: "proposal",
+                      cond: {
+                        $eq: [
+                          "$$proposal.expert.email",
+                          request.auth.credentials.email,
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            ]);
+            console.log(
+              "proposals ---------------------->>>>>>>>>>>>>",
+              proposal
+            );
+            data["attached_files"].forEach(async (fileItem) => {
+              const bucketdb = mongoose.connection.db;
+              const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
+                bucketName: "file",
+              });
+
+              const attached_file = fileItem;
+              // console.log(request.payload);
+
+              console.log(
+                "-------------here-----------",
+                attached_file.hapi.filename
+              );
+              const uploadStream = bucket.openUploadStream(
+                attached_file.hapi.filename
+              );
+              uploadStream.on("finish", async (file) => {
+                // proposalField["attached_files"].push ({
+                //   name: attached_file.hapi.filename,
+                //   file_id: file._id,
+                // });
+                console.log(
+                  "<<<<<<<<<--------attached_file.hapi.filename----------->>>>>>>>>>>>>>>>>>",
+                  attached_file.hapi.filename
+                );
+                console.log(
+                  "<<<<<<<<<--------file._id----------->>>>>>>>>>>>>>>>>>",
+                  file._id
+                );
+                console.log(
+                  "<<<<<<<<<--------proposal._id----------->>>>>>>>>>>>>>>>>>",
+                  proposal[0].proposals[0]._id
+                );
+                const attachedProposal = await Job.findOneAndUpdate(
+                  {
+                    _id: request.params.jobId,
+                    "proposals._id": proposal[0].proposals[0]._id,
+                  },
+                  {
+                    $push: {
+                      "proposals.$.attached_files": {
+                        name: attached_file.hapi.filename,
+                        file_id: file._id,
+                      },
+                    },
+                  },
+                  { new: true }
+                );
+                console.log(
+                  "------------------------attachedProposal--------------------",
+                  attachedProposal
+                );
+              });
+              await attached_file.pipe(uploadStream);
+            });
+          } else {
+            console.log(
+              "----------------------------here-------------------------------------"
+            );
+            const proposal = await Job.findOneAndUpdate(
+              {
+                _id: request.params.jobId,
+                "proposals.expert.email": account.email,
+              },
+              {
+                $set: {
+                  "proposals.$.cover_letter": proposalField.cover_letter,
+                  "proposals.$.total_amount": proposalField.total_amount,
+                  "proposals.$.milestones": proposalField.milestones,
+                  "proposals.$.proposal_status": proposalField.proposal_status,
+                  "proposals.$.mentor_check":
+                    proposalField["mentor_check"] ?? null,
+                  "proposals.$.attached_files": null,
                 },
               },
               { new: true }
@@ -440,7 +580,7 @@ export let proposalRoute = [
             {
               $match: {
                 _id: new ObjectId(request.params.jobId),
-                "proposals.expert_email": account.email,
+                "proposals.expert.email": account.email,
               },
             },
             {
@@ -451,7 +591,7 @@ export let proposalRoute = [
                     as: "proposal",
                     cond: {
                       $eq: [
-                        "$$proposal.expert_email",
+                        "$$proposal.expert.email",
                         request.auth.credentials.email,
                       ],
                     },
@@ -525,7 +665,7 @@ export let proposalRoute = [
         // Check whether already apply proposal
         const existingProposal = await Job.findOne({
           _id: request.params.jobId,
-          "proposals.expert_email": account.email,
+          "proposals.expert.email": account.email,
         });
         console.log(
           "existingproposal ------------->>>>>>>>>>>",
@@ -541,11 +681,11 @@ export let proposalRoute = [
           await Job.findOneAndUpdate(
             {
               _id: request.params.jobId,
-              "proposals.expert_email": account.email,
+              "proposals.expert.email": account.email,
             },
             {
               $pull: {
-                proposals: { expert_email: account.email },
+                proposals: { "expert.email": account.email },
               },
             }
           );
@@ -604,7 +744,7 @@ export let proposalRoute = [
         const proposal = await Job.findOneAndUpdate(
           {
             _id: request.params.jobId,
-            "proposals.expert_email": account.email,
+            "proposals.expert.email": account.email,
           },
           {
             $set: {
@@ -654,7 +794,7 @@ export let proposalRoute = [
             { $unwind: "$proposals" },
             {
               $match: {
-                "proposals.expert_email": account.email,
+                "proposals.expert.email": account.email,
               },
             },
           ]);
@@ -672,6 +812,37 @@ export let proposalRoute = [
                 "proposals.mentor_check.mentor": account.email,
               },
             },
+            {
+              $lookup: {
+                from: "experts",
+                localField: "proposals.expert.id",
+                foreignField: "account",
+                as: "expertAvatar",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "proposals.expert.id",
+                foreignField: "_id",
+                as: "expertName",
+                pipeline: [
+                  {
+                    $project: {
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
           ]);
           if (!proposal) {
             return response
@@ -685,6 +856,56 @@ export let proposalRoute = [
         return response
           .response({ staus: "err", err: "Not implemented" })
           .code(501);
+      }
+    },
+  },
+  {
+    method: "GET",
+    path: "/download/{fileId}",
+    options: {
+      auth: "jwt",
+      description: "download specific attached_file",
+      plugins: downloadProposalSwagger,
+      tags: ["api", "proposal"],
+    },
+    handler: async (request: Request, h) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(`GET api/v1/proposal/download/${request.params.fileId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+
+        const bucketdb = mongoose.connection.db;
+        const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
+          bucketName: "file",
+        });
+
+        // const downloadfile = bucket
+        // .openDownloadStream(new ObjectId(`${request.params.fileId}`))
+        // .pipe(fs.createWriteStream("Contract Project Lead.docx"));
+        // const cursor = bucket.find({_id: new ObjectId(`${request.params.fileId}`)});
+        // for await (const docs of cursor) {
+        //   console.log(docs);
+        // }
+        const ObjectId = mongoose.Types.ObjectId;
+        let mime = require("mime-types");
+        console.log("mime------------->>>>>>>>>>>>>>", "mime");
+        let file = bucket.find({ _id: new ObjectId(request.params.fileId) });
+        let filename;
+        let contentType;
+        for await (const docs of file) {
+          console.log(docs);
+          filename = docs.filename;
+          contentType = mime.contentType(docs.filename);
+        }
+
+        const downloadStream = bucket.openDownloadStream(new ObjectId(request.params.fileId));
+        // console.log("file---------------->>>>>>>>>>>", file);
+
+        return h.response(downloadStream)
+        .header('Content-Type', contentType)
+        .header('Content-Disposition', "attachment; filename= " + filename);
+      } catch (err) {
+        return h.response({ status: "err", err: "Download failed" }).code(501);
       }
     },
   },

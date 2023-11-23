@@ -112,22 +112,30 @@ const JobSchema = new Schema({
 
   proposals: [
     {
-      expert_email: {
-        type: String,
-        required: true,
+      expert: {
+        id: {
+          type: Schema.Types.ObjectId,
+          required: true,
+        },
+        email: {
+          type: String,
+          required: true,
+        },
       },
       cover_letter: {
         type: String,
         required: true,
       },
-      attached_file: {
-        name: {
-          type: String
+      attached_files: [
+        {
+          name: {
+            type: String,
+          },
+          file_id: {
+            type: Schema.Types.ObjectId,
+          },
         },
-        file_id: {
-          type: Schema.Types.ObjectId
-        }
-      },
+      ],
       viewed_by_client: {
         type: Number,
         default: 0,
@@ -154,7 +162,7 @@ const JobSchema = new Schema({
       },
       total_amount: {
         type: Number,
-        required: true
+        required: true,
       },
       milestones: [
         {
@@ -178,7 +186,7 @@ const JobSchema = new Schema({
             type: String,
             required: true,
           },
-          ammount: {
+          amount: {
             type: Number,
             required: true,
           },

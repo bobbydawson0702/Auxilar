@@ -48,7 +48,6 @@ const dbConnect_1 = __importDefault(require("./lib/dbConnect"));
 const routes_1 = __importDefault(require("./routes"));
 const major_1 = __importDefault(require("./models/major"));
 const skill_1 = __importDefault(require("./models/skill"));
-const category_1 = __importDefault(require("./models/category"));
 const vadliateAccount = (decoded, request, h) => __awaiter(void 0, void 0, void 0, function* () {
     return { isValid: true, accountId: decoded.accountId };
 });
@@ -56,7 +55,7 @@ const path = process_1.default.cwd();
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, dbConnect_1.default)();
     const server = new hapi.Server({
-        port: 3050,
+        port: 3030,
         routes: { cors: { origin: ["*"] } },
         host: "0.0.0.0",
     });
@@ -117,11 +116,9 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
     // ----------------------------------------------------- Initialize Skill, Major database -------------------------------------------------------------------//
     yield skill_1.default.deleteMany({});
     yield major_1.default.deleteMany({});
-    yield category_1.default.deleteMany({});
     for (let index = 1; index <= 20; index++) {
         yield skill_1.default.create({ name: "skill" + index });
         yield major_1.default.create({ name: "major" + index });
-        yield category_1.default.create({ name: "category" + index });
     }
     return server;
 });

@@ -480,5 +480,38 @@ exports.accountRoute = [
             }
         }),
     },
+    {
+        method: "GET",
+        path: "/mentors",
+        options: {
+            auth: "jwt",
+            description: "Get mentor list",
+            plugins: account_2.currentAccountSwagger,
+            tags: ["api", "account"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/account/mentors request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                console.log(request.auth.credentials.email);
+                const account = yield account_1.default.find({
+                    account_type: "mentor"
+                }).select({ email: 1, _id: false });
+                // if (!account) {
+                //   return response.response({ err: "Account not found!" }).code(404);
+                // }
+                // const fullName = account.first_name + " " + account.last_name;
+                return response
+                    .response({
+                    account,
+                })
+                    .code(200);
+            }
+            catch (error) {
+                console.log(error);
+                return response.response({ err: error }).code(500);
+            }
+        }),
+    },
 ];
 //# sourceMappingURL=account.js.map
