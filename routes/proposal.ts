@@ -858,13 +858,13 @@ export let proposalRoute = [
             .code(403);
         }
         // try {
-        const approvedProposal = await Job.findOneAndUpdate(
+        await Job.findOneAndUpdate(
           {
             $and: [
               { _id: request.params.jobId },
               { "proposals._id": request.params.proposalId },
               {
-                "proposals.mentor_check.mentor": request.auth.credentials.email,
+                "proposals.mentor_check.mentor": account.email,
               },
             ],
           },
@@ -875,6 +875,23 @@ export let proposalRoute = [
           },
           { new: true }
         );
+
+        const ObjectId = mongoose.Types.ObjectId;
+
+        const approvedProposal = await Job.aggregate([
+          {
+            $match: {
+              _id: new ObjectId(request.params.jobId),
+            },
+          },
+          { $unwind: "$proposals" },
+          {
+            $match: {
+              "proposals._id": new ObjectId(request.params.proposalId),
+              "proposals.mentor_check.mentor": account.email,
+            },
+          },
+        ]);
         // } catch (err) {
         //   return response
         //     .response({ status: "err", err: "Applied proposal Not found!" })
