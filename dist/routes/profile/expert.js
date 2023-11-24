@@ -44,6 +44,7 @@ exports.expertRoute = [
             },
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a, _b;
             try {
                 console.log(`POST api/v1/expert request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
@@ -60,6 +61,8 @@ exports.expertRoute = [
                     account: account.id,
                     address: data["address"],
                     country: data["country"],
+                    state: (_a = data["state"]) !== null && _a !== void 0 ? _a : null,
+                    city: (_b = data["city"]) !== null && _b !== void 0 ? _b : null,
                     languages: data["languages"],
                     avatar: data["avatar"],
                     hourly_rate: data["hourly_rate"],
@@ -74,8 +77,8 @@ exports.expertRoute = [
                     linkedin: data["linkedin"],
                     education: data["education"],
                 };
-                data["state"] ? (expertField["state"] = data["state"]) : null;
-                data["city"] ? (expertField["city"] = data["city"]) : null;
+                // data["state"] ? (expertField["state"] = data["state"]) : null;
+                // data["city"] ? (expertField["city"] = data["city"]) : null;
                 // const expert = await Expert.findOneAndUpdate(
                 //   { account: account.id },
                 //   { $set: expertField },
@@ -638,6 +641,7 @@ exports.expertRoute = [
             },
         },
         handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            var _c, _d;
             try {
                 console.log(`PUT api/v1/expert/person-detail request from ${request.auth.credentials.email}`);
                 const account = yield account_1.default.findById(request.auth.credentials.accountId);
@@ -650,6 +654,8 @@ exports.expertRoute = [
                     languages: data["languages"],
                     skills: data["skills"],
                     majors: data["majors"],
+                    state: (_c = data["state"]) !== null && _c !== void 0 ? _c : null,
+                    city: (_d = data["city"]) !== null && _d !== void 0 ? _d : null,
                     // notification_preferences: data["notification_preferences"] ?? null,
                     // reviews: data["reviews"] ?? null,
                     active_status: data["active_status"],
@@ -657,11 +663,15 @@ exports.expertRoute = [
                     // profile_links: data["profile_links"] ?? null,
                     // linkedin: data["linkedin"] ?? null,
                 };
-                data["state"] ? (updateData["state"] = data["state"]) : null;
-                data["city"] ? (updateData["city"] = data["city"]) : null;
                 const expert = yield expert_3.default.findOneAndUpdate({ account: account.id }, {
                     $set: updateData,
-                });
+                }, { new: true });
+                // data["state"]
+                //   ? (expert["state"] = data["state"])
+                //   : (expert["state"] = null);
+                // data["city"]
+                //   ? (expert["city"] = data["city"])
+                //   : (expert["city"] = null);
                 // await expert.save();
                 // const responseData = await expert.populate("account", [
                 //   "first_name",

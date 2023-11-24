@@ -18,8 +18,8 @@ exports.ProfileSchema = joi_1.default.object({
     // city: Joi.string().required().messages({
     //   "any.required": "Please provide city",
     // }),
-    state: joi_1.default.string(),
-    city: joi_1.default.string(),
+    state: joi_1.default.string().allow(null).allow("").optional(),
+    city: joi_1.default.string().allow(null).allow("").optional(),
     languages: joi_1.default.array().required().messages({
         "any.required": "Please provide languages",
     }),
@@ -99,8 +99,8 @@ exports.updatePersonDetailSchema = joi_1.default.object({
     country: joi_1.default.string().required().messages({
         "any.required": "Please provide country",
     }),
-    state: joi_1.default.string(),
-    city: joi_1.default.string(),
+    state: joi_1.default.string().allow(null).allow("").optional(),
+    city: joi_1.default.string().allow(null).allow("").optional(),
     languages: joi_1.default.array().required().messages({
         "any.required": "Please provide languages",
     }),

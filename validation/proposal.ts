@@ -13,8 +13,8 @@ const milestone = Joi.object().keys({
   description: Joi.string().required().messages({
     "any.required": "Please provide description",
   }),
-  ammount: Joi.number().required().messages({
-    "any.required": "Please provide ammount",
+  amount: Joi.number().required().messages({
+    "any.required": "Please provide amount",
   }),
 });
 
@@ -51,7 +51,7 @@ export const ProposalSchema = Joi.object({
       "any.required": "Please provide milestones",
     }),
   }),
-  attached_file: Joi.any().allow(null).allow("").meta({ swaggerType: "file" }),
+  attached_files: Joi.array().allow(null).allow("").meta({ swaggerType: "file" }),
 });
 export const updateProposalSchema = Joi.object({
   proposalData: custom.object({
@@ -66,5 +66,5 @@ export const updateProposalSchema = Joi.object({
       "any.required": "Please provide milestones",
     }),
   }),
-  attached_file: Joi.any().allow(null).allow("").meta({ swaggerType: "file" }),
+  attached_files: Joi.array().allow(null).allow("").meta({ swaggerType: "file" }),
 });

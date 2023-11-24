@@ -115,7 +115,44 @@ export const ProposalSwagger = {
           description: "Posted Proposal not found!",
         },
         501: {
-          description: "Requeset not implemented.",
+          description: "Request not implemented.",
+        },
+      },
+    },
+  };
+  export const downloadProposalSwagger = {
+    "hapi-swagger": {
+      responses: {
+        200: {
+          description: "Download attached files Success",
+        },
+        403: {
+          description: "Forbidden request",
+        },
+        404: {
+          description: "Proposal not found!",
+        },
+        501: {
+          description: "Request not implemented.",
+        },
+      },
+    },
+  };
+
+  export const approveProposalSwagger = {
+    "hapi-swagger": {
+      responses: {
+        200: {
+          description: "Proposal approved Successfully",
+        },
+        403: {
+          description: "Forbidden request",
+        },
+        404: {
+          description: "Applied Proposal not found!",
+        },
+        501: {
+          description: "Request not implemented.",
         },
       },
     },
