@@ -1,10 +1,21 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
+<<<<<<< HEAD
+=======
+import GridFsStorage from "multer-gridfs-storage";
+import multer from "multer";
+import Grid from "gridfs-stream";
+import fs from "fs";
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
 
 import {
   ProposalSwagger,
   approveProposalSwagger,
   deleteProposalSwagger,
   downloadProposalSwagger,
+<<<<<<< HEAD
+=======
+  getAllProposalSwagger,
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
   getProposalSwagger,
   updateProposalSwagger,
 } from "../swagger/proposal";
@@ -12,7 +23,7 @@ import { ProposalSchema, updateProposalSchema } from "../validation/proposal";
 import Account from "../models/account";
 import Expert from "../models/profile/expert";
 import Job from "../models/job";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -122,7 +133,15 @@ export let proposalRoute = [
             proposalField["proposal_status"] = 2;
           }
 
+<<<<<<< HEAD
           // Check whether attached_files exist
+=======
+          console.log(
+            "data[attached_files]------------------------>>>>>>>>>>>>>>",
+            data["attached_files"]
+          );
+
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
           if (data["attached_files"]) {
             // push proposal not add attached_files info
             await Job.findOneAndUpdate(
@@ -161,9 +180,16 @@ export let proposalRoute = [
                 },
               },
             ]);
+<<<<<<< HEAD
 
             // upload attached files
 
+=======
+            console.log(
+              "proposals ---------------------->>>>>>>>>>>>>",
+              proposal
+            );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
             data["attached_files"].forEach(async (fileItem) => {
               const bucketdb = mongoose.connection.db;
               const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
@@ -171,6 +197,10 @@ export let proposalRoute = [
               });
 
               const attached_file = fileItem;
+<<<<<<< HEAD
+=======
+              // console.log(request.payload);
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
 
               console.log(
                 "-------------here-----------",
@@ -180,7 +210,26 @@ export let proposalRoute = [
                 attached_file.hapi.filename
               );
               uploadStream.on("finish", async (file) => {
+<<<<<<< HEAD
                 // record attached_files info to database
+=======
+                // proposalField["attached_files"].push ({
+                //   name: attached_file.hapi.filename,
+                //   file_id: file._id,
+                // });
+                console.log(
+                  "<<<<<<<<<--------attached_file.hapi.filename----------->>>>>>>>>>>>>>>>>>",
+                  attached_file.hapi.filename
+                );
+                console.log(
+                  "<<<<<<<<<--------file._id----------->>>>>>>>>>>>>>>>>>",
+                  file._id
+                );
+                console.log(
+                  "<<<<<<<<<--------proposal._id----------->>>>>>>>>>>>>>>>>>",
+                  proposal[0].proposals[0]._id
+                );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
                 const attachedProposal = await Job.findOneAndUpdate(
                   {
                     _id: request.params.jobId,
@@ -196,6 +245,13 @@ export let proposalRoute = [
                   },
                   { new: true }
                 );
+<<<<<<< HEAD
+=======
+                console.log(
+                  "------------------------attachedProposal--------------------",
+                  attachedProposal
+                );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
               });
               await attached_file.pipe(uploadStream);
             });
@@ -286,17 +342,36 @@ export let proposalRoute = [
               },
               { "proposals.$": 1 }
             );
+<<<<<<< HEAD
             const attached_file =
               appliedProposal.proposals[0]["attached_files"];
 
             // delete uploaded file
+=======
+            console.log(
+              "here---------------------->>>>>>>>>>",
+              appliedProposal
+            );
+            const attached_file =
+              appliedProposal.proposals[0]["attached_files"];
+
+            console.log(
+              "attached_file.length-------------->>>>>>>>>>>>>>",
+              attached_file
+            );
+
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
             if (attached_file) {
               attached_file.forEach((item) => {
                 const bucketdb = mongoose.connection.db;
                 const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
                   bucketName: "file",
                 });
+<<<<<<< HEAD
 
+=======
+                console.log("item---------------->>>>>>>>>>>>>>", item);
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
                 try {
                   bucket.delete(item.file_id);
                 } catch (err) {
@@ -320,7 +395,11 @@ export let proposalRoute = [
             milestones: data["proposalData"]["milestones"],
             proposal_status: 1,
             mentor_check: [],
+<<<<<<< HEAD
             attached_files: [], // don't use null
+=======
+            attached_files: [],
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
           };
 
           if (data["proposalData"]["mentors"].length) {
@@ -339,7 +418,11 @@ export let proposalRoute = [
             proposalField["mentor_check"] = mentor_check;
             proposalField["proposal_status"] = 2;
           }
+<<<<<<< HEAD
           // Upadate proposal which have attached_files
+=======
+
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
           if (data["attached_files"]) {
             // Update proposal not add attached_files info
             await Job.findOneAndUpdate(
@@ -387,7 +470,14 @@ export let proposalRoute = [
                 },
               },
             ]);
+<<<<<<< HEAD
             // upload attached_files
+=======
+            console.log(
+              "proposals ---------------------->>>>>>>>>>>>>",
+              proposal
+            );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
             data["attached_files"].forEach(async (fileItem) => {
               const bucketdb = mongoose.connection.db;
               const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
@@ -395,11 +485,39 @@ export let proposalRoute = [
               });
 
               const attached_file = fileItem;
+<<<<<<< HEAD
+=======
+              // console.log(request.payload);
+
+              console.log(
+                "-------------here-----------",
+                attached_file.hapi.filename
+              );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
               const uploadStream = bucket.openUploadStream(
                 attached_file.hapi.filename
               );
               uploadStream.on("finish", async (file) => {
+<<<<<<< HEAD
                 // update attached_files info
+=======
+                // proposalField["attached_files"].push ({
+                //   name: attached_file.hapi.filename,
+                //   file_id: file._id,
+                // });
+                console.log(
+                  "<<<<<<<<<--------attached_file.hapi.filename----------->>>>>>>>>>>>>>>>>>",
+                  attached_file.hapi.filename
+                );
+                console.log(
+                  "<<<<<<<<<--------file._id----------->>>>>>>>>>>>>>>>>>",
+                  file._id
+                );
+                console.log(
+                  "<<<<<<<<<--------proposal._id----------->>>>>>>>>>>>>>>>>>",
+                  proposal[0].proposals[0]._id
+                );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
                 const attachedProposal = await Job.findOneAndUpdate(
                   {
                     _id: request.params.jobId,
@@ -415,11 +533,24 @@ export let proposalRoute = [
                   },
                   { new: true }
                 );
+<<<<<<< HEAD
+=======
+                console.log(
+                  "------------------------attachedProposal--------------------",
+                  attachedProposal
+                );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
               });
               await attached_file.pipe(uploadStream);
             });
           } else {
+<<<<<<< HEAD
             // update proposal which don't have attached_files
+=======
+            console.log(
+              "----------------------------here-------------------------------------"
+            );
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
             const proposal = await Job.findOneAndUpdate(
               {
                 _id: request.params.jobId,
@@ -821,6 +952,7 @@ export let proposalRoute = [
           contentType = mime.contentType(docs.filename);
         }
 
+<<<<<<< HEAD
         const downloadStream = bucket.openDownloadStream(
           new ObjectId(request.params.fileId)
         );
@@ -828,11 +960,20 @@ export let proposalRoute = [
           .response(downloadStream)
           .header("Content-Type", contentType)
           .header("Content-Disposition", "attachment; filename= " + filename);
+=======
+        const downloadStream = bucket.openDownloadStream(new ObjectId(request.params.fileId));
+        // console.log("file---------------->>>>>>>>>>>", file);
+
+        return h.response(downloadStream)
+        .header('Content-Type', contentType)
+        .header('Content-Disposition', "attachment; filename= " + filename);
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
       } catch (err) {
         return h.response({ status: "err", err: "Download failed" }).code(501);
       }
     },
   },
+<<<<<<< HEAD
   {
     method: "PUT",
     path: "/{jobId}/approve/{proposalId}",
@@ -908,4 +1049,6 @@ export let proposalRoute = [
       }
     },
   },
+=======
+>>>>>>> df30c4a5ccc3006a2e9a9881aa978952a3c485d3
 ];
