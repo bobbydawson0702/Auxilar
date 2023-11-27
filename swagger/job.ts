@@ -144,3 +144,23 @@ export const deleteJobSwagger = {
     },
   },
 };
+
+
+export const connectChatSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Receive posted job successfully!",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      404: {
+        description: "Posted job not found!",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};

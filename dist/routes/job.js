@@ -677,48 +677,19 @@ exports.jobRoute = [
     },
     // {
     //   method: 'POST',
-    //   path: '/proposal',
-    //   // options: {
-    //   config: {
+    //   path: '/chat',
+    //   options: {
     //     auth: 'jwt',
-    //     description: 'Create or Update job',
-    //     plugins: JobSwagger,
-    //     payload: {
-    //       maxBytes: 10485760000,
-    //       output: 'stream',
-    //       parse: true,
-    //       allow: "multipart/form-data",
-    //       multipart: { output: 'stream' }
-    //       // maxBytes: 10 * 1024 * 1024, // Maximum file size (10MB in this example)
-    //     },
+    //     description: 'Connect chat',
+    //     plugins: connectChatSwagger,
     //     tags: ['api', 'job'],
-    //     validate: {
-    //       payload: JobSchema,
-    //       options,
-    //       failAction: (request, h, error) => {
-    //         const details = error.details.map((d) => {
-    //           return { err: d.message, pagth: d.path }
-    //         })
-    //         return h.response(details).code(400).takeover();
-    //       }
-    //     },
-    //     // },
-    //     handler: async (request: Request, response: ResponseToolkit) => {
-    //       try {
-    //         console.log(`POST api/v1/job request from ${request.auth.credentials.email}`);
-    //         const bucketdb = mongoose.connection.db;
-    //         const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
-    //           bucketName: 'file',
-    //         });
-    //         const file = request.payload['file'];
-    //         // console.log(request.payload);
-    //         console.log('-------------here-----------', file.hapi.filename);
-    //         const uploadStream = bucket.openUploadStream(file.hapi.filename);
-    //         file.pipe(uploadStream);
-    //         return response.response({ msg: 'Success!' });
-    //       } catch (error) {
-    //         return response.response({ err: error });
-    //       }
+    //   },
+    //   handler: async (request: Request, response: ResponseToolkit) => {
+    //     try {
+    //       const currentDate = new Date().toUTCString();
+    //       console.log(
+    //         `POST api/v1/job/chat request from ${request.auth.credentials.email} Time: ${currentDate}`
+    //       );
     //     }
     //   }
     // }
