@@ -104,7 +104,7 @@ export let accountRoute = [
         <p style="font-size: 18px; color: #666; margin-bottom: 40px;">
         This is your email verification link. Please click the button below to verify your email:
         </p>
-        <a href="/account/verify-email/${token}" style="background-color: #4CAF50; 
+        <a href="136.243.150.17:3000/account/verify-email/${token}" style="background-color: #4CAF50; 
         color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
         // const mailOptions = {
         //   from: "oliver970315@gmail.com", // replace with your email address
