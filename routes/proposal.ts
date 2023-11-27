@@ -1,10 +1,15 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
+import GridFsStorage from "multer-gridfs-storage";
+import multer from "multer";
+import Grid from "gridfs-stream";
+import fs from "fs";
 
 import {
   ProposalSwagger,
   approveProposalSwagger,
   deleteProposalSwagger,
   downloadProposalSwagger,
+  getAllProposalSwagger,
   getProposalSwagger,
   updateProposalSwagger,
 } from "../swagger/proposal";
@@ -12,7 +17,7 @@ import { ProposalSchema, updateProposalSchema } from "../validation/proposal";
 import Account from "../models/account";
 import Expert from "../models/profile/expert";
 import Job from "../models/job";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -296,7 +301,6 @@ export let proposalRoute = [
                 const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
                   bucketName: "file",
                 });
-
                 try {
                   bucket.delete(item.file_id);
                 } catch (err) {
