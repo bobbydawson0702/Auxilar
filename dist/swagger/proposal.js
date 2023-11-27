@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadProposalSwagger = exports.deleteProposalSwagger = exports.getProposalSwagger = exports.getMyAllProposalSwagger = exports.getAllProposalSwagger = exports.updateProposalSwagger = exports.ProposalSwagger = void 0;
+exports.approveProposalSwagger = exports.downloadProposalSwagger = exports.deleteProposalSwagger = exports.getProposalSwagger = exports.getMyAllProposalSwagger = exports.getAllProposalSwagger = exports.updateProposalSwagger = exports.ProposalSwagger = void 0;
 exports.ProposalSwagger = {
     "hapi-swagger": {
         responses: {
@@ -122,13 +122,31 @@ exports.downloadProposalSwagger = {
     "hapi-swagger": {
         responses: {
             200: {
-                description: "Receive posted Proposal successfully!",
+                description: "Download attached files Success",
             },
             403: {
                 description: "Forbidden request",
             },
             404: {
-                description: "Posted Proposal not found!",
+                description: "Proposal not found!",
+            },
+            501: {
+                description: "Request not implemented.",
+            },
+        },
+    },
+};
+exports.approveProposalSwagger = {
+    "hapi-swagger": {
+        responses: {
+            200: {
+                description: "Proposal approved Successfully",
+            },
+            403: {
+                description: "Forbidden request",
+            },
+            404: {
+                description: "Applied Proposal not found!",
             },
             501: {
                 description: "Request not implemented.",

@@ -20,6 +20,7 @@ const passcode_1 = __importDefault(require("../models/passcode"));
 const config_1 = __importDefault(require("../config"));
 const account_2 = require("../swagger/account");
 const account_3 = require("../validation/account");
+const sendMail_1 = __importDefault(require("../utils/sendMail"));
 const options = { abortEarly: false, stripUnknown: true };
 exports.accountRoute = [
     {
@@ -124,17 +125,18 @@ exports.accountRoute = [
                 //   console.log("EEEEEEEEERRRRRRRRRR", error);
                 // }
                 // console.log("3");
+                (0, sendMail_1.default)(newAccount.email, content);
                 return response
                     .response({
-                    msg: "register Success! please verify your email.",
-                    htmlContent: content,
+                    status: "ok",
+                    data: "register Sucess! Please verify your email.",
                 })
                     .code(201);
                 // linkUrl: `localhost:3000/verify-email/${token}`,
             }
             catch (error) {
                 console.log("===================================>>>>>>>>>>> ", error);
-                return response.response({ err: error }).code(500);
+                return response.response({ status: 'err', err: error }).code(500);
             }
         }),
     },
@@ -495,7 +497,7 @@ exports.accountRoute = [
                 console.log(`GET api/v1/account/mentors request from ${request.auth.credentials.email} Time: ${currentDate}`);
                 console.log(request.auth.credentials.email);
                 const account = yield account_1.default.find({
-                    account_type: "mentor"
+                    account_type: "mentor",
                 }).select({ email: 1, _id: false });
                 // if (!account) {
                 //   return response.response({ err: "Account not found!" }).code(404);

@@ -150,7 +150,7 @@ const JobSchema = new Schema({
             proposal_status: {
                 type: Number,
                 default: 0,
-                enum: [0, 1, 2], // 0: visible to client, 1: withdraw(deleted), 2: pending status
+                enum: [0, 1, 2], // 1: visible to client, 0: withdraw(deleted), 2: pending status
             },
             pub_date: {
                 type: Date,

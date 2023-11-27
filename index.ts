@@ -24,7 +24,7 @@ const path = process.cwd();
 const init = async () => {
   await connectDB();
   const server: hapi.Server = new hapi.Server({
-    port: 3030,
+    port: 3050,
     routes: { cors: { origin: ["*"] } },
     host: "0.0.0.0",
   });

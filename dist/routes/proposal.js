@@ -8,12 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.proposalRoute = void 0;
-const fs_1 = __importDefault(require("fs"));
 const proposal_1 = require("../swagger/proposal");
 const proposal_2 = require("../validation/proposal");
 const account_1 = __importDefault(require("../models/account"));
@@ -72,9 +78,8 @@ exports.proposalRoute = [
                             .code(406);
                     }
                     const data = request.payload;
-                    console.log("------------------<<<<<<<here>>>>>>>>>>>>>>>>>---------------", data["proposalData"]["cover_letter"]);
+                    // Check whether Posted job exist
                     try {
-                        // Check whether Posted job exist
                         yield job_1.default.findById(request.params.jobId);
                     }
                     catch (err) {
@@ -93,6 +98,7 @@ exports.proposalRoute = [
                             .response({ status: "err", err: "Proposal already exist!" })
                             .code(409);
                     }
+                    // get field
                     const proposalField = {
                         expert: { id: account.id, email: account.email },
                         cover_letter: data["proposalData"]["cover_letter"],
@@ -114,7 +120,7 @@ exports.proposalRoute = [
                         proposalField["mentor_check"] = mentor_check;
                         proposalField["proposal_status"] = 2;
                     }
-                    console.log("data[attached_files]------------------------>>>>>>>>>>>>>>", data["attached_files"]);
+                    // Check whether attached_files exist
                     if (data["attached_files"]) {
                         // push proposal not add attached_files info
                         yield job_1.default.findOneAndUpdate({ _id: request.params.jobId }, {
@@ -148,24 +154,17 @@ exports.proposalRoute = [
                                 },
                             },
                         ]);
-                        console.log("proposals ---------------------->>>>>>>>>>>>>", proposal);
+                        // upload attached files
                         data["attached_files"].forEach((fileItem) => __awaiter(void 0, void 0, void 0, function* () {
                             const bucketdb = mongoose_1.default.connection.db;
                             const bucket = new mongoose_1.default.mongo.GridFSBucket(bucketdb, {
                                 bucketName: "file",
                             });
                             const attached_file = fileItem;
-                            // console.log(request.payload);
                             console.log("-------------here-----------", attached_file.hapi.filename);
                             const uploadStream = bucket.openUploadStream(attached_file.hapi.filename);
                             uploadStream.on("finish", (file) => __awaiter(void 0, void 0, void 0, function* () {
-                                // proposalField["attached_files"].push ({
-                                //   name: attached_file.hapi.filename,
-                                //   file_id: file._id,
-                                // });
-                                console.log("<<<<<<<<<--------attached_file.hapi.filename----------->>>>>>>>>>>>>>>>>>", attached_file.hapi.filename);
-                                console.log("<<<<<<<<<--------file._id----------->>>>>>>>>>>>>>>>>>", file._id);
-                                console.log("<<<<<<<<<--------proposal._id----------->>>>>>>>>>>>>>>>>>", proposal[0].proposals[0]._id);
+                                // record attached_files info to database
                                 const attachedProposal = yield job_1.default.findOneAndUpdate({
                                     _id: request.params.jobId,
                                     "proposals._id": proposal[0].proposals[0]._id,
@@ -177,13 +176,12 @@ exports.proposalRoute = [
                                         },
                                     },
                                 }, { new: true });
-                                console.log("------------------------attachedProposal--------------------", attachedProposal);
                             }));
                             yield attached_file.pipe(uploadStream);
                         }));
                     }
                     else {
-                        console.log("----------------------------here-------------------------------------");
+                        // add proposals which attached_files not exist
                         const proposal = yield job_1.default.findOneAndUpdate({ _id: request.params.jobId }, {
                             $push: {
                                 proposals: proposalField,
@@ -227,7 +225,6 @@ exports.proposalRoute = [
                     return h.response(details).code(400).takeover();
                 },
             },
-            // },
             handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
                 var _a, _b;
                 try {
@@ -255,21 +252,18 @@ exports.proposalRoute = [
                     const data = request.payload;
                     try {
                         // Check whether Posted job, proposal exist
-                        // delete uploaded file
                         const appliedProposal = yield job_1.default.findOne({
                             _id: request.params.jobId,
                             "proposals.expert.email": account.email,
                         }, { "proposals.$": 1 });
-                        console.log("here---------------------->>>>>>>>>>", appliedProposal);
                         const attached_file = appliedProposal.proposals[0]["attached_files"];
-                        console.log("attached_file.length-------------->>>>>>>>>>>>>>", attached_file);
+                        // delete uploaded file
                         if (attached_file) {
                             attached_file.forEach((item) => {
                                 const bucketdb = mongoose_1.default.connection.db;
                                 const bucket = new mongoose_1.default.mongo.GridFSBucket(bucketdb, {
                                     bucketName: "file",
                                 });
-                                console.log("item---------------->>>>>>>>>>>>>>", item);
                                 try {
                                     bucket.delete(item.file_id);
                                 }
@@ -286,6 +280,7 @@ exports.proposalRoute = [
                             .response({ status: "err", err: "Applied proposal not found!" })
                             .code(404);
                     }
+                    // receive field
                     const proposalField = {
                         expert: { id: account.id, email: account.email },
                         cover_letter: data["proposalData"]["cover_letter"],
@@ -293,7 +288,7 @@ exports.proposalRoute = [
                         milestones: data["proposalData"]["milestones"],
                         proposal_status: 1,
                         mentor_check: [],
-                        attached_files: [],
+                        attached_files: [], // don't use null
                     };
                     if (data["proposalData"]["mentors"].length) {
                         console.log("data[proposalData][mentors]------------->>>>>>>>>>", data["proposalData"]["mentors"]);
@@ -307,6 +302,7 @@ exports.proposalRoute = [
                         proposalField["mentor_check"] = mentor_check;
                         proposalField["proposal_status"] = 2;
                     }
+                    // Upadate proposal which have attached_files
                     if (data["attached_files"]) {
                         // Update proposal not add attached_files info
                         yield job_1.default.findOneAndUpdate({
@@ -348,24 +344,16 @@ exports.proposalRoute = [
                                 },
                             },
                         ]);
-                        console.log("proposals ---------------------->>>>>>>>>>>>>", proposal);
+                        // upload attached_files
                         data["attached_files"].forEach((fileItem) => __awaiter(void 0, void 0, void 0, function* () {
                             const bucketdb = mongoose_1.default.connection.db;
                             const bucket = new mongoose_1.default.mongo.GridFSBucket(bucketdb, {
                                 bucketName: "file",
                             });
                             const attached_file = fileItem;
-                            // console.log(request.payload);
-                            console.log("-------------here-----------", attached_file.hapi.filename);
                             const uploadStream = bucket.openUploadStream(attached_file.hapi.filename);
                             uploadStream.on("finish", (file) => __awaiter(void 0, void 0, void 0, function* () {
-                                // proposalField["attached_files"].push ({
-                                //   name: attached_file.hapi.filename,
-                                //   file_id: file._id,
-                                // });
-                                console.log("<<<<<<<<<--------attached_file.hapi.filename----------->>>>>>>>>>>>>>>>>>", attached_file.hapi.filename);
-                                console.log("<<<<<<<<<--------file._id----------->>>>>>>>>>>>>>>>>>", file._id);
-                                console.log("<<<<<<<<<--------proposal._id----------->>>>>>>>>>>>>>>>>>", proposal[0].proposals[0]._id);
+                                // update attached_files info
                                 const attachedProposal = yield job_1.default.findOneAndUpdate({
                                     _id: request.params.jobId,
                                     "proposals._id": proposal[0].proposals[0]._id,
@@ -377,13 +365,12 @@ exports.proposalRoute = [
                                         },
                                     },
                                 }, { new: true });
-                                console.log("------------------------attachedProposal--------------------", attachedProposal);
                             }));
                             yield attached_file.pipe(uploadStream);
                         }));
                     }
                     else {
-                        console.log("----------------------------here-------------------------------------");
+                        // update proposal which don't have attached_files
                         const proposal = yield job_1.default.findOneAndUpdate({
                             _id: request.params.jobId,
                             "proposals.expert.email": account.email,
@@ -427,14 +414,9 @@ exports.proposalRoute = [
                 const account = yield account_1.default.findOne({
                     email: request.auth.credentials.email,
                 });
-                // Check whether account is expert
-                // if (account.account_type !== "expert") {
-                //   return response
-                //     .response({ status: "err", err: "Frobidden Request!" })
-                //     .code(403);
-                // }
                 let proposal;
                 const ObjectId = mongoose_1.default.Types.ObjectId;
+                // check account whether client if account is client display job and visisble proposals
                 if (account.account_type === "client") {
                     proposal = yield job_1.default.aggregate([
                         {
@@ -739,6 +721,7 @@ exports.proposalRoute = [
             tags: ["api", "proposal"],
         },
         handler: (request, h) => __awaiter(void 0, void 0, void 0, function* () {
+            var _c, e_1, _d, _e;
             try {
                 const currentDate = new Date().toUTCString();
                 console.log(`GET api/v1/proposal/download/${request.params.fileId} from 
@@ -747,23 +730,112 @@ exports.proposalRoute = [
                 const bucket = new mongoose_1.default.mongo.GridFSBucket(bucketdb, {
                     bucketName: "file",
                 });
-                // const fileId = request.params.fileId;
-                // const files = bucketdb.collection("GridFS Buckets.file");
-                // console.log("files----------------------->>>>>>>>>>>>>>>>>", files);
-                // // const filename = await files.findOne({ _id: fileId });
-                const ObjectId = mongoose_1.default.Types.ObjectId;
-                const downloadfile = bucket.openDownloadStream(new ObjectId(`${request.params.fileId}`));
+                // const downloadfile = bucket
+                // .openDownloadStream(new ObjectId(`${request.params.fileId}`))
                 // .pipe(fs.createWriteStream("Contract Project Lead.docx"));
-                console.log("-------------------here----------");
-                return h.response({
-                    status: "success",
-                    data: downloadfile.pipe(fs_1.default.createWriteStream("Contract Project Lead.docx")),
-                });
-                // return downloadfile.pipe(h.response());
-                // return h.download(downloadfile);
+                // const cursor = bucket.find({_id: new ObjectId(`${request.params.fileId}`)});
+                // for await (const docs of cursor) {
+                //   console.log(docs);
+                // }
+                const ObjectId = mongoose_1.default.Types.ObjectId;
+                let mime = require("mime-types");
+                console.log("mime------------->>>>>>>>>>>>>>", "mime");
+                let file = bucket.find({ _id: new ObjectId(request.params.fileId) });
+                let filename;
+                let contentType;
+                try {
+                    for (var _f = true, file_1 = __asyncValues(file), file_1_1; file_1_1 = yield file_1.next(), _c = file_1_1.done, !_c; _f = true) {
+                        _e = file_1_1.value;
+                        _f = false;
+                        const docs = _e;
+                        console.log(docs);
+                        filename = docs.filename;
+                        contentType = mime.contentType(docs.filename);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (!_f && !_c && (_d = file_1.return)) yield _d.call(file_1);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+                const downloadStream = bucket.openDownloadStream(new ObjectId(request.params.fileId));
+                return h
+                    .response(downloadStream)
+                    .header("Content-Type", contentType)
+                    .header("Content-Disposition", "attachment; filename= " + filename);
             }
             catch (err) {
                 return h.response({ status: "err", err: "Download failed" }).code(501);
+            }
+        }),
+    },
+    {
+        method: "PUT",
+        path: "/{jobId}/approve/{proposalId}",
+        options: {
+            auth: "jwt",
+            description: "Approve proposal",
+            plugins: proposal_1.approveProposalSwagger,
+            tags: ["api", "proposal"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/proposal/download/${request.params.fileId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+                // Check whether account is mentor
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "mentor") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request" })
+                        .code(403);
+                }
+                // try {
+                yield job_1.default.findOneAndUpdate({
+                    $and: [
+                        { _id: request.params.jobId },
+                        { "proposals._id": request.params.proposalId },
+                        {
+                            "proposals.mentor_check.mentor": account.email,
+                        },
+                    ],
+                }, {
+                    $set: {
+                        "proposals.$.proposal_status": 1,
+                    },
+                }, { new: true });
+                const ObjectId = mongoose_1.default.Types.ObjectId;
+                const approvedProposal = yield job_1.default.aggregate([
+                    {
+                        $match: {
+                            _id: new ObjectId(request.params.jobId),
+                        },
+                    },
+                    { $unwind: "$proposals" },
+                    {
+                        $match: {
+                            "proposals._id": new ObjectId(request.params.proposalId),
+                            "proposals.mentor_check.mentor": account.email,
+                        },
+                    },
+                ]);
+                // } catch (err) {
+                //   return response
+                //     .response({ status: "err", err: "Applied proposal Not found!" })
+                //     .code(404);
+                // }
+                return response
+                    .response({ status: "ok", data: approvedProposal })
+                    .code(200);
+            }
+            catch (err) {
+                return response
+                    .response({ status: "err", err: "Approve failed!" })
+                    .code(501);
             }
         }),
     },
