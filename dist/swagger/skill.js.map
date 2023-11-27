@@ -1,1 +1,0 @@
-{"version":3,"file":"skill.js","sourceRoot":"","sources":["../../swagger/skill.ts"],"names":[],"mappings":";;;AAAa,QAAA,YAAY,GAAG;IAC1B,cAAc,EAAE;QACd,SAAS,EAAE;YACT,GAAG,EAAE;gBACH,WAAW,EAAE,SAAS;aACvB;YACD,GAAG,EAAE;gBACH,WAAW,EAAE,kBAAkB;aAChC;YACD,GAAG,EAAE;gBACH,WAAW,EAAE,2BAA2B;aACzC;SACF;KACF;CACF,CAAC"}

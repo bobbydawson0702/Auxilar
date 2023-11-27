@@ -1,1 +1,0 @@
-{"version":3,"file":"cateogory.js","sourceRoot":"","sources":["../../swagger/cateogory.ts"],"names":[],"mappings":";;;AAAa,QAAA,gBAAgB,GAAG;IAC9B,cAAc,EAAE;QACd,SAAS,EAAE;YACT,GAAG,EAAE;gBACH,WAAW,EAAE,SAAS;aACvB;YACD,GAAG,EAAE;gBACH,WAAW,EAAE,qBAAqB;aACnC;YACD,GAAG,EAAE;gBACH,WAAW,EAAE,2BAA2B;aACzC;SACF;KACF;CACF,CAAC"}

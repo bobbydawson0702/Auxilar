@@ -22,6 +22,7 @@ import {
   signinAccountSchema,
   updateAccountPasswordSchema,
 } from "../validation/account";
+import sendMail from "../utils/sendMail";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -133,16 +134,17 @@ export let accountRoute = [
         //   console.log("EEEEEEEEERRRRRRRRRR", error);
         // }
         // console.log("3");
+        sendMail(newAccount.email, content);
         return response
           .response({
-            msg: "register Success! please verify your email.",
-            htmlContent: content,
+            status: "ok",
+            data: "register Sucess! Please verify your email.",
           })
           .code(201);
         // linkUrl: `localhost:3000/verify-email/${token}`,
       } catch (error) {
         console.log("===================================>>>>>>>>>>> ", error);
-        return response.response({ err: error }).code(500);
+        return response.response({ status: 'err', err: error }).code(500);
       }
     },
   },
@@ -246,7 +248,6 @@ export let accountRoute = [
         if (!isMatch) {
           return response.response({ err: "Password incorrect." }).code(405);
         }
-
 
         const token = Jwt.sign(
           { accountId: account.id, email: account.email },
@@ -534,8 +535,8 @@ export let accountRoute = [
         );
         console.log(request.auth.credentials.email);
         const account = await Account.find({
-          account_type: "mentor"
-        }).select({email: 1, _id: false});
+          account_type: "mentor",
+        }).select({ email: 1, _id: false });
         // if (!account) {
         //   return response.response({ err: "Account not found!" }).code(404);
         // }
