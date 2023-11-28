@@ -11,13 +11,9 @@ export const ProfileSchema = Joi.object({
     "any.required": "Please provide country",
   }),
 
-  state: Joi.string().required().messages({
-    "any.required": "Please provide state",
-  }),
+  state: Joi.string().allow(null).allow(""),
 
-  city: Joi.string().required().messages({
-    "any.required": "Please provide city",
-  }),
+  city: Joi.string().allow(null).allow(""),
 
   address: Joi.string().required().messages({
     "any.required": "Please provide address.",
@@ -56,12 +52,8 @@ export const updatePersonalInfoSchema = Joi.object({
   country: Joi.string().required().messages({
     "any.required": "Please provide country",
   }),
-  state: Joi.string().required().messages({
-    "any.required": "Please provide state",
-  }),
-  city: Joi.string().required().messages({
-    "any.required": "Please provide city",
-  }),
+  state: Joi.string().allow(null).allow(""),
+  city: Joi.string().allow(null).allow(""),
   address: Joi.string().required().messages({
     "any.required": "Please provide address",
   }),

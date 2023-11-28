@@ -188,7 +188,7 @@ const JobSchema = new Schema({
                     },
                 },
             ],
-            chart: [
+            chat: [
                 {
                     conversation: {
                         sender: {

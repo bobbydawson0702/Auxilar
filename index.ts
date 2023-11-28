@@ -15,6 +15,7 @@ import setRoutes from "./routes";
 
 import Major from "./models/major";
 import Skill from "./models/skill";
+import registerSocketServer from "./utils/socketServer";
 
 const vadliateAccount = async (decoded, request, h) => {
   return { isValid: true, accountId: decoded.accountId };
@@ -24,7 +25,7 @@ const path = process.cwd();
 const init = async () => {
   await connectDB();
   const server: hapi.Server = new hapi.Server({
-    port: 3030,
+    port: 3050,
     routes: { cors: { origin: ["*"] } },
     host: "0.0.0.0",
   });
@@ -63,6 +64,9 @@ const init = async () => {
     },
   });
   await setRoutes(server);
+
+  // --------------------------------------------------- Initialize socketServer ------------------------------------------------------/
+  await registerSocketServer(server.listener);
 
   await server.start();
 
