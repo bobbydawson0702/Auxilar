@@ -2,41 +2,63 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ConversationSchema = new Schema({
-  chat: {
-    sender: {
-      type: Schema.Types.ObjectId,
-    },
-    recevier: {
-      type: Schema.Types.ObjectId,
-    },
-    job: {
-      type: Schema.Types.ObjectId,
-    },
-    proposal: {
-      type: Schema.Types.ObjectId,
-    },
-
-    messages: [
-      {
-        sender: {
-          type: Schema.Types.ObjectId,
-        },
-        parent_message_id: {
-          type: Schema.Types.ObjectId,
-        },
-        message_body: {
-          type: String,
-        },
-        create_date: {
-          type: Date,
-        },
-        expire_date: {
-          type: Date,
-        },
-      },
-    ],
+  client_email: {
+    type: String,
   },
+  expert_email: {
+    type: String,
+    required: true,
+  },
+  mentor_email: {
+    type: String,
+  },
+  job: {
+    id: {
+      type: Schema.Types.ObjectId,
+    },
+    title: {
+      type: String,
+    },
+  },
+  proposal: {
+    id: {
+      type: Schema.Types.ObjectId,
+    },
+  },
+
+  messages: [
+    {
+      sender: {
+        type: String,
+      },
+      message_type: {
+        type: String
+      },
+      message_body: {
+        type: String,
+      },
+      parent_message_id: {
+        type: Schema.Types.ObjectId,
+      },
+      attached_files: [
+        {
+          name: {
+            type: String,
+          },
+          file_id: {
+            type: Schema.Types.ObjectId,
+          },
+        },
+      ],
+      created_date: {
+        type: Date,
+      },
+      expire_date: {
+        type: Date,
+      },
+    },
+  ],
 });
 
-const Conversation = mongoose.model("job", ConversationSchema);
+const Conversation = mongoose.model("conversation", ConversationSchema);
 export default Conversation;
