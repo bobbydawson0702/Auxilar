@@ -111,3 +111,51 @@ export const updateMessageSwagger = {
     },
   },
 };
+
+export const getMessageSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Update message Success!",
+      },
+      404: {
+        description: "Message does not exist",
+      },
+      501: {
+        description: "Request not implemented.",
+      },
+    },
+  },
+};
+
+export const deleteMessageSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Delete a message Success!",
+      },
+      404: {
+        description: "Message does not exist",
+      },
+      501: {
+        description: "Request not implemented.",
+      },
+    },
+  },
+};
+
+export const downloadMessageFileSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Delete a message Success!",
+      },
+      404: {
+        description: "Message does not exist",
+      },
+      501: {
+        description: "Request not implemented.",
+      },
+    },
+  },
+};

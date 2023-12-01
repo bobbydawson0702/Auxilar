@@ -1,8 +1,11 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
 import {
   ConversationSwagger,
+  deleteMessageSwagger,
   deleteMyConversationSwagger,
+  downloadMessageFileSwagger,
   getAllConversationSwagger,
+  getMessageSwagger,
   getMyConversationSwagger,
   putMessageToConversationSwagger,
   updateMessageSwagger,
@@ -509,7 +512,7 @@ export let conversationRoute = [
     path: "/my/messages",
     config: {
       auth: "jwt",
-      description: "PUT a message to conversation",
+      description: "Add a message to conversation",
       plugins: putMessageToConversationSwagger,
       payload: {
         maxBytes: 10485760000,
@@ -533,7 +536,7 @@ export let conversationRoute = [
         try {
           const currentDate = new Date();
           console.log(
-            `PUT api/v1/my/messages request from ${request.auth.credentials.email} Time: ${currentDate}`
+            `PATCH api/v1/my/messages request from ${request.auth.credentials.email} Time: ${currentDate}`
           );
 
           const data = request.payload;
@@ -761,7 +764,7 @@ export let conversationRoute = [
         try {
           const currentDate = new Date();
           console.log(
-            `PUT api/v1/my/messages request from ${request.auth.credentials.email} Time: ${currentDate}`
+            `PATCH api/v1/my/messages request from ${request.auth.credentials.email} Time: ${currentDate}`
           );
 
           const data = request.payload;
@@ -1009,6 +1012,293 @@ export let conversationRoute = [
             .code(501);
         }
       },
+    },
+  },
+
+  {
+    method: "GET",
+    path: "/my/messages/{contact_email}/{messageId}",
+    options: {
+      auth: "jwt",
+      description: "Get specific message in conversation",
+      plugins: getMessageSwagger,
+      tags: ["api", "conversation"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(`GET api/v1/conversation/my/message/${request.params.contact_email}/${request.params.messageId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+        const data = request.payload;
+
+        // check whether acount exist
+        const myAccount = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+
+        const contactAccount = await Account.findOne({
+          email: request.params.contact_email,
+        });
+
+        if (!(myAccount && contactAccount)) {
+          return response
+            .response({ status: "err", err: "Account does not exist!" })
+            .code(404);
+        }
+
+        let client_email: string = null;
+        let expert_email: string = null;
+        let mentor_email: string = null;
+
+        // check account type
+        switch (myAccount.account_type) {
+          case "client": {
+            client_email = myAccount.email;
+            break;
+          }
+          case "expert": {
+            expert_email = myAccount.email;
+            break;
+          }
+          case "mentor": {
+            mentor_email = myAccount.email;
+            break;
+          }
+        }
+
+        let isAllright: boolean = true;
+        switch (contactAccount.account_type) {
+          case "client": {
+            !client_email
+              ? (client_email = contactAccount.email)
+              : (isAllright = false);
+            break;
+          }
+          case "expert": {
+            !expert_email
+              ? (expert_email = contactAccount.email)
+              : (isAllright = false);
+            break;
+          }
+          case "mentor": {
+            !mentor_email
+              ? (mentor_email = contactAccount.email)
+              : (isAllright = false);
+            break;
+          }
+        }
+
+        // if myAccount.account_type === contactAccount.acount_type Conversation is not exist
+        if (!isAllright) {
+          return response
+            .response({ status: "err", err: "Conversation does not exist" })
+            .code(404);
+        }
+
+        // build query to find conversation
+        const queryAll: object = {
+          $and: [],
+        };
+        if (client_email) queryAll["$and"].push({ client_email });
+        if (expert_email) queryAll["$and"].push({ expert_email });
+        if (mentor_email) queryAll["$and"].push({ mentor_email });
+
+        const queryMessage = queryAll;
+        queryMessage["$and"].push({
+          "messages._id": request.params.messageId,
+        });
+
+        let myMessage;
+
+        try {
+          // Get my message in conversation
+          myMessage = await Conversation.findOne(queryAll, {
+            "messages.$": 1,
+          });
+        } catch (err) {
+          return response
+            .response({ status: "err", err: "Message does not exist!" })
+            .code(404);
+        }
+
+        return response.response({ status: "ok", data: myMessage }).code(200);
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Not implemented" })
+          .code(501);
+      }
+    },
+  },
+  {
+    method: "DELETE",
+    path: "/my/messages/{contact_email}/{messageId}",
+    options: {
+      auth: "jwt",
+      description: "Delete specific message in conversation",
+      plugins: deleteMessageSwagger,
+      tags: ["api", "conversation"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(`DELETE api/v1/conversation/my/message/${request.params.contact_email}/${request.params.messageId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+        const data = request.payload;
+
+        // check whether acount exist
+        const myAccount = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+
+        const contactAccount = await Account.findOne({
+          email: request.params.contact_email,
+        });
+
+        if (!(myAccount && contactAccount)) {
+          return response
+            .response({ status: "err", err: "Account does not exist!" })
+            .code(404);
+        }
+
+        let client_email: string = null;
+        let expert_email: string = null;
+        let mentor_email: string = null;
+
+        // check account type
+        switch (myAccount.account_type) {
+          case "client": {
+            client_email = myAccount.email;
+            break;
+          }
+          case "expert": {
+            expert_email = myAccount.email;
+            break;
+          }
+          case "mentor": {
+            mentor_email = myAccount.email;
+            break;
+          }
+        }
+
+        let isAllright: boolean = true;
+        switch (contactAccount.account_type) {
+          case "client": {
+            !client_email
+              ? (client_email = contactAccount.email)
+              : (isAllright = false);
+            break;
+          }
+          case "expert": {
+            !expert_email
+              ? (expert_email = contactAccount.email)
+              : (isAllright = false);
+            break;
+          }
+          case "mentor": {
+            !mentor_email
+              ? (mentor_email = contactAccount.email)
+              : (isAllright = false);
+            break;
+          }
+        }
+
+        // if myAccount.account_type === contactAccount.acount_type Conversation is not exist
+        if (!isAllright) {
+          return response
+            .response({ status: "err", err: "Conversation does not exist" })
+            .code(404);
+        }
+
+        // build query to find conversation
+        const queryAll: object = {
+          $and: [],
+        };
+        if (client_email) queryAll["$and"].push({ client_email });
+        if (expert_email) queryAll["$and"].push({ expert_email });
+        if (mentor_email) queryAll["$and"].push({ mentor_email });
+
+        const queryMessage = queryAll;
+        queryMessage["$and"].push({
+          "messages._id": request.params.messageId,
+        });
+
+        let myMessage;
+
+        try {
+          console.log("here------------------------>>>>>>>>");
+          // Get my message in conversation
+          myMessage = await Conversation.findOneAndUpdate(
+            queryAll,
+            {
+              $pull: {
+                messages: { _id: request.params.messageId },
+              },
+            },
+            { new: true }
+          );
+        } catch (err) {
+          return response
+            .response({ status: "err", err: "Message does not exist!" })
+            .code(404);
+        }
+
+        return response.response({ status: "ok", data: "Delete message Success!" }).code(200);
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Not implemented" })
+          .code(501);
+      }
+    },
+  },
+  {
+    method: "GET",
+    path: "/download/{fileId}",
+    options: {
+      auth: "jwt",
+      description: "download message file",
+      plugins: downloadMessageFileSwagger,
+      tags: ["api", "proposal"],
+    },
+    handler: async (request: Request, h) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(`GET api/v1/conversation/download/${request.params.fileId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+
+        const bucketdb = mongoose.connection.db;
+        const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
+          bucketName: "messageFiles",
+        });
+
+        // const downloadfile = bucket
+        // .openDownloadStream(new ObjectId(`${request.params.fileId}`))
+        // .pipe(fs.createWriteStream("Contract Project Lead.docx"));
+        // const cursor = bucket.find({_id: new ObjectId(`${request.params.fileId}`)});
+        // for await (const docs of cursor) {
+        //   console.log(docs);
+        // }
+        const ObjectId = mongoose.Types.ObjectId;
+        let mime = require("mime-types");
+        console.log("mime------------->>>>>>>>>>>>>>", "mime");
+        let file = bucket.find({ _id: new ObjectId(request.params.fileId) });
+        let filename;
+        let contentType;
+        for await (const docs of file) {
+          console.log(docs);
+          filename = docs.filename;
+          contentType = mime.contentType(docs.filename);
+        }
+
+        const downloadStream = bucket.openDownloadStream(
+          new ObjectId(request.params.fileId)
+        );
+        return h
+          .response(downloadStream)
+          .header("Content-Type", contentType)
+          .header("Content-Disposition", "attachment; filename= " + filename);
+      } catch (err) {
+        return h.response({ status: "err", err: "Download failed" }).code(501);
+      }
     },
   },
 ];
