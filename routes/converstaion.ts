@@ -5,14 +5,16 @@ import {
   getAllConversationSwagger,
   getMyConversationSwagger,
   putMessageToConversationSwagger,
+  updateMessageSwagger,
 } from "../swagger/converstaion";
 import {
   ConversationSchema,
   putMessageToConversationSchema,
+  updateMessageSchema,
 } from "../validation/conversation";
 import Account from "../models/account";
 import Conversation from "../models/conversation";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -503,7 +505,7 @@ export let conversationRoute = [
 
   // handle messages
   {
-    method: "PUT",
+    method: "PATCH",
     path: "/my/messages",
     config: {
       auth: "jwt",
@@ -730,5 +732,283 @@ export let conversationRoute = [
       },
     },
   },
-  
+  {
+    method: "PATCH",
+    path: "/my/messages/{messageId}",
+    config: {
+      auth: "jwt",
+      description: "update a message",
+      plugins: updateMessageSwagger,
+      payload: {
+        maxBytes: 10485760000,
+        output: "stream",
+        parse: true,
+        allow: "multipart/form-data",
+        multipart: { output: "stream" },
+      },
+      tags: ["api", "conversation"],
+      validate: {
+        payload: updateMessageSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+      handler: async (request: Request, response: ResponseToolkit) => {
+        try {
+          const currentDate = new Date();
+          console.log(
+            `PUT api/v1/my/messages request from ${request.auth.credentials.email} Time: ${currentDate}`
+          );
+
+          const data = request.payload;
+
+          // check whether acount exist
+          const myAccount = await Account.findOne({
+            email: request.auth.credentials.email,
+          });
+
+          const contactAccount = await Account.findOne({
+            email: data["messageData"]["to"],
+          });
+
+          if (!(myAccount && contactAccount)) {
+            return response
+              .response({ status: "err", err: "Account does not exist!" })
+              .code(404);
+          }
+
+          let client_email: string = null;
+          let expert_email: string = null;
+          let mentor_email: string = null;
+
+          // check account type
+          switch (myAccount.account_type) {
+            case "client": {
+              client_email = myAccount.email;
+              break;
+            }
+            case "expert": {
+              expert_email = myAccount.email;
+              break;
+            }
+            case "mentor": {
+              mentor_email = myAccount.email;
+              break;
+            }
+          }
+
+          let isAllright: boolean = true;
+          switch (contactAccount.account_type) {
+            case "client": {
+              !client_email
+                ? (client_email = contactAccount.email)
+                : (isAllright = false);
+              break;
+            }
+            case "expert": {
+              !expert_email
+                ? (expert_email = contactAccount.email)
+                : (isAllright = false);
+              break;
+            }
+            case "mentor": {
+              !mentor_email
+                ? (mentor_email = contactAccount.email)
+                : (isAllright = false);
+              break;
+            }
+          }
+
+          // if myAccount.account_type === contactAccount.acount_type Conversation is not exist
+          if (!isAllright) {
+            return response
+              .response({ status: "err", err: "Conversation does not exist" })
+              .code(404);
+          }
+
+          // build query to find conversation
+          const queryAll: object = {
+            $and: [],
+          };
+          if (client_email) queryAll["$and"].push({ client_email });
+          if (expert_email) queryAll["$and"].push({ expert_email });
+          if (mentor_email) queryAll["$and"].push({ mentor_email });
+
+          if (data["messageData"]["job"]) {
+            queryAll["$and"].push({
+              "job.id": data["messageData"]["job"]["id"],
+            });
+            queryAll["$and"].push({
+              "job.title": data["messageData"]["job"]["title"],
+            });
+          }
+
+          const queryMessage = queryAll;
+          queryMessage["$and"].push({
+            "messages._id": request.params.messageId,
+          });
+
+          let myConversation;
+
+          try {
+            // Check whether conversation exist
+            const sendedMessage = await Conversation.findOne(queryAll, {
+              "messages.$": 1,
+            });
+
+            console.log(
+              "sendedMessage-------------->>>>>>>>>>>>",
+              sendedMessage
+            );
+
+            const attached_files = sendedMessage.messages[0]["attached_files"];
+
+            // delete uploaded files
+            if (attached_files) {
+              attached_files.forEach((item) => {
+                const bucketdb = mongoose.connection.db;
+                const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
+                  bucketName: "messageFiles",
+                });
+                try {
+                  bucket.delete(item.file_id);
+                } catch (err) {
+                  return response
+                    .response({ staus: "err", err: "Not implemented!" })
+                    .code(501);
+                }
+              });
+            }
+          } catch (err) {
+            return response
+              .response({ status: "err", err: "Message does not exist!" })
+              .code(404);
+          }
+
+          // confirm message field
+          const messageField = {
+            sender: myAccount.email,
+            message_type: data["messageData"]["message_type"],
+            message_body: data["messageData"]["message_body"],
+            parent_message_id: data["messageData"]["parent_message_id"] ?? null,
+            attached_files: [],
+            created_date: currentDate,
+            expire_date: null,
+          };
+
+          console.log(
+            "data[attached_files]--------------------->>>>>>>>>>",
+            data["attached_files"]
+          );
+
+          // add attached files if it exist
+          if (data["attached_files"]) {
+            // Update message in the conversation
+            console.log("queryAll---------------->>>>>>>>>", queryAll);
+
+            myConversation = await Conversation.findOneAndUpdate(
+              queryAll,
+              {
+                $set: {
+                  "messages.$.sender": messageField.sender,
+                  "messages.$.message_type": messageField.message_type,
+                  "messages.$.message_body": messageField.message_body,
+                  "messages.$.parent_message_id":
+                    messageField.parent_message_id,
+                  "messages.$.attached_files": [],
+                  "messages.$.created_date": messageField.created_date,
+                  "messages.$.expire_date": messageField.expire_date,
+                },
+              },
+              { new: true }
+            );
+
+            // // get message id
+            // const message = await Conversation.aggregate([
+            //   {
+            //     $match: queryAll,
+            //   },
+            //   {
+            //     $project: {
+            //       messages: {
+            //         $filter: {
+            //           input: "$messages",
+            //           as: "message",
+            //           cond: {
+            //             $eq: ["$$message.created_date", currentDate],
+            //           },
+            //         },
+            //       },
+            //     },
+            //   },
+            // ]);
+
+            // upload_attached_files
+            data["attached_files"].forEach(async (fileItem) => {
+              const bucketdb = mongoose.connection.db;
+              const bucket = new mongoose.mongo.GridFSBucket(bucketdb, {
+                bucketName: "messageFiles",
+              });
+
+              const attached_file = fileItem;
+              const uploadStream = bucket.openUploadStream(
+                attached_file.hapi.filename
+              );
+              uploadStream.on("finish", async (file) => {
+                // record attached_files info to database
+                // const queryMessage = queryAll;
+                // queryMessage["$and"].push({
+                //   "messages._id": message[0].messages[0]._id,
+                // });
+                myConversation = await Conversation.findOneAndUpdate(
+                  queryAll,
+                  {
+                    $push: {
+                      "messages.$.attached_files": {
+                        name: attached_file.hapi.filename,
+                        file_id: file._id,
+                      },
+                    },
+                  },
+                  { new: true }
+                );
+              });
+
+              await attached_file.pipe(uploadStream);
+            });
+          } else {
+            // Update message in the conversation
+            myConversation = await Conversation.findOneAndUpdate(
+              queryAll,
+              {
+                $set: {
+                  "messages.$.sender": messageField.sender,
+                  "messages.$.message_type": messageField.message_type,
+                  "messages.$.message_body": messageField.message_body,
+                  "messages.$.parent_message_id":
+                    messageField.parent_message_id,
+                  "messages.$.attached_files": [],
+                  "messages.$.created_date": messageField.created_date,
+                  "messages.$.expire_date": messageField.expire_date,
+                },
+              },
+              { new: true }
+            );
+          }
+
+          return response
+            .response({ status: "ok", data: "Update message Success!" })
+            .code(200);
+        } catch (err) {
+          return response
+            .response({ status: "err", err: "Not implemented" })
+            .code(501);
+        }
+      },
+    },
+  },
 ];

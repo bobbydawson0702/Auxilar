@@ -75,3 +75,38 @@ export const putMessageToConversationSchema = Joi.object({
     .allow("")
     .meta({ swaggerType: "file" }),
 });
+
+export const updateMessageSchema = Joi.object({
+  messageData: custom
+    .object({
+      from: Joi.string().required().messages({
+        "any.required": "Please provide sender email.",
+      }),
+      to: Joi.string().required().messages({
+        "any.required": "Please provide receiver email.",
+      }),
+      message_type: Joi.string().required().messages({
+        "any.required": "Please provide message_type",
+      }),
+      message_body: Joi.string().required().messages({
+        "any.required": "Please provide message_body",
+      }),
+      parent_message_id: Joi.string().allow(null).allow(""),
+      job: Joi.object({
+        id: Joi.string().required().messages({
+          "any.required": "Please provide job id",
+        }),
+        title: Joi.string().required().messages({
+          "any.required": "Please provide job title",
+        }),
+      }).allow(null),
+    })
+    .required()
+    .messages({
+      "any.required": "Please provide message data",
+    }),
+  attached_files: Joi.array()
+    .allow(null)
+    .allow("")
+    .meta({ swaggerType: "file" }),
+});

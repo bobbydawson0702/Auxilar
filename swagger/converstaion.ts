@@ -92,3 +92,22 @@ export const putMessageToConversationSwagger = {
     },
   },
 };
+
+export const updateMessageSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Update message Success!",
+      },
+      400: {
+        description: "Input Fields Required.",
+      },
+      404: {
+        description: "Message does not exist",
+      },
+      501: {
+        description: "Request not implemented.",
+      },
+    },
+  },
+};
