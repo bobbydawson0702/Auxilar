@@ -104,21 +104,23 @@ export let conversationRoute = [
             proposal: data["proposal"],
           };
         } else if (account.account_type === "mentor") {
+          
           // check whether conversation already exist
           const existConversation = await Conversation.findOne({
             mentor_email: account.email,
             expert_email: data["expert_email"],
           });
-
+          
           if (existConversation) {
             return response
-              .response({ status: "err", err: "Conversation already exist!" })
-              .code(409);
+            .response({ status: "err", err: "Conversation already exist!" })
+            .code(409);
           }
-
+          
+          console.log("here-------------------->>>>>>>>>>");
           // fill conversationField
           conversationField = {
-            expert: data["expert"],
+            expert_email: data["expert_email"],
             mentor_email: account.email,
           };
         }
