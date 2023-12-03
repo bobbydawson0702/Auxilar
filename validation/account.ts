@@ -64,3 +64,6 @@ export const updateAccountPasswordSchema = Joi.object({
     "string.min": "New password must be at least 6 characters.",
   }),
 });
+
+
+

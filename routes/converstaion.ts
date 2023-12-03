@@ -104,19 +104,18 @@ export let conversationRoute = [
             proposal: data["proposal"],
           };
         } else if (account.account_type === "mentor") {
-          
           // check whether conversation already exist
           const existConversation = await Conversation.findOne({
             mentor_email: account.email,
             expert_email: data["expert_email"],
           });
-          
+
           if (existConversation) {
             return response
-            .response({ status: "err", err: "Conversation already exist!" })
-            .code(409);
+              .response({ status: "err", err: "Conversation already exist!" })
+              .code(409);
           }
-          
+
           console.log("here-------------------->>>>>>>>>>");
           // fill conversationField
           conversationField = {
@@ -612,11 +611,14 @@ export let conversationRoute = [
             sender: myAccount.email,
             message_type: data["messageData"]["message_type"],
             message_body: data["messageData"]["message_body"],
-            parent_message_id: data["messageData"]["parent_message_id"] ?? null,
+            // parent_message_id: data["messageData"]["parent_message_id"] ?? null,
             attached_files: [],
             created_date: currentDate,
             expire_date: null,
           };
+          if (data["messageData"]["parent_message_id"])
+            messageField["message_body"] =
+              data["messageData"]["parent_message_id"];
 
           // build query to find conversation
           const queryAll: object = {
@@ -899,11 +901,15 @@ export let conversationRoute = [
             sender: myAccount.email,
             message_type: data["messageData"]["message_type"],
             message_body: data["messageData"]["message_body"],
-            parent_message_id: data["messageData"]["parent_message_id"] ?? null,
+            // parent_message_id: data["messageData"]["parent_message_id"] ?? null,
             attached_files: [],
             created_date: currentDate,
             expire_date: null,
           };
+
+          if (data["messageData"]["parent_message_id"])
+            messageField["message_body"] =
+              data["messageData"]["parent_message_id"];
 
           console.log(
             "data[attached_files]--------------------->>>>>>>>>>",
@@ -923,7 +929,7 @@ export let conversationRoute = [
                   "messages.$.message_type": messageField.message_type,
                   "messages.$.message_body": messageField.message_body,
                   "messages.$.parent_message_id":
-                    messageField.parent_message_id,
+                    messageField["parent_message_id"],
                   "messages.$.attached_files": [],
                   "messages.$.created_date": messageField.created_date,
                   "messages.$.expire_date": messageField.expire_date,
@@ -995,7 +1001,7 @@ export let conversationRoute = [
                   "messages.$.message_type": messageField.message_type,
                   "messages.$.message_body": messageField.message_body,
                   "messages.$.parent_message_id":
-                    messageField.parent_message_id,
+                    messageField["parent_message_id"],
                   "messages.$.attached_files": [],
                   "messages.$.created_date": messageField.created_date,
                   "messages.$.expire_date": messageField.expire_date,
@@ -1244,7 +1250,9 @@ export let conversationRoute = [
             .code(404);
         }
 
-        return response.response({ status: "ok", data: "Delete message Success!" }).code(200);
+        return response
+          .response({ status: "ok", data: "Delete message Success!" })
+          .code(200);
       } catch (err) {
         return response
           .response({ status: "err", err: "Not implemented" })

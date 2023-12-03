@@ -13,8 +13,6 @@ import config from "./config";
 import connectDB from "./lib/dbConnect";
 import setRoutes from "./routes";
 
-import Major from "./models/major";
-import Skill from "./models/skill";
 import registerSocketServer from "./utils/socketServer";
 
 const vadliateAccount = async (decoded, request, h) => {
@@ -93,13 +91,13 @@ const init = async () => {
   }
   console.log(`🚀 Server running on ${server.info.uri} 🚀`);
 
-  // ----------------------------------------------------- Initialize Skill, Major database -------------------------------------------------------------------//
-  await Skill.deleteMany({});
-  await Major.deleteMany({});
-  for (let index = 1; index <= 20; index++) {
-    await Skill.create({ name: "skill" + index });
-    await Major.create({ name: "major" + index });
-  }
+  // // ----------------------------------------------------- Initialize Skill, Major database -------------------------------------------------------------------//
+  // await Skill.deleteMany({});
+  // await Major.deleteMany({});
+  // for (let index = 1; index <= 20; index++) {
+  //   await Skill.create({ name: "skill" + index });
+  //   await Major.create({ name: "major" + index });
+  // }
 
   return server;
 };

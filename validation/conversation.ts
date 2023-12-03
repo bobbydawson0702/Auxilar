@@ -56,7 +56,7 @@ export const putMessageToConversationSchema = Joi.object({
       message_body: Joi.string().required().messages({
         "any.required": "Please provide message_body",
       }),
-      parent_message_id: Joi.string().allow(null).allow(""),
+      parent_message_id: Joi.string().allow(""),
       job: Joi.object({
         id: Joi.string().required().messages({
           "any.required": "Please provide job id",
