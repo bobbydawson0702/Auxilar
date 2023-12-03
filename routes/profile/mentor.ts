@@ -73,8 +73,8 @@ export let mentorRoute = [
           avatar: data["avatar"] ?? null,
           birthday: birthday,
           country: data["country"],
-          state: data["state"],
-          city: data["city"],
+          state: data["state"] ?? null,
+          city: data["city"] ?? null,
           address: data["address"],
           languages: data["languages"],
           summary: data["summary"],
@@ -308,8 +308,8 @@ export let mentorRoute = [
 
         const updateData = {
           country: data["country"],
-          state: data["state"],
-          city: data["city"],
+          state: data["state"] ?? null,
+          city: data["city"] ?? null,
           address: data["address"],
           languages: data["languages"],
         };

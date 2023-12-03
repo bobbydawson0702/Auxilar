@@ -9,6 +9,7 @@ import { mentorRoute } from "./profile/mentor";
 import { jobRoute } from "./job";
 import { proposalRoute } from "./proposal";
 import { adminRoute } from "./admin";
+import { conversationRoute } from "./converstaion";
 // const prefix = `/api/${config.apiVersion}`;
 
 const setRoutes = async (server: Server) => {
@@ -26,5 +27,7 @@ const setRoutes = async (server: Server) => {
   server.route(proposalRoute);
   server.realm.modifiers.route.prefix = `/api/${config.apiVersion}/admin`;
   server.route(adminRoute);
+  server.realm.modifiers.route.prefix = `/api/${config.apiVersion}/conversation`;
+  server.route(conversationRoute);
 };
 export default setRoutes;

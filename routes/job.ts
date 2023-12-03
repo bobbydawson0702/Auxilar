@@ -111,6 +111,17 @@ export let jobRoute = [
         await newJob.save();
         console.log("job posted successfully!", newJob);
 
+        // add posted job to client
+        await Client.findOneAndUpdate(
+          { email: account.email },
+          {
+            $push: {
+              ongoing_project: { project: newJob._id },
+            },
+          },
+          { new: true }
+        );
+
         return response.response({ status: "ok", data: newJob }).code(201);
       } catch (error) {
         return response.response({ err: error }).code(501);
@@ -308,7 +319,7 @@ export let jobRoute = [
             $sort: { pub_date: -1 },
           },
         ]);
-         
+
         if (allMyJobs.length === 0) {
           return response
             .response({ status: "err", err: "Posted job not found!" })
@@ -389,6 +400,20 @@ export let jobRoute = [
             _id: request.params.jobId,
             client_email: account.email,
           });
+
+          // remove job id from client ongoing project
+          await Client.findOneAndUpdate(
+            {
+              email: account.email,
+              "ongoing_project.project": request.params.jobId,
+            },
+            {
+              $pull: {
+                ongoing_project: { project: request.params.jobId },
+              },
+            },
+            { new: true }
+          );
           return response
             .response({ status: "ok", data: "successfully deleted!" })
             .code(200);
@@ -787,8 +812,6 @@ export let jobRoute = [
   //       console.log(
   //         `POST api/v1/job/chat request from ${request.auth.credentials.email} Time: ${currentDate}`
   //       );
-
-
 
   //     }
   //   }

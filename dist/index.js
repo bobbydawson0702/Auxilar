@@ -48,6 +48,7 @@ const dbConnect_1 = __importDefault(require("./lib/dbConnect"));
 const routes_1 = __importDefault(require("./routes"));
 const major_1 = __importDefault(require("./models/major"));
 const skill_1 = __importDefault(require("./models/skill"));
+const socketServer_1 = __importDefault(require("./utils/socketServer"));
 const vadliateAccount = (decoded, request, h) => __awaiter(void 0, void 0, void 0, function* () {
     return { isValid: true, accountId: decoded.accountId };
 });
@@ -93,6 +94,8 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         },
     });
     yield (0, routes_1.default)(server);
+    // --------------------------------------------------- Initialize socketServer ------------------------------------------------------/
+    yield (0, socketServer_1.default)(server.listener);
     yield server.start();
     // await registerSocketServer(server.listener);
     console.log(path);

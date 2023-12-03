@@ -11,7 +11,7 @@ export const ProfileSwagger = {
         description: "Forbidden request",
       },
       501: {
-        description: "Requeset not implemented.",
+        description: "Request not implemented.",
       },
     },
   },

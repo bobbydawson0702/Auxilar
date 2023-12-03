@@ -1,8 +1,8 @@
 import { Server } from "socket.io";
-import User from "../models/users";
+import Account from "../models/account";
 
 const registerSocketServer = async (server) => {
-  const admin = await User.findOne({ role: "admin" });
+  // const admin = await Account.findOne({ account_type: "admin" });
   const io = new Server(server, {
     cors: {
       origin: "*",
@@ -10,32 +10,32 @@ const registerSocketServer = async (server) => {
     },
   });
   io.on("connection", (socket) => {
-    console.log(`user connected ${socket.id}`);
+    console.log(`account connected ${socket.id}`);
     socket.on("login", async (data) => {
-      const user = await User.findOne({ email: data });
-      if (user) {
-        if (user.role === "admin") {
-          socket["role"] = 0;
-          console.log("admin has joined in help room");
+      const account = await Account.findOne({ email: data });
+      if (account) {
+        if (account.account_type === "admin") {
+          socket["account_type"] = 0;
+          console.log("admin has joined in chat room");
         } else {
-          socket["role"] = 1;
-          console.log(data + "logged in help room");
+          socket["account_type"] = 1;
+          console.log(data + "logged in chat room");
         }
-        socket["email"] = user.email;
-        socket.join(user.email);
+        socket["email"] = account.email;
+        socket.join(account.email);
       }
     });
     socket.on("newMessage", (data) => {
       console.log(data);
-      console.log(socket["role"]);
+      console.log(socket["account_type"]);
       if (data["to"] !== "admin")
         io.to(data["to"]).emit("messageFromServer", data);
       else io.to(data["from"]).emit("messageFromServer", data);
     });
-    socket.on("currentUser", (data) => {
+    socket.on("currentAccount", (data) => {
       console.log(data);
-      socket.leave(socket["currentUser"]);
-      socket["currentUser"] = data;
+      socket.leave(socket["currentAccount"]);
+      socket["currentAccount"] = data;
       socket.join(data);
     });
     socket.on("disconnect", () => {

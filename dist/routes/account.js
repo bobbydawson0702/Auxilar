@@ -20,7 +20,6 @@ const passcode_1 = __importDefault(require("../models/passcode"));
 const config_1 = __importDefault(require("../config"));
 const account_2 = require("../swagger/account");
 const account_3 = require("../validation/account");
-const sendMail_1 = __importDefault(require("../utils/sendMail"));
 const options = { abortEarly: false, stripUnknown: true };
 exports.accountRoute = [
     {
@@ -95,41 +94,13 @@ exports.accountRoute = [
         <p style="font-size: 18px; color: #666; margin-bottom: 40px;">
         This is your email verification link. Please click the button below to verify your email:
         </p>
-        <a href="/account/verify-email/${token}" style="background-color: #4CAF50; 
+        <a href="http://136.243.150.17:3000/account/verify-email/${token}" style="background-color: #4CAF50; 
         color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
-                // const mailOptions = {
-                //   from: "oliver970315@gmail.com", // replace with your email address
-                //   to: "yujikoyama485@gmail.com", // replace with recipient's email address
-                //   subject: "Email Verification",
-                //   html: content
-                // };
-                // console.log("2");
-                // // Send the email
-                // try {
-                //   console.log("tryign....")
-                //   transporter.sendMail(mailOptions, (error, info) => {
-                //     console.log("email send try...");
-                //     if (error) {
-                //       console.log(error);
-                //       return response.response(error).code(500);
-                //     } else {
-                //       console.log("Email sent: " + info.response);
-                //       return response
-                //         .response({
-                //           msg: "register Success! please verify your email."
-                //         })
-                //         .code(201);
-                //     }
-                //   });
-                // } catch (error) {
-                //   console.log("EEEEEEEEERRRRRRRRRR", error);
-                // }
-                // console.log("3");
-                (0, sendMail_1.default)(newAccount.email, content);
+                // sendMail(newAccount.email, content);
                 return response
                     .response({
                     status: "ok",
-                    data: "register Sucess! Please verify your email.",
+                    data: content,
                 })
                     .code(201);
                 // linkUrl: `localhost:3000/verify-email/${token}`,

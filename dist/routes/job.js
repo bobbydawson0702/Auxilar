@@ -97,6 +97,12 @@ exports.jobRoute = [
                 );
                 yield newJob.save();
                 console.log("job posted successfully!", newJob);
+                // add posted job to client
+                yield client_1.default.findOneAndUpdate({ email: account.email }, {
+                    $push: {
+                        ongoing_project: { project: newJob._id },
+                    },
+                }, { new: true });
                 return response.response({ status: "ok", data: newJob }).code(201);
             }
             catch (error) {
@@ -356,6 +362,15 @@ exports.jobRoute = [
                         _id: request.params.jobId,
                         client_email: account.email,
                     });
+                    // remove job id from client ongoing project
+                    yield client_1.default.findOneAndUpdate({
+                        email: account.email,
+                        "ongoing_project.project": request.params.jobId,
+                    }, {
+                        $pull: {
+                            ongoing_project: { project: request.params.jobId },
+                        },
+                    }, { new: true });
                     return response
                         .response({ status: "ok", data: "successfully deleted!" })
                         .code(200);
