@@ -206,6 +206,9 @@ export const findExpertSwagger = {
       400: {
         description: "Input fields are required!",
       },
+      403: {
+        description: "Forbidden request",
+      },
       404: {
         description: "Expert is not found!",
       },

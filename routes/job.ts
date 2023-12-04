@@ -7,6 +7,7 @@ import {
   getJobSwagger,
   getMyAllJobSwagger,
   inviteExpertSwagger,
+  recommendedExpertsSwagger,
   updateJobSwagger,
 } from "../swagger/job";
 import {
@@ -856,6 +857,75 @@ export let jobRoute = [
         return response
           .response({ status: "ok", data: inviteExpertToJob })
           .code(201);
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Not implemented!" })
+          .code(501);
+      }
+    },
+  },
+
+  {
+    method: "GET",
+    path: "/{jobId}/recommendedExperts",
+    options: {
+      auth: "jwt",
+      description: "Find expert",
+      plugins: recommendedExpertsSwagger,
+      tags: ["api", "expert"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(
+          `POST api/v1/job/${request.params.jobId}/recommendedExperts request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        // check whether account is client
+        const account = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+        if (account.account_type !== "client") {
+          return response
+            .response({ status: "err", err: "Forbidden request!" })
+            .code(403);
+        }
+
+        // Get Job
+        const job = await Job.findOne({
+          _id: request.params.jobId,
+          client_email: account.email,
+        });
+        if (!job) {
+          return response.response({ status: "err", err: "Job is not found!" });
+        }
+
+        const queryAll = {};
+        if (job.skill_set.length) queryAll["skills"] = { $in: job.skill_set };
+        console.log("queryAll------------------->>>>>>>>>>>>>>>>", queryAll);
+
+        const findExperts = await Expert.aggregate([
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "account",
+              foreignField: "_id",
+              as: "accountData",
+              pipeline: [
+                {
+                  $project: {
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $match: queryAll,
+          },
+        ]);
+        return response.response({ status: "ok", data: findExperts }).code(200);
       } catch (err) {
         return response
           .response({ status: "err", err: "Not implemented!" })
