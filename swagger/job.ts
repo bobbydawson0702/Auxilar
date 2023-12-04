@@ -145,21 +145,23 @@ export const deleteJobSwagger = {
   },
 };
 
-
-export const connectChatSwagger = {
+export const inviteExpertSwagger = {
   "hapi-swagger": {
     responses: {
-      200: {
-        description: "Receive posted job successfully!",
+      201: {
+        description: "Invite expert Success1",
       },
       403: {
         description: "Forbidden request",
       },
       404: {
-        description: "Posted job not found!",
+        description: "Not found!",
+      },
+      409: {
+        description: "Expert already invited!",
       },
       501: {
-        description: "Requeset not implemented.",
+        description: "Request not implemented.",
       },
     },
   },

@@ -805,8 +805,11 @@ exports.proposalRoute = [
                     ],
                 }, {
                     $set: {
-                        "proposals.$.proposal_status": 1,
+                        "proposals.$.proposal_status": 0,
+                        "proposals.$[mentorCheckId].mentor_check.checked": true,
                     },
+                }, {
+                    arrayFilters: [{ "mentorCheckId.mentor": account.email }]
                 }, { new: true });
                 const ObjectId = mongoose_1.default.Types.ObjectId;
                 const approvedProposal = yield job_1.default.aggregate([

@@ -59,6 +59,7 @@ exports.expertRoute = [
                 console.log("data---------------", data);
                 const expertField = {
                     account: account.id,
+                    email: account.email,
                     address: data["address"],
                     country: data["country"],
                     state: (_a = data["state"]) !== null && _a !== void 0 ? _a : null,
@@ -135,7 +136,7 @@ exports.expertRoute = [
                 const responseData = yield expert_3.default.findOne({
                     account: request.auth.credentials.accountId,
                 })
-                    .populate("account", ["first_name", "last_name", "email"])
+                    .populate("account", ["first_name", "last_name"])
                     .select("-ongoing_project");
                 // const responseData = expert;
                 console.log("request success");

@@ -85,6 +85,7 @@ export let expertRoute = [
 
         const expertField = {
           account: account.id,
+          email: account.email,
           address: data["address"],
           country: data["country"],
           state: data["state"] ?? null,
@@ -171,7 +172,7 @@ export let expertRoute = [
         const responseData = await Expert.findOne({
           account: request.auth.credentials.accountId,
         })
-          .populate("account", ["first_name", "last_name", "email"])
+          .populate("account", ["first_name", "last_name"])
           .select("-ongoing_project");
 
         // const responseData = expert;

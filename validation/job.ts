@@ -50,7 +50,7 @@ export const JobSchema = Joi.object({
     .messages({
       "any.required": "Please provide hours per week",
     }),
-  invited_expert: Joi.array<Object>(),
+  // invited_expert: Joi.array<Object>(),
 });
 
 export const updateJobSchema = Joi.object({
@@ -103,7 +103,7 @@ export const updateJobSchema = Joi.object({
     .messages({
       "any.required": "Please provide hours per week",
     }),
-  invited_expert: Joi.array<Object>(),
+  // invited_expert: Joi.array<Object>(),
 });
 
 interface min_max_object {
@@ -169,5 +169,14 @@ export const findPostedJobSchema = Joi.object({
   }),
   page_index: Joi.number().required().messages({
     "any.required": "Please provide page index",
+  }),
+});
+
+export const inviteExpertSchema = Joi.object({
+  type: Joi.string().required().messages({
+    "any.required": "Please provide invite type",
+  }),
+  content: Joi.string().required().messages({
+    "any.required": "Please provide invite content",
   }),
 });

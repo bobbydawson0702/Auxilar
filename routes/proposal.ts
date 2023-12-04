@@ -1,6 +1,5 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
 
-
 import {
   ProposalSwagger,
   approveProposalSwagger,
@@ -863,16 +862,24 @@ export let proposalRoute = [
           {
             $and: [
               { _id: request.params.jobId },
-              { "proposals._id": request.params.proposalId },
-              {
-                "proposals.mentor_check.mentor": account.email,
-              },
+              // { "proposals._id": request.params.proposalId },
+              // {
+              //   "proposals.mentor_check.mentor": account.email,
+              // },
             ],
           },
           {
             $set: {
-              "proposals.$.proposal_status": 1,
+              "proposals.$[proposal].proposal_status": 1,
+              "proposals.$[proposal].mentor_check.$[mentorCheckId].checked":
+                true,
             },
+          },
+          {
+            arrayFilters: [
+              { "proposal._id": request.params.proposalId },
+              { "mentorCheckId.mentor": account.email },
+            ],
           },
           { new: true }
         );

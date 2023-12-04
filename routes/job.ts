@@ -1,17 +1,18 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
 import {
   JobSwagger,
-  connectChatSwagger,
   deleteJobSwagger,
   findPostedJobSwagger,
   getAllJobSwagger,
   getJobSwagger,
   getMyAllJobSwagger,
+  inviteExpertSwagger,
   updateJobSwagger,
 } from "../swagger/job";
 import {
   JobSchema,
   findPostedJobSchema,
+  inviteExpertSchema,
   updateJobSchema,
 } from "../validation/job";
 
@@ -98,7 +99,7 @@ export let jobRoute = [
           job_type: data["job_type"],
           project_duration: data["project_duration"],
           pub_date: currentDate,
-          invited_expert: data["invited_expert"],
+          // invited_expert: data["invited_expert"],
         };
 
         const newJob = new Job(
@@ -189,9 +190,9 @@ export let jobRoute = [
           hours_per_week: data["hours_per_week"],
         };
 
-        data["invited_expert"]
-          ? (jobField["invitied_expert"] = data["invited_expert"])
-          : null;
+        // data["invited_expert"]
+        //   ? (jobField["invitied_expert"] = data["invited_expert"])
+        //   : null;
 
         const job = await Job.findOneAndUpdate(
           { _id: request.params.jobId, client_email: account.email },
@@ -764,6 +765,104 @@ export let jobRoute = [
       }
     },
   },
+  {
+    method: "PATCH",
+    path: "/{jobId}/invite/{expertId}",
+    options: {
+      auth: "jwt",
+      description: "Invite expert to the posted job",
+      plugins: inviteExpertSwagger,
+      tags: ["api", "job"],
+      validate: {
+        payload: inviteExpertSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(
+          `PATCH api/v1/job/${request.params.jobId}/invite/${request.params.expertId} request from
+           ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        // check whether account is client
+        const account = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+        if (account.account_type !== "client") {
+          return response
+            .response({ status: "err", err: "Forbidden Request" })
+            .code(403);
+        }
+
+        // Check whether expert profile exist
+        const expert = await Expert.findOne({
+          account: request.params.expertId,
+        }).populate("account", ["first_name", "last_name"]);
+        if (!expert) {
+          return response
+            .response({ status: "err", err: "Expert does not exist" })
+            .code(404);
+        }
+
+        // check already invited
+        const isAreadyInvited = await Job.findOne({
+          _id: request.params.jobId,
+          client_email: account.email,
+          "invited_expert.id": expert.account._id,
+        });
+        if (isAreadyInvited) {
+          return response
+            .response({ status: "err", err: "Expert already invited!" })
+            .code(409);
+        }
+
+        console.log("expert------------------>>>>>>>>>>>>>>>>>>>", expert);
+        let inviteExpertToJob;
+        const data = request.payload;
+
+        try {
+          const inviteExpertField = {
+            id: request.params.expertId,
+            first_name: expert.account.first_name,
+            last_name: expert.account.last_name,
+            type: data["type"],
+            content: data["content"],
+          };
+          inviteExpertToJob = await Job.findOneAndUpdate(
+            {
+              _id: request.params.jobId,
+              client_email: account.email,
+            },
+            {
+              $push: {
+                invited_expert: inviteExpertField,
+              },
+            },
+            { new: true }
+          );
+        } catch (err) {
+          return response
+            .response({ status: "err", err: "Posted Job not found!" })
+            .code(404);
+        }
+        return response
+          .response({ status: "ok", data: inviteExpertToJob })
+          .code(201);
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Not implemented!" })
+          .code(501);
+      }
+    },
+  },
 
   {
     method: "GET",
@@ -795,25 +894,4 @@ export let jobRoute = [
       }
     },
   },
-
-  // {
-  //   method: 'POST',
-  //   path: '/chat',
-  //   options: {
-  //     auth: 'jwt',
-  //     description: 'Connect chat',
-  //     plugins: connectChatSwagger,
-  //     tags: ['api', 'job'],
-  //   },
-  //   handler: async (request: Request, response: ResponseToolkit) => {
-  //     try {
-  //       const currentDate = new Date().toUTCString();
-
-  //       console.log(
-  //         `POST api/v1/job/chat request from ${request.auth.credentials.email} Time: ${currentDate}`
-  //       );
-
-  //     }
-  //   }
-  // }
 ];

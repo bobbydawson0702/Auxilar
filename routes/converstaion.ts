@@ -17,7 +17,9 @@ import {
 } from "../validation/conversation";
 import Account from "../models/account";
 import Conversation from "../models/conversation";
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
+import Client from "../models/profile/client";
+import Expert from "../models/profile/expert";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -96,10 +98,16 @@ export let conversationRoute = [
               .code(409);
           }
 
+          // get client, expert avatar
+          const client_profile = await Client.findOne({account: account._id});
+          const expert_profile = await Expert.findOne({account: expert._id});
+          
           // fill conversationField
           conversationField = {
             client_email: account.email,
+            client_avatar: client_profile.avatar,
             expert_email: data["expert_email"],
+            expert_avatar: expert_profile.avatar,
             job: data["job"],
             proposal: data["proposal"],
           };
