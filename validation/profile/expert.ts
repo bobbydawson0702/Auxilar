@@ -150,3 +150,9 @@ export const updateEducationSchema = Joi.object({
     "any.required": "Please provide education",
   }),
 });
+
+export const findExpertSchema = Joi.object({
+  email: Joi.string().allow("").allow(null),
+  skills: Joi.array<String>().allow("").allow(null),
+  majors: Joi.array<String>().allow("").allow(null),
+});

@@ -14,6 +14,7 @@ import {
   addPortfolioItemSwagger,
   deletePortfolioItemSwagger,
   deleteProfileSwagger,
+  findExpertSwagger,
   getProfileSwagger,
   updateBaseInfoSwagger,
   updateEducationSwagger,
@@ -27,6 +28,7 @@ import {
 import {
   ProfileSchema,
   addPortfolioItemSchema,
+  findExpertSchema,
   updateBaseInfoSchema,
   updateEducationSchema,
   updatePersonDetailSchema,
@@ -980,6 +982,39 @@ export let expertRoute = [
       }
     },
   },
+
+  // {
+  //   method: "POST",
+  //   path: "/findExperts",
+  //   options: {
+  //     auth: "jwt",
+  //     description: "Find expert",
+  //     plugins: findExpertSwagger,
+  //     tags: ["api", "expert"],
+  //     validate: {
+  //       payload: findExpertSchema,
+  //       options,
+  //       failAction: (request, h, error) => {
+  //         const details = error.details.map((d) => {
+  //           return { err: d.message, path: d.path };
+  //         });
+  //         return h.response(details).code(400).takeover();
+  //       },
+  //     },
+  //   },
+  //   handler: async (request: Request, response: ResponseToolkit) => {
+  //     try {
+  //       const currentDate = new Date().toUTCString();
+  //       console.log(
+  //         `POST api/v1/expert/findExperts request from ${request.auth.credentials.email} Time: ${currentDate}`
+  //       );
+
+
+  //     } catch(err) {
+
+  //     }
+  //   }
+  // },
 
   {
     method: "GET",

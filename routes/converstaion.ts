@@ -20,6 +20,7 @@ import Conversation from "../models/conversation";
 import mongoose from "mongoose";
 import Client from "../models/profile/client";
 import Expert from "../models/profile/expert";
+import Mentor from "../models/profile/mentor";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -99,9 +100,9 @@ export let conversationRoute = [
           }
 
           // get client, expert avatar
-          const client_profile = await Client.findOne({account: account._id});
-          const expert_profile = await Expert.findOne({account: expert._id});
-          
+          const client_profile = await Client.findOne({ account: account._id });
+          const expert_profile = await Expert.findOne({ account: expert._id });
+
           // fill conversationField
           conversationField = {
             client_email: account.email,
@@ -124,11 +125,17 @@ export let conversationRoute = [
               .code(409);
           }
 
+          // get client, expert avatar
+          const mentor_profile = await Mentor.findOne({ account: account._id });
+          const expert_profile = await Expert.findOne({ account: expert._id });
+
           console.log("here-------------------->>>>>>>>>>");
           // fill conversationField
           conversationField = {
             expert_email: data["expert_email"],
+            expert_avatar: expert_profile.avatar,
             mentor_email: account.email,
+            mentor_avatar: mentor_profile.avatar,
           };
         }
 

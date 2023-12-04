@@ -196,3 +196,22 @@ export const deleteProfileSwagger = {
     },
   },
 };
+
+export const findExpertSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Find expert Success!",
+      },
+      400: {
+        description: "Input fields are required!",
+      },
+      404: {
+        description: "Expert is not found!",
+      },
+      501: {
+        description: "Requeset not implemented.",
+      },
+    },
+  },
+};
