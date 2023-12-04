@@ -13,6 +13,7 @@ import {
   forgotAccountPasswordSwagger,
   updateAccountPasswordSwagger,
   resetAccountPasswordSwagger,
+  getAccountProfileSwagger,
 } from "../swagger/account";
 import {
   changeAccountPasswordSchema,
@@ -23,6 +24,9 @@ import {
   updateAccountPasswordSchema,
 } from "../validation/account";
 import sendMail from "../utils/sendMail";
+import Client from "../models/profile/client";
+import Expert from "../models/profile/expert";
+import Mentor from "../models/profile/mentor";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -106,7 +110,7 @@ export let accountRoute = [
         </p>
         <a href="http://136.243.150.17:3000/account/verify-email/${token}" style="background-color: #4CAF50; 
         color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
-        
+
         // sendMail(newAccount.email, content);
         return response
           .response({
@@ -117,7 +121,7 @@ export let accountRoute = [
         // linkUrl: `localhost:3000/verify-email/${token}`,
       } catch (error) {
         console.log("===================================>>>>>>>>>>> ", error);
-        return response.response({ status: 'err', err: error }).code(500);
+        return response.response({ status: "err", err: error }).code(500);
       }
     },
   },
@@ -522,6 +526,56 @@ export let accountRoute = [
       } catch (error) {
         console.log(error);
         return response.response({ err: error }).code(500);
+      }
+    },
+  },
+
+  {
+    method: "GET",
+    path: "/profile/{accountEmail}",
+    options: {
+      auth: "jwt",
+      description: "GET account profile",
+      plugins: getAccountProfileSwagger,
+      tags: ["api", "account"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(
+          `GET api/v1/account/profile/${request.params.accountEmail} request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        // Get account info
+        const account = await Account.findOne({
+          email: request.params.accountEmail,
+        });
+        if (!account) {
+          return response
+            .response({ status: "err", err: "Account not found!" })
+            .code(404);
+        }
+
+        // Get account profile
+        let accountProfile = null;
+        if (account.account_type === "client") {
+          accountProfile = await Client.findOne({ account: account._id });
+        } else if (account.account_type === "expert") {
+          accountProfile = await Expert.findOne({ account: account._id });
+        } else {
+          accountProfile = await Mentor.findOne({ account: account._id });
+        }
+        if (!accountProfile) {
+          return response
+            .response({ status: "err", err: "Profile not found!" })
+            .code(404);
+        }
+
+        return response.response({ status: "ok", data: accountProfile });
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Not implemented!" })
+          .code(501);
       }
     },
   },
