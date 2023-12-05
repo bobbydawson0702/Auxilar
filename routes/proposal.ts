@@ -474,24 +474,76 @@ export let proposalRoute = [
         // check account whether client if account is client display job and visisble proposals
         if (account.account_type === "client") {
           proposal = await Job.aggregate([
+            // {
+            //   $lookup: {
+            //     from: "experts",
+            //     localField: "proposals.expert.id",
+            //     foreignField: "account",
+            //     as: "expertData",
+            //     pipeline: [
+            //       {
+            //         $project: {
+            //           avatar: 1,
+            //           first_name: 1,
+            //           last_name: 1,
+            //           skills: 1,
+            //           majors: 1,
+            //         },
+            //       },
+            //     ],
+            //   },
+            // },
             {
               $match: {
                 _id: new ObjectId(request.params.jobId),
               },
             },
             {
-              $project: {
-                proposals: {
-                  $filter: {
-                    input: "$proposals",
-                    as: "proposal",
-                    cond: {
-                      $eq: ["$$proposal.proposal_status", 1],
-                    },
-                  },
-                },
+              $unwind: "$proposals",
+            },
+            {
+              $match: {
+                "proposals.proposal_status": 1,
               },
             },
+            {
+              $lookup: {
+                from: "experts",
+                localField: "proposals.expert.id",
+                foreignField: "account",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $project: {
+                proposals: 1,
+                expertData: 1,
+              },
+            },
+            // {
+            //   $project: {
+            //     proposals: {
+            //       $filter: {
+            //         input: "$proposals",
+            //         as: "proposal",
+            //         cond: {
+            //           $eq: ["$$proposal.proposal_status", 1],
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
           ]);
           if (!proposal) {
             return response
@@ -503,23 +555,39 @@ export let proposalRoute = [
             {
               $match: {
                 _id: new ObjectId(request.params.jobId),
+              },
+            },
+            {
+              $unwind: "$proposals",
+            },
+            {
+              $match: {
                 "proposals.expert.email": account.email,
               },
             },
             {
-              $project: {
-                proposals: {
-                  $filter: {
-                    input: "$proposals",
-                    as: "proposal",
-                    cond: {
-                      $eq: [
-                        "$$proposal.expert.email",
-                        request.auth.credentials.email,
-                      ],
+              $lookup: {
+                from: "experts",
+                localField: "proposals.expert.id",
+                foreignField: "account",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
                     },
                   },
-                },
+                ],
+              },
+            },
+            {
+              $project: {
+                proposals: 1,
+                expertData: 1,
               },
             },
           ]);
@@ -532,6 +600,25 @@ export let proposalRoute = [
           console.log("account.id ------------------", account.id);
           proposal = await Job.aggregate([
             {
+              $lookup: {
+                from: "experts",
+                localField: "proposals.account",
+                foreignField: "_id",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
               $match: {
                 _id: new ObjectId(request.params.jobId),
                 "proposals.mentor_check.mentor": account.email,
@@ -541,6 +628,31 @@ export let proposalRoute = [
             {
               $match: {
                 "proposals.mentor_check.mentor": account.email,
+              },
+            },
+            {
+              $lookup: {
+                from: "experts",
+                localField: "proposals.expert.id",
+                foreignField: "account",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $project: {
+                proposals: 1,
+                expertData: 1,
               },
             },
           ]);
