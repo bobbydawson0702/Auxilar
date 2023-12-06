@@ -100,7 +100,38 @@ export let accountRoute = [
         // });
         // console.log("1");
         // const content = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px;"><h1 style="font-size: 36px; color: #333; margin-bottom: 20px;">Hello</h1><p style="font-size: 18px; color: #666; margin-bottom: 20px;">Welcome To Homepage</p><p style="font-size: 18px; color: #666; margin-bottom: 40px;">This is your email verification link. Please click the button below to verify your email:</p><a href="${baseUrl}/api/v1/user/verify-email/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
-        const content = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px;">
+        const content = `<tr><td style="background-color:rgba(255,255,255,1);padding-top:30px;padding-bottom:30px">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tbody><tr><td align="left" style="padding-top:0;padding-bottom:20px;padding-left:30px">
+        <span style="font-size:40px;color:rgb(27,158,197)">Auxilar</span>
+        </td></tr>
+        <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding:20px"><h2 style="margin-top:0;margin-bottom:0;font-family:Helvetica,sans-serif;
+        font-weight:normal;font-size:24px;line-height:30px;color:rgba(0,30,0,1)">
+        Verify your email address to complete registration</h2></td></tr>
+        <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding-left:20px;padding-right:20px;padding-top:20px">Hi ${request.payload["first_name"]} ${request.payload["last_name"]} , </td></tr>
+        <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding-left:20px;padding-right:20px;padding-top:20px">
+        Thanks for your interest in joining Auxilar! To complete your registration, we need you to
+         verify your email address. </td></tr><tr><td style="font-family:Helvetica,Arial,sans-serif;
+         font-size:16px;line-height:24px;padding:40px 20px 20px"><table style="text-align:center"
+          width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>
+          <tr><td><div style="text-align:center;margin:0 auto"><a style="background-color:rgb(27,158,197);
+          border:2px solid rgb(0,123,168);border-radius:100px;min-width:230px;color:rgba(255,255,255,1);
+          white-space:nowrap;font-weight:normal;display:block;font-family:Helvetica,Arial,sans-serif;
+          font-size:16px;line-height:40px;text-align:center;text-decoration:none"
+          href="http://136.243.150.17:3000/account/verify-email/${token}" target="_blank"
+          data-saferedirecturl="https://www.google.com/url?q="http://136.243.150.17:3000/account/verify-email/${token}">
+          Verify Email</a></div></td></tr></tbody></table></td></tr><tr>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+          padding-left:20px;padding-right:20px;padding-top:20px">
+          Please note that not all applications to join Auxilar are accepted.
+          We will notify you of our decision by email within 24 hours. </td></tr>
+          <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+          padding-left:20px;padding-right:20px;padding-top:30px"><div style="padding-top:10px">
+          Thanks for your time,<br>The Auxilar Team</div></td></tr></tbody></table></td></tr>`;
+        const content1 = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px;">
         <h1 style="font-size: 36px; color: #333; margin-bottom: 20px;">Hello</h1>
         <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
         Welcome To Homepage
@@ -111,11 +142,11 @@ export let accountRoute = [
         <a href="http://136.243.150.17:3000/account/verify-email/${token}" style="background-color: #4CAF50; 
         color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
 
-        // sendMail(newAccount.email, content);
+        sendMail(newAccount.email, content);
         return response
           .response({
             status: "ok",
-            data: content,
+            data: "verify Email!",
           })
           .code(201);
         // linkUrl: `localhost:3000/verify-email/${token}`,

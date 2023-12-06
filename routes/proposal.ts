@@ -5,7 +5,6 @@ import {
   approveProposalSwagger,
   deleteProposalSwagger,
   downloadProposalSwagger,
-  getAllProposalSwagger,
   getProposalSwagger,
   updateProposalSwagger,
 } from "../swagger/proposal";
@@ -13,7 +12,7 @@ import { ProposalSchema, updateProposalSchema } from "../validation/proposal";
 import Account from "../models/account";
 import Expert from "../models/profile/expert";
 import Job from "../models/job";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -108,9 +107,18 @@ export let proposalRoute = [
             attached_files: [],
           };
 
-          // Check whether mentors exist
-
+          // Check invited status
+          const invited_expert = await Job.findOne({
+            _id: request.params.jobId,
+            "invited_expert.id": account._id,
+          });
+          if (invited_expert) {
+            proposalField["expert"]["invited_status"] = true;
+            console.log("proposalField---------->", proposalField);
+          }
           if (data["proposalData"]["mentors"]) {
+            // Check whether mentors exist
+
             const mentor_check = [];
             data["proposalData"]["mentors"].forEach((item) => {
               mentor_check.push({

@@ -112,6 +112,10 @@ const JobSchema = new Schema({
           type: String,
           required: true,
         },
+        invited_status: {
+          type: Boolean,
+          default: 0,
+        },
       },
       cover_letter: {
         type: String,
