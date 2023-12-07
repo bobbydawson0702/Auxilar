@@ -690,23 +690,5 @@ exports.jobRoute = [
             }
         }),
     },
-    // {
-    //   method: 'POST',
-    //   path: '/chat',
-    //   options: {
-    //     auth: 'jwt',
-    //     description: 'Connect chat',
-    //     plugins: connectChatSwagger,
-    //     tags: ['api', 'job'],
-    //   },
-    //   handler: async (request: Request, response: ResponseToolkit) => {
-    //     try {
-    //       const currentDate = new Date().toUTCString();
-    //       console.log(
-    //         `POST api/v1/job/chat request from ${request.auth.credentials.email} Time: ${currentDate}`
-    //       );
-    //     }
-    //   }
-    // }
 ];
 //# sourceMappingURL=job.js.map

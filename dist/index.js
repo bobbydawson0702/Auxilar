@@ -46,8 +46,6 @@ const process_1 = __importDefault(require("process"));
 const config_1 = __importDefault(require("./config"));
 const dbConnect_1 = __importDefault(require("./lib/dbConnect"));
 const routes_1 = __importDefault(require("./routes"));
-const major_1 = __importDefault(require("./models/major"));
-const skill_1 = __importDefault(require("./models/skill"));
 const socketServer_1 = __importDefault(require("./utils/socketServer"));
 const vadliateAccount = (decoded, request, h) => __awaiter(void 0, void 0, void 0, function* () {
     return { isValid: true, accountId: decoded.accountId };
@@ -116,13 +114,13 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         fs_1.default.mkdirSync(project);
     }
     console.log(`🚀 Server running on ${server.info.uri} 🚀`);
-    // ----------------------------------------------------- Initialize Skill, Major database -------------------------------------------------------------------//
-    yield skill_1.default.deleteMany({});
-    yield major_1.default.deleteMany({});
-    for (let index = 1; index <= 20; index++) {
-        yield skill_1.default.create({ name: "skill" + index });
-        yield major_1.default.create({ name: "major" + index });
-    }
+    // // ----------------------------------------------------- Initialize Skill, Major database -------------------------------------------------------------------//
+    // await Skill.deleteMany({});
+    // await Major.deleteMany({});
+    // for (let index = 1; index <= 20; index++) {
+    //   await Skill.create({ name: "skill" + index });
+    //   await Major.create({ name: "major" + index });
+    // }
     return server;
 });
 init();

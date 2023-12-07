@@ -5,11 +5,21 @@ const ConversationSchema = new Schema({
   client_email: {
     type: String,
   },
+  client_avatar: {
+    type: String,
+  },
   expert_email: {
     type: String,
     required: true,
   },
+  expert_avatar: {
+    type: String,
+    required: true,
+  },
   mentor_email: {
+    type: String,
+  },
+  mentor_avatar: {
     type: String,
   },
   job: {
@@ -32,7 +42,7 @@ const ConversationSchema = new Schema({
         type: String,
       },
       message_type: {
-        type: String
+        type: String,
       },
       message_body: {
         type: String,

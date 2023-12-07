@@ -129,3 +129,22 @@ export const updateAccountPasswordSwagger = {
     },
   },
 };
+
+export const getAccountProfileSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Get accout profile Success!",
+      },
+      400: {
+        description: "Password input invalid",
+      },
+      404: {
+        description: "Not found!",
+      },
+      501: {
+        description: "Request not implemented!",
+      },
+    },
+  },
+};

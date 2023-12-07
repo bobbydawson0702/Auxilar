@@ -1,12 +1,10 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
 
-
 import {
   ProposalSwagger,
   approveProposalSwagger,
   deleteProposalSwagger,
   downloadProposalSwagger,
-  getAllProposalSwagger,
   getProposalSwagger,
   updateProposalSwagger,
 } from "../swagger/proposal";
@@ -14,7 +12,7 @@ import { ProposalSchema, updateProposalSchema } from "../validation/proposal";
 import Account from "../models/account";
 import Expert from "../models/profile/expert";
 import Job from "../models/job";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -109,9 +107,18 @@ export let proposalRoute = [
             attached_files: [],
           };
 
-          // Check whether mentors exist
-
+          // Check invited status
+          const invited_expert = await Job.findOne({
+            _id: request.params.jobId,
+            "invited_expert.id": account._id,
+          });
+          if (invited_expert) {
+            proposalField["expert"]["invited_status"] = true;
+            console.log("proposalField---------->", proposalField);
+          }
           if (data["proposalData"]["mentors"]) {
+            // Check whether mentors exist
+
             const mentor_check = [];
             data["proposalData"]["mentors"].forEach((item) => {
               mentor_check.push({
@@ -475,24 +482,76 @@ export let proposalRoute = [
         // check account whether client if account is client display job and visisble proposals
         if (account.account_type === "client") {
           proposal = await Job.aggregate([
+            // {
+            //   $lookup: {
+            //     from: "experts",
+            //     localField: "proposals.expert.id",
+            //     foreignField: "account",
+            //     as: "expertData",
+            //     pipeline: [
+            //       {
+            //         $project: {
+            //           avatar: 1,
+            //           first_name: 1,
+            //           last_name: 1,
+            //           skills: 1,
+            //           majors: 1,
+            //         },
+            //       },
+            //     ],
+            //   },
+            // },
             {
               $match: {
                 _id: new ObjectId(request.params.jobId),
               },
             },
             {
-              $project: {
-                proposals: {
-                  $filter: {
-                    input: "$proposals",
-                    as: "proposal",
-                    cond: {
-                      $eq: ["$$proposal.proposal_status", 1],
-                    },
-                  },
-                },
+              $unwind: "$proposals",
+            },
+            {
+              $match: {
+                "proposals.proposal_status": 1,
               },
             },
+            {
+              $lookup: {
+                from: "experts",
+                localField: "proposals.expert.id",
+                foreignField: "account",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $project: {
+                proposals: 1,
+                expertData: 1,
+              },
+            },
+            // {
+            //   $project: {
+            //     proposals: {
+            //       $filter: {
+            //         input: "$proposals",
+            //         as: "proposal",
+            //         cond: {
+            //           $eq: ["$$proposal.proposal_status", 1],
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
           ]);
           if (!proposal) {
             return response
@@ -504,23 +563,39 @@ export let proposalRoute = [
             {
               $match: {
                 _id: new ObjectId(request.params.jobId),
+              },
+            },
+            {
+              $unwind: "$proposals",
+            },
+            {
+              $match: {
                 "proposals.expert.email": account.email,
               },
             },
             {
-              $project: {
-                proposals: {
-                  $filter: {
-                    input: "$proposals",
-                    as: "proposal",
-                    cond: {
-                      $eq: [
-                        "$$proposal.expert.email",
-                        request.auth.credentials.email,
-                      ],
+              $lookup: {
+                from: "experts",
+                localField: "proposals.expert.id",
+                foreignField: "account",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
                     },
                   },
-                },
+                ],
+              },
+            },
+            {
+              $project: {
+                proposals: 1,
+                expertData: 1,
               },
             },
           ]);
@@ -533,6 +608,25 @@ export let proposalRoute = [
           console.log("account.id ------------------", account.id);
           proposal = await Job.aggregate([
             {
+              $lookup: {
+                from: "experts",
+                localField: "proposals.account",
+                foreignField: "_id",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
               $match: {
                 _id: new ObjectId(request.params.jobId),
                 "proposals.mentor_check.mentor": account.email,
@@ -542,6 +636,31 @@ export let proposalRoute = [
             {
               $match: {
                 "proposals.mentor_check.mentor": account.email,
+              },
+            },
+            {
+              $lookup: {
+                from: "experts",
+                localField: "proposals.expert.id",
+                foreignField: "account",
+                as: "expertData",
+                pipeline: [
+                  {
+                    $project: {
+                      avatar: 1,
+                      first_name: 1,
+                      last_name: 1,
+                      skills: 1,
+                      majors: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $project: {
+                proposals: 1,
+                expertData: 1,
               },
             },
           ]);
@@ -863,16 +982,24 @@ export let proposalRoute = [
           {
             $and: [
               { _id: request.params.jobId },
-              { "proposals._id": request.params.proposalId },
-              {
-                "proposals.mentor_check.mentor": account.email,
-              },
+              // { "proposals._id": request.params.proposalId },
+              // {
+              //   "proposals.mentor_check.mentor": account.email,
+              // },
             ],
           },
           {
             $set: {
-              "proposals.$.proposal_status": 1,
+              "proposals.$[proposal].proposal_status": 1,
+              "proposals.$[proposal].mentor_check.$[mentorCheckId].checked":
+                true,
             },
+          },
+          {
+            arrayFilters: [
+              { "proposal._id": request.params.proposalId },
+              { "mentorCheckId.mentor": account.email },
+            ],
           },
           { new: true }
         );

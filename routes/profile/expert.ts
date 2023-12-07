@@ -14,6 +14,7 @@ import {
   addPortfolioItemSwagger,
   deletePortfolioItemSwagger,
   deleteProfileSwagger,
+  findExpertSwagger,
   getProfileSwagger,
   updateBaseInfoSwagger,
   updateEducationSwagger,
@@ -27,6 +28,7 @@ import {
 import {
   ProfileSchema,
   addPortfolioItemSchema,
+  findExpertSchema,
   updateBaseInfoSchema,
   updateEducationSchema,
   updatePersonDetailSchema,
@@ -85,6 +87,7 @@ export let expertRoute = [
 
         const expertField = {
           account: account.id,
+          email: account.email,
           address: data["address"],
           country: data["country"],
           state: data["state"] ?? null,
@@ -171,7 +174,7 @@ export let expertRoute = [
         const responseData = await Expert.findOne({
           account: request.auth.credentials.accountId,
         })
-          .populate("account", ["first_name", "last_name", "email"])
+          .populate("account", ["first_name", "last_name"])
           .select("-ongoing_project");
 
         // const responseData = expert;
@@ -976,6 +979,83 @@ export let expertRoute = [
             .code(404);
       } catch (error) {
         return response.response({ status: "err", err: error }).code(501);
+      }
+    },
+  },
+
+  {
+    method: "POST",
+    path: "/findExperts",
+    options: {
+      auth: "jwt",
+      description: "Find expert",
+      plugins: findExpertSwagger,
+      tags: ["api", "expert"],
+      validate: {
+        payload: findExpertSchema,
+        options,
+        failAction: (request, h, error) => {
+          const details = error.details.map((d) => {
+            return { err: d.message, path: d.path };
+          });
+          return h.response(details).code(400).takeover();
+        },
+      },
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(
+          `POST api/v1/expert/findExperts request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        // check whether account is client
+        const account = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+        if (account.account_type !== "client") {
+          return response
+            .response({ status: "err", err: "Forbidden request!" })
+            .code(403);
+        }
+
+        const data = request.payload;
+        const queryAll = {};
+        if (data["skills"].length) queryAll["skills"] = { $in: data["skills"] };
+        if (data["majors"].length) queryAll["majors"] = { $in: data["majors"] };
+        console.log(
+          "queryAll------------------->>>>>>>>>>>>>>>>",
+          data["majors"]
+        );
+        if (data["email"]) queryAll["email"] = data["email"];
+        console.log("queryAll------------------->>>>>>>>>>>>>>>>", queryAll);
+
+        const findExperts = await Expert.aggregate([
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "account",
+              foreignField: "_id",
+              as: "accountData",
+              pipeline: [
+                {
+                  $project: {
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $match: queryAll,
+          },
+        ]);
+        return response.response({ status: "ok", data: findExperts }).code(200);
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Not implemented!" })
+          .code(501);
       }
     },
   },

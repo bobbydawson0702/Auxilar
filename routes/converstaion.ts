@@ -17,7 +17,10 @@ import {
 } from "../validation/conversation";
 import Account from "../models/account";
 import Conversation from "../models/conversation";
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
+import Client from "../models/profile/client";
+import Expert from "../models/profile/expert";
+import Mentor from "../models/profile/mentor";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -96,10 +99,16 @@ export let conversationRoute = [
               .code(409);
           }
 
+          // get client, expert avatar
+          const client_profile = await Client.findOne({ account: account._id });
+          const expert_profile = await Expert.findOne({ account: expert._id });
+
           // fill conversationField
           conversationField = {
             client_email: account.email,
+            client_avatar: client_profile.avatar,
             expert_email: data["expert_email"],
+            expert_avatar: expert_profile.avatar,
             job: data["job"],
             proposal: data["proposal"],
           };
@@ -116,11 +125,17 @@ export let conversationRoute = [
               .code(409);
           }
 
+          // get client, expert avatar
+          const mentor_profile = await Mentor.findOne({ account: account._id });
+          const expert_profile = await Expert.findOne({ account: expert._id });
+
           console.log("here-------------------->>>>>>>>>>");
           // fill conversationField
           conversationField = {
             expert_email: data["expert_email"],
+            expert_avatar: expert_profile.avatar,
             mentor_email: account.email,
+            mentor_avatar: mentor_profile.avatar,
           };
         }
 
@@ -170,6 +185,9 @@ export let conversationRoute = [
                 client_email: 1,
                 expert_email: 1,
                 mentor_email: 1,
+                client_avatar: 1,
+                expert_avatar: 1,
+                mentor_avatar: 1,
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
@@ -190,6 +208,9 @@ export let conversationRoute = [
                 client_email: 1,
                 expert_email: 1,
                 mentor_email: 1,
+                client_avatar: 1,
+                expert_avatar: 1,
+                mentor_avatar: 1,
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
@@ -210,6 +231,9 @@ export let conversationRoute = [
                 client_email: 1,
                 expert_email: 1,
                 mentor_email: 1,
+                client_avatar: 1,
+                expert_avatar: 1,
+                mentor_avatar: 1,
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
@@ -230,6 +254,9 @@ export let conversationRoute = [
                 client_email: 1,
                 expert_email: 1,
                 mentor_email: 1,
+                client_avatar: 1,
+                expert_avatar: 1,
+                mentor_avatar: 1,
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,

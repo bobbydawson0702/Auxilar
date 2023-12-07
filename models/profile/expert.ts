@@ -7,6 +7,11 @@ const ExpertSchema = new Schema({
     ref: "account",
   },
 
+  email: {
+    type: String,
+    required: true,
+  },
+
   address: {
     type: String,
     required: true,
@@ -26,7 +31,6 @@ const ExpertSchema = new Schema({
     type: String,
     // required: true,
   },
-
 
   languages: [
     {
@@ -90,7 +94,7 @@ const ExpertSchema = new Schema({
   },
 
   notification_preferences: {
-    type: [String]
+    type: [String],
   },
 
   ongoing_project: [
@@ -104,9 +108,9 @@ const ExpertSchema = new Schema({
   mentors: [
     {
       mentor: {
-        type: Schema.Types.ObjectId
-      }
-    }
+        type: Schema.Types.ObjectId,
+      },
+    },
   ],
 
   reviews: [
