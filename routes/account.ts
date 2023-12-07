@@ -1,6 +1,8 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
 import Jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import AWS from "aws-sdk";
+
 import Account from "../models/account";
 import Passcode from "../models/passcode";
 import config from "../config";
@@ -100,6 +102,12 @@ export let accountRoute = [
         // });
         // console.log("1");
         // const content = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px;"><h1 style="font-size: 36px; color: #333; margin-bottom: 20px;">Hello</h1><p style="font-size: 18px; color: #666; margin-bottom: 20px;">Welcome To Homepage</p><p style="font-size: 18px; color: #666; margin-bottom: 40px;">This is your email verification link. Please click the button below to verify your email:</p><a href="${baseUrl}/api/v1/user/verify-email/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
+        const ses = new AWS.SES({
+          region: "eu-north-1",
+          accessKeyId: "AKIAXK4RATQJAHY5WL44",
+          secretAccessKey: "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",
+        });
+
         const content = `<tr><td style="background-color:rgba(255,255,255,1);padding-top:30px;padding-bottom:30px">
         <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tbody><tr><td align="left" style="padding-top:0;padding-bottom:20px;padding-left:30px">
@@ -131,18 +139,33 @@ export let accountRoute = [
           <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
           padding-left:20px;padding-right:20px;padding-top:30px"><div style="padding-top:10px">
           Thanks for your time,<br>The Auxilar Team</div></td></tr></tbody></table></td></tr>`;
-        const content1 = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px;">
-        <h1 style="font-size: 36px; color: #333; margin-bottom: 20px;">Hello</h1>
-        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
-        Welcome To Homepage
-        </p>
-        <p style="font-size: 18px; color: #666; margin-bottom: 40px;">
-        This is your email verification link. Please click the button below to verify your email:
-        </p>
-        <a href="http://136.243.150.17:3000/account/verify-email/${token}" style="background-color: #4CAF50; 
-        color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
 
-        sendMail(newAccount.email, content);
+        const emailParams = {
+          Source: "galaxydragon0702@gmail.com",
+          Destination: {
+            ToAddresses: [newAccount.email],
+          },
+          Message: {
+            Subject: {
+              Data: "Verify Email",
+            },
+            Body: {
+              Text: {
+                Data: content,
+              },
+            },
+          },
+        };
+
+        ses.sendEmail(emailParams, (err, data) => {
+          if (err) {
+            console.log("Error sending email:", err);
+          } else {
+            console.log("Email sent successfully:", data);
+          }
+        });
+
+        // sendMail(newAccount.email, content);
         return response
           .response({
             status: "ok",

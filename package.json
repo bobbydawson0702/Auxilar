@@ -34,6 +34,7 @@
     "@hapi/vision": "^7.0.3",
     "@truffle/hdwallet-provider": "^2.1.14",
     "@types/supertest": "^2.0.12",
+    "aws-sdk": "^2.1513.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "coinpayments": "^2.2.0",
