@@ -108,8 +108,17 @@ exports.proposalRoute = [
                         mentor_check: [],
                         attached_files: [],
                     };
-                    // Check whether mentors exist
+                    // Check invited status
+                    const invited_expert = yield job_1.default.findOne({
+                        _id: request.params.jobId,
+                        "invited_expert.id": account._id,
+                    });
+                    if (invited_expert) {
+                        proposalField["expert"]["invited_status"] = true;
+                        console.log("proposalField---------->", proposalField);
+                    }
                     if (data["proposalData"]["mentors"]) {
+                        // Check whether mentors exist
                         const mentor_check = [];
                         data["proposalData"]["mentors"].forEach((item) => {
                             mentor_check.push({
@@ -419,24 +428,76 @@ exports.proposalRoute = [
                 // check account whether client if account is client display job and visisble proposals
                 if (account.account_type === "client") {
                     proposal = yield job_1.default.aggregate([
+                        // {
+                        //   $lookup: {
+                        //     from: "experts",
+                        //     localField: "proposals.expert.id",
+                        //     foreignField: "account",
+                        //     as: "expertData",
+                        //     pipeline: [
+                        //       {
+                        //         $project: {
+                        //           avatar: 1,
+                        //           first_name: 1,
+                        //           last_name: 1,
+                        //           skills: 1,
+                        //           majors: 1,
+                        //         },
+                        //       },
+                        //     ],
+                        //   },
+                        // },
                         {
                             $match: {
                                 _id: new ObjectId(request.params.jobId),
                             },
                         },
                         {
-                            $project: {
-                                proposals: {
-                                    $filter: {
-                                        input: "$proposals",
-                                        as: "proposal",
-                                        cond: {
-                                            $eq: ["$$proposal.proposal_status", 1],
-                                        },
-                                    },
-                                },
+                            $unwind: "$proposals",
+                        },
+                        {
+                            $match: {
+                                "proposals.proposal_status": 1,
                             },
                         },
+                        {
+                            $lookup: {
+                                from: "experts",
+                                localField: "proposals.expert.id",
+                                foreignField: "account",
+                                as: "expertData",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            avatar: 1,
+                                            first_name: 1,
+                                            last_name: 1,
+                                            skills: 1,
+                                            majors: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $project: {
+                                proposals: 1,
+                                expertData: 1,
+                            },
+                        },
+                        // {
+                        //   $project: {
+                        //     proposals: {
+                        //       $filter: {
+                        //         input: "$proposals",
+                        //         as: "proposal",
+                        //         cond: {
+                        //           $eq: ["$$proposal.proposal_status", 1],
+                        //         },
+                        //       },
+                        //     },
+                        //   },
+                        // },
                     ]);
                     if (!proposal) {
                         return response
@@ -449,23 +510,39 @@ exports.proposalRoute = [
                         {
                             $match: {
                                 _id: new ObjectId(request.params.jobId),
+                            },
+                        },
+                        {
+                            $unwind: "$proposals",
+                        },
+                        {
+                            $match: {
                                 "proposals.expert.email": account.email,
                             },
                         },
                         {
-                            $project: {
-                                proposals: {
-                                    $filter: {
-                                        input: "$proposals",
-                                        as: "proposal",
-                                        cond: {
-                                            $eq: [
-                                                "$$proposal.expert.email",
-                                                request.auth.credentials.email,
-                                            ],
+                            $lookup: {
+                                from: "experts",
+                                localField: "proposals.expert.id",
+                                foreignField: "account",
+                                as: "expertData",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            avatar: 1,
+                                            first_name: 1,
+                                            last_name: 1,
+                                            skills: 1,
+                                            majors: 1,
                                         },
                                     },
-                                },
+                                ],
+                            },
+                        },
+                        {
+                            $project: {
+                                proposals: 1,
+                                expertData: 1,
                             },
                         },
                     ]);
@@ -479,6 +556,25 @@ exports.proposalRoute = [
                     console.log("account.id ------------------", account.id);
                     proposal = yield job_1.default.aggregate([
                         {
+                            $lookup: {
+                                from: "experts",
+                                localField: "proposals.account",
+                                foreignField: "_id",
+                                as: "expertData",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            avatar: 1,
+                                            first_name: 1,
+                                            last_name: 1,
+                                            skills: 1,
+                                            majors: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        {
                             $match: {
                                 _id: new ObjectId(request.params.jobId),
                                 "proposals.mentor_check.mentor": account.email,
@@ -488,6 +584,31 @@ exports.proposalRoute = [
                         {
                             $match: {
                                 "proposals.mentor_check.mentor": account.email,
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: "experts",
+                                localField: "proposals.expert.id",
+                                foreignField: "account",
+                                as: "expertData",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            avatar: 1,
+                                            first_name: 1,
+                                            last_name: 1,
+                                            skills: 1,
+                                            majors: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $project: {
+                                proposals: 1,
+                                expertData: 1,
                             },
                         },
                     ]);
@@ -798,18 +919,21 @@ exports.proposalRoute = [
                 yield job_1.default.findOneAndUpdate({
                     $and: [
                         { _id: request.params.jobId },
-                        { "proposals._id": request.params.proposalId },
-                        {
-                            "proposals.mentor_check.mentor": account.email,
-                        },
+                        // { "proposals._id": request.params.proposalId },
+                        // {
+                        //   "proposals.mentor_check.mentor": account.email,
+                        // },
                     ],
                 }, {
                     $set: {
-                        "proposals.$.proposal_status": 0,
-                        "proposals.$[mentorCheckId].mentor_check.checked": true,
+                        "proposals.$[proposal].proposal_status": 1,
+                        "proposals.$[proposal].mentor_check.$[mentorCheckId].checked": true,
                     },
                 }, {
-                    arrayFilters: [{ "mentorCheckId.mentor": account.email }]
+                    arrayFilters: [
+                        { "proposal._id": request.params.proposalId },
+                        { "mentorCheckId.mentor": account.email },
+                    ],
                 }, { new: true });
                 const ObjectId = mongoose_1.default.Types.ObjectId;
                 const approvedProposal = yield job_1.default.aggregate([

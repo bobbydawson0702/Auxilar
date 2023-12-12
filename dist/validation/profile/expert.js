@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateEducationSchema = exports.updatePersonDetailSchema = exports.updateResumeSchema = exports.updateVerifierSchema = exports.addPortfolioItemSchema = exports.updatePortfolioItemSchema = exports.updatePortfolioSchema = exports.updateSummarySchema = exports.updateBaseInfoSchema = exports.ProfileSchema = void 0;
+exports.findExpertSchema = exports.updateEducationSchema = exports.updatePersonDetailSchema = exports.updateResumeSchema = exports.updateVerifierSchema = exports.addPortfolioItemSchema = exports.updatePortfolioItemSchema = exports.updatePortfolioSchema = exports.updateSummarySchema = exports.updateBaseInfoSchema = exports.ProfileSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.ProfileSchema = joi_1.default.object({
     address: joi_1.default.string().required().messages({
@@ -129,5 +129,10 @@ exports.updateEducationSchema = joi_1.default.object({
     education: joi_1.default.object().required().messages({
         "any.required": "Please provide education",
     }),
+});
+exports.findExpertSchema = joi_1.default.object({
+    email: joi_1.default.string().allow("").allow(null),
+    skills: joi_1.default.array().allow("").allow(null),
+    majors: joi_1.default.array().allow("").allow(null),
 });
 //# sourceMappingURL=expert.js.map

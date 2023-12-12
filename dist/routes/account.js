@@ -15,11 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountRoute = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const account_1 = __importDefault(require("../models/account"));
 const passcode_1 = __importDefault(require("../models/passcode"));
 const config_1 = __importDefault(require("../config"));
 const account_2 = require("../swagger/account");
 const account_3 = require("../validation/account");
+const client_1 = __importDefault(require("../models/profile/client"));
+const expert_1 = __importDefault(require("../models/profile/expert"));
+const mentor_1 = __importDefault(require("../models/profile/mentor"));
 const options = { abortEarly: false, stripUnknown: true };
 exports.accountRoute = [
     {
@@ -86,28 +90,86 @@ exports.accountRoute = [
                 // });
                 // console.log("1");
                 // const content = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px;"><h1 style="font-size: 36px; color: #333; margin-bottom: 20px;">Hello</h1><p style="font-size: 18px; color: #666; margin-bottom: 20px;">Welcome To Homepage</p><p style="font-size: 18px; color: #666; margin-bottom: 40px;">This is your email verification link. Please click the button below to verify your email:</p><a href="${baseUrl}/api/v1/user/verify-email/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
-                const content = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px;">
-        <h1 style="font-size: 36px; color: #333; margin-bottom: 20px;">Hello</h1>
-        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
-        Welcome To Homepage
-        </p>
-        <p style="font-size: 18px; color: #666; margin-bottom: 40px;">
-        This is your email verification link. Please click the button below to verify your email:
-        </p>
-        <a href="http://136.243.150.17:3000/account/verify-email/${token}" style="background-color: #4CAF50; 
-        color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px; font-size: 18px;">Verify Email</a></div>`;
+                const ses = new aws_sdk_1.default.SES({
+                    region: "eu-north-1",
+                    accessKeyId: "AKIAXK4RATQJAHY5WL44",
+                    secretAccessKey: "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",
+                });
+                // const content = `Hi ${request.payload["first_name"]} ${request.payload["last_name"]}
+                //                 Thanks for your interest in joining Auxilar! To complete your registration, we need you to
+                //                 verify your email address."http://136.243.150.17:3000/account/verify-email/${token}" 
+                //                 Verify Email!
+                //                 Please note that not all applications to join Auxilar are accepted.
+                //                 We will notify you of our decision by email within 24 hours.
+                //                 Thanks for your time,
+                //                 The Auxilar Team`;
+                const content = `<tr><td style="background-color:rgba(255,255,255,1);padding-top:30px;padding-bottom:30px">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tbody><tr><td align="left" style="padding-top:0;padding-bottom:20px;padding-left:30px">
+        <span style="font-size:40px;color:rgb(27,158,197)">Auxilar</span>
+        </td></tr>
+        <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding:20px"><h2 style="margin-top:0;margin-bottom:0;font-family:Helvetica,sans-serif;
+        font-weight:normal;font-size:24px;line-height:30px;color:rgba(0,30,0,1)">
+        Verify your email address to complete registration</h2></td></tr>
+        <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding-left:20px;padding-right:20px;padding-top:20px">Hi ${request.payload["first_name"]} ${request.payload["last_name"]} , </td></tr>
+        <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding-left:20px;padding-right:20px;padding-top:20px">
+        Thanks for your interest in joining Auxilar! To complete your registration, we need you to
+         verify your email address. </td></tr><tr><td style="font-family:Helvetica,Arial,sans-serif;
+         font-size:16px;line-height:24px;padding:40px 20px 20px"><table style="text-align:center"
+          width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>
+          <tr><td><div style="text-align:center;margin:0 auto"><a style="background-color:rgb(27,158,197);
+          border:2px solid rgb(0,123,168);border-radius:100px;min-width:230px;color:rgba(255,255,255,1);
+          white-space:nowrap;font-weight:normal;display:block;font-family:Helvetica,Arial,sans-serif;
+          font-size:16px;line-height:40px;text-align:center;text-decoration:none"
+          href="http://136.243.150.17:3000/account/verify-email/${token}" target="_blank"
+          data-saferedirecturl="https://www.google.com/url?q="http://136.243.150.17:3000/account/verify-email/${token}">
+          Verify Email</a></div></td></tr></tbody></table></td></tr><tr>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+          padding-left:20px;padding-right:20px;padding-top:20px">
+          Please note that not all applications to join Auxilar are accepted.
+          We will notify you of our decision by email within 24 hours. </td></tr>
+          <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+          padding-left:20px;padding-right:20px;padding-top:30px"><div style="padding-top:10px">
+          Thanks for your time,<br>The Auxilar Team</div></td></tr></tbody></table></td></tr>`;
+                const emailParams = {
+                    Source: "galaxydragon0702@gmail.com",
+                    Destination: {
+                        ToAddresses: [newAccount.email],
+                    },
+                    Message: {
+                        Subject: {
+                            Data: "Verify Email",
+                        },
+                        Body: {
+                            Html: {
+                                Data: content,
+                            },
+                        },
+                    },
+                };
+                ses.sendEmail(emailParams, (err, data) => {
+                    if (err) {
+                        console.log("Error sending email:", err);
+                    }
+                    else {
+                        console.log("Email sent successfully:", data);
+                    }
+                });
                 // sendMail(newAccount.email, content);
                 return response
                     .response({
                     status: "ok",
-                    data: content,
+                    data: "verify Email!",
                 })
                     .code(201);
                 // linkUrl: `localhost:3000/verify-email/${token}`,
             }
             catch (error) {
                 console.log("===================================>>>>>>>>>>> ", error);
-                return response.response({ status: 'err', err: error }).code(500);
+                return response.response({ status: "err", err: error }).code(500);
             }
         }),
     },
@@ -483,6 +545,53 @@ exports.accountRoute = [
             catch (error) {
                 console.log(error);
                 return response.response({ err: error }).code(500);
+            }
+        }),
+    },
+    {
+        method: "GET",
+        path: "/profile/{accountEmail}",
+        options: {
+            auth: "jwt",
+            description: "GET account profile",
+            plugins: account_2.getAccountProfileSwagger,
+            tags: ["api", "account"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/account/profile/${request.params.accountEmail} request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                // Get account info
+                const account = yield account_1.default.findOne({
+                    email: request.params.accountEmail,
+                });
+                if (!account) {
+                    return response
+                        .response({ status: "err", err: "Account not found!" })
+                        .code(404);
+                }
+                // Get account profile
+                let accountProfile = null;
+                if (account.account_type === "client") {
+                    accountProfile = yield client_1.default.findOne({ account: account._id });
+                }
+                else if (account.account_type === "expert") {
+                    accountProfile = yield expert_1.default.findOne({ account: account._id });
+                }
+                else {
+                    accountProfile = yield mentor_1.default.findOne({ account: account._id });
+                }
+                if (!accountProfile) {
+                    return response
+                        .response({ status: "err", err: "Profile not found!" })
+                        .code(404);
+                }
+                return response.response({ status: "ok", data: accountProfile });
+            }
+            catch (err) {
+                return response
+                    .response({ status: "err", err: "Not implemented!" })
+                    .code(501);
             }
         }),
     },

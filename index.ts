@@ -1,4 +1,4 @@
-import * as hapi from "@hapi/hapi";
+ import * as hapi from "@hapi/hapi";
 import Vision from "@hapi/vision";
 import Inert from "@hapi/inert";
 

@@ -80,30 +80,21 @@ const JobSchema = new Schema({
     },
     invited_expert: [
         {
+            id: {
+                type: Schema.Types.ObjectId,
+            },
             first_name: {
                 type: String,
             },
             last_name: {
                 type: String,
             },
-            email: {
+            type: {
                 type: String,
             },
-            mentors: [
-                {
-                    mentor: {
-                        first_name: {
-                            type: String,
-                        },
-                        last_name: {
-                            type: String,
-                        },
-                        email: {
-                            type: String,
-                        },
-                    },
-                },
-            ],
+            content: {
+                type: String,
+            },
         },
     ],
     proposals: [
@@ -116,6 +107,10 @@ const JobSchema = new Schema({
                 email: {
                     type: String,
                     required: true,
+                },
+                invited_status: {
+                    type: Boolean,
+                    default: 0,
                 },
             },
             cover_letter: {
