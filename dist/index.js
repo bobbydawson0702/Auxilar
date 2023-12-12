@@ -54,9 +54,9 @@ const path = process_1.default.cwd();
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, dbConnect_1.default)();
     const server = new hapi.Server({
-        port: 3050,
+        port: 3030,
         routes: { cors: { origin: ["*"] } },
-        host: "0.0.0.0",
+        host: "136.243.150.17",
     });
     yield server.register(inert_1.default);
     yield server.register(vision_1.default);

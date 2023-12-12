@@ -780,6 +780,78 @@ exports.expertRoute = [
         }),
     },
     {
+        method: "POST",
+        path: "/findExperts",
+        options: {
+            auth: "jwt",
+            description: "Find expert",
+            plugins: expert_1.findExpertSwagger,
+            tags: ["api", "expert"],
+            validate: {
+                payload: expert_2.findExpertSchema,
+                options,
+                failAction: (request, h, error) => {
+                    const details = error.details.map((d) => {
+                        return { err: d.message, path: d.path };
+                    });
+                    return h.response(details).code(400).takeover();
+                },
+            },
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`POST api/v1/expert/findExperts request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                // check whether account is client
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request!" })
+                        .code(403);
+                }
+                const data = request.payload;
+                const queryAll = {};
+                if (data["skills"].length)
+                    queryAll["skills"] = { $in: data["skills"] };
+                if (data["majors"].length)
+                    queryAll["majors"] = { $in: data["majors"] };
+                console.log("queryAll------------------->>>>>>>>>>>>>>>>", data["majors"]);
+                if (data["email"])
+                    queryAll["email"] = data["email"];
+                console.log("queryAll------------------->>>>>>>>>>>>>>>>", queryAll);
+                const findExperts = yield expert_3.default.aggregate([
+                    {
+                        $lookup: {
+                            from: "accounts",
+                            localField: "account",
+                            foreignField: "_id",
+                            as: "accountData",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        first_name: 1,
+                                        last_name: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $match: queryAll,
+                    },
+                ]);
+                return response.response({ status: "ok", data: findExperts }).code(200);
+            }
+            catch (err) {
+                return response
+                    .response({ status: "err", err: "Not implemented!" })
+                    .code(501);
+            }
+        }),
+    },
+    {
         method: "GET",
         path: "/all-skills",
         options: {

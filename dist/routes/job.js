@@ -88,7 +88,7 @@ exports.jobRoute = [
                     job_type: data["job_type"],
                     project_duration: data["project_duration"],
                     pub_date: currentDate,
-                    invited_expert: data["invited_expert"],
+                    // invited_expert: data["invited_expert"],
                 };
                 const newJob = new job_3.default(jobField
                 // { client_email: account.email },
@@ -166,9 +166,9 @@ exports.jobRoute = [
                     project_duration: data["project_duration"],
                     hours_per_week: data["hours_per_week"],
                 };
-                data["invited_expert"]
-                    ? (jobField["invitied_expert"] = data["invited_expert"])
-                    : null;
+                // data["invited_expert"]
+                //   ? (jobField["invitied_expert"] = data["invited_expert"])
+                //   : null;
                 const job = yield job_3.default.findOneAndUpdate({ _id: request.params.jobId, client_email: account.email }, {
                     $set: jobField,
                 }, { new: true });
@@ -659,6 +659,159 @@ exports.jobRoute = [
             }
             catch (error) {
                 return response.response({ status: "err", err: error }).code(501);
+            }
+        }),
+    },
+    {
+        method: "PATCH",
+        path: "/{jobId}/invite/{expertId}",
+        options: {
+            auth: "jwt",
+            description: "Invite expert to the posted job",
+            plugins: job_1.inviteExpertSwagger,
+            tags: ["api", "job"],
+            validate: {
+                payload: job_2.inviteExpertSchema,
+                options,
+                failAction: (request, h, error) => {
+                    const details = error.details.map((d) => {
+                        return { err: d.message, path: d.path };
+                    });
+                    return h.response(details).code(400).takeover();
+                },
+            },
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`PATCH api/v1/job/${request.params.jobId}/invite/${request.params.expertId} request from
+           ${request.auth.credentials.email} Time: ${currentDate}`);
+                // check whether account is client
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden Request" })
+                        .code(403);
+                }
+                // Check whether expert profile exist
+                const expert = yield expert_1.default.findOne({
+                    account: request.params.expertId,
+                }).populate("account", ["first_name", "last_name"]);
+                if (!expert) {
+                    return response
+                        .response({ status: "err", err: "Expert does not exist" })
+                        .code(404);
+                }
+                // check already invited
+                const isAreadyInvited = yield job_3.default.findOne({
+                    _id: request.params.jobId,
+                    client_email: account.email,
+                    "invited_expert.id": expert.account._id,
+                });
+                if (isAreadyInvited) {
+                    return response
+                        .response({ status: "err", err: "Expert already invited!" })
+                        .code(409);
+                }
+                console.log("expert------------------>>>>>>>>>>>>>>>>>>>", expert);
+                let inviteExpertToJob;
+                const data = request.payload;
+                try {
+                    const inviteExpertField = {
+                        id: request.params.expertId,
+                        first_name: expert.account.first_name,
+                        last_name: expert.account.last_name,
+                        type: data["type"],
+                        content: data["content"],
+                    };
+                    inviteExpertToJob = yield job_3.default.findOneAndUpdate({
+                        _id: request.params.jobId,
+                        client_email: account.email,
+                    }, {
+                        $push: {
+                            invited_expert: inviteExpertField,
+                        },
+                    }, { new: true });
+                }
+                catch (err) {
+                    return response
+                        .response({ status: "err", err: "Posted Job not found!" })
+                        .code(404);
+                }
+                return response
+                    .response({ status: "ok", data: inviteExpertToJob })
+                    .code(201);
+            }
+            catch (err) {
+                return response
+                    .response({ status: "err", err: "Not implemented!" })
+                    .code(501);
+            }
+        }),
+    },
+    {
+        method: "GET",
+        path: "/{jobId}/recommendedExperts",
+        options: {
+            auth: "jwt",
+            description: "Find expert",
+            plugins: job_1.recommendedExpertsSwagger,
+            tags: ["api", "expert"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`POST api/v1/job/${request.params.jobId}/recommendedExperts request from ${request.auth.credentials.email} Time: ${currentDate}`);
+                // check whether account is client
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request!" })
+                        .code(403);
+                }
+                // Get Job
+                const job = yield job_3.default.findOne({
+                    _id: request.params.jobId,
+                    client_email: account.email,
+                });
+                if (!job) {
+                    return response.response({ status: "err", err: "Job is not found!" });
+                }
+                const queryAll = {};
+                if (job.skill_set.length)
+                    queryAll["skills"] = { $in: job.skill_set };
+                console.log("queryAll------------------->>>>>>>>>>>>>>>>", queryAll);
+                const findExperts = yield expert_1.default.aggregate([
+                    {
+                        $lookup: {
+                            from: "accounts",
+                            localField: "account",
+                            foreignField: "_id",
+                            as: "accountData",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        first_name: 1,
+                                        last_name: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $match: queryAll,
+                    },
+                ]);
+                return response.response({ status: "ok", data: findExperts }).code(200);
+            }
+            catch (err) {
+                return response
+                    .response({ status: "err", err: "Not implemented!" })
+                    .code(501);
             }
         }),
     },
