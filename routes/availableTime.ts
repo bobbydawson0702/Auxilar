@@ -41,7 +41,7 @@ export let availableTimeRoute = [
           `POST api/v1/schedule request from ${request.auth.credentials.email} Time: ${currentDate}`
         );
 
-        // check whether schedul already exist.
+        // check whether schedule already exist.
         const isAlreadyExist = await AvailableTime.findOne({
           email: request.auth.credentials.email,
         });
