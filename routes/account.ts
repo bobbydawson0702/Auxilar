@@ -594,7 +594,7 @@ export let accountRoute = [
 
   {
     method: "GET",
-    path: "/profile/{accountEmail}",
+    path: "/profile/{accountId}",
     options: {
       auth: "jwt",
       description: "GET account profile",
@@ -605,13 +605,11 @@ export let accountRoute = [
       try {
         const currentDate = new Date().toUTCString();
         console.log(
-          `GET api/v1/account/profile/${request.params.accountEmail} request from ${request.auth.credentials.email} Time: ${currentDate}`
+          `GET api/v1/account/profile/${request.params.accountId} request from ${request.auth.credentials.email} Time: ${currentDate}`
         );
 
         // Get account info
-        const account = await Account.findOne({
-          email: request.params.accountEmail,
-        });
+        const account = await Account.findById(request.params.accountId);
         if (!account) {
           return response
             .response({ status: "err", err: "Account not found!" })

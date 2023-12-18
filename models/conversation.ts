@@ -2,22 +2,22 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ConversationSchema = new Schema({
-  client_email: {
-    type: String,
+  client_id: {
+    type: Schema.Types.ObjectId,
   },
   client_avatar: {
     type: String,
   },
-  expert_email: {
-    type: String,
+  expert_id: {
+    type: Schema.Types.ObjectId,
     required: true,
   },
   expert_avatar: {
     type: String,
     required: true,
   },
-  mentor_email: {
-    type: String,
+  mentor_id: {
+    type: Schema.Types.ObjectId,
   },
   mentor_avatar: {
     type: String,
@@ -38,8 +38,13 @@ const ConversationSchema = new Schema({
 
   messages: [
     {
-      sender: {
-        type: String,
+      from: {
+        type: Schema.Types.ObjectId,
+        required: true,
+      },
+      to: {
+        type: Schema.Types.ObjectId,
+        required: true,
       },
       message_type: {
         type: String,

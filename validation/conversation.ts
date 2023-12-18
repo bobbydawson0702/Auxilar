@@ -1,11 +1,11 @@
 import Joi from "joi";
 
 export const ConversationSchema = Joi.object({
-  client_email: Joi.string().allow(null).allow(""),
-  expert_email: Joi.string().required().messages({
+  client_id: Joi.string().allow(null).allow(""),
+  expert_id: Joi.string().required().messages({
     "any.required": "Please provide expert id",
   }),
-  mentor_email: Joi.string().allow(null).allow(""),
+  mentor_id: Joi.string().allow(null).allow(""),
   job: Joi.object({
     id: Joi.string().required().messages({
       "any.required": "Please provide job id",
@@ -45,10 +45,10 @@ export const putMessageToConversationSchema = Joi.object({
   messageData: custom
     .object({
       from: Joi.string().required().messages({
-        "any.required": "Please provide sender email.",
+        "any.required": "Please provide sender id.",
       }),
       to: Joi.string().required().messages({
-        "any.required": "Please provide receiver email.",
+        "any.required": "Please provide receiver id.",
       }),
       message_type: Joi.string().required().messages({
         "any.required": "Please provide message_type",
@@ -80,10 +80,10 @@ export const updateMessageSchema = Joi.object({
   messageData: custom
     .object({
       from: Joi.string().required().messages({
-        "any.required": "Please provide sender email.",
+        "any.required": "Please provide sender id.",
       }),
       to: Joi.string().required().messages({
-        "any.required": "Please provide receiver email.",
+        "any.required": "Please provide receiver id.",
       }),
       message_type: Joi.string().required().messages({
         "any.required": "Please provide message_type",
