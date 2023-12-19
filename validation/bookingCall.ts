@@ -1,14 +1,26 @@
 import Joi from "joi";
 
 const participant = Joi.object().keys({
-  participant: Joi.string().required().messages({
-    "any.required": "Please provide participant id",
-  }),
+  participant: Joi.object({
+    id: Joi.string().required().messages({
+      "any.required": "Please provide participant id",
+    }),
+    first_name: Joi.string().required().messages({
+      "any.required": "Please provide participant first_name",
+    }),
+    last_name: Joi.string().required().messages({
+      "any.required": "Please provide participant last_name",
+    }),
+  })
+    .required()
+    .messages({
+      "any.required": "Please provide participant info",
+    }),
 });
 
 export const createBookingSchema = Joi.object({
   participants: Joi.array().items(participant).required().messages({
-    "any.required": "Plase provide participants Ids",
+    "any.required": "Plase provide participants infos",
   }),
 
   call_link: Joi.string().required().messages({
@@ -43,7 +55,7 @@ export const createBookingSchema = Joi.object({
 
 export const updateBookedCallSchema = Joi.object({
   participants: Joi.array().items(participant).required().messages({
-    "any.required": "Plase provide participants Ids",
+    "any.required": "Plase provide participants infos",
   }),
 
   call_link: Joi.string().required().messages({

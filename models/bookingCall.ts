@@ -6,14 +6,34 @@ const Schema = mongoose.Schema;
 
 const BookingCallSchema = new Schema({
   owner: {
-    type: Schema.Types.ObjectId,
-    required: true,
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    first_name: {
+      type: String,
+      required: true,
+    },
+    last_name: {
+      type: String,
+      required: true,
+    },
   },
   participants: [
     {
       participant: {
-        type: Schema.Types.ObjectId,
-        required: true,
+        id: {
+          type: Schema.Types.ObjectId,
+          required: true,
+        },
+        first_name: {
+          type: String,
+          required: true,
+        },
+        last_name: {
+          type: String,
+          required: true,
+        },
       },
     },
   ],

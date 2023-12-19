@@ -50,7 +50,11 @@ export let bookingCallRoute = [
         });
 
         const bookingCallData = {
-          owner: account._id,
+          owner: {
+            id: account._id,
+            first_name: account.first_name,
+            last_name: account.last_name,
+          },
           participants: data["participants"],
           call_link: data["call_link"],
           title: data["title"],
@@ -94,10 +98,10 @@ export let bookingCallRoute = [
         const bookedCalls = await BookingCall.find({
           $or: [
             {
-              owner: account._id,
+              "owner.id": account._id,
             },
             {
-              "participants.participant": account._id,
+              "participants.participant.id": account._id,
             },
           ],
         });
@@ -140,10 +144,10 @@ export let bookingCallRoute = [
         const bookedCalls = await BookingCall.find({
           $or: [
             {
-              owner: contactorAccount._id,
+              "owner.id": contactorAccount._id,
             },
             {
-              "participants.participant": contactorAccount._id,
+              "participants.participant.id": contactorAccount._id,
             },
           ],
         }).select("meeting_date meeting_time");
@@ -182,10 +186,10 @@ export let bookingCallRoute = [
             {
               $or: [
                 {
-                  owner: account._id,
+                  "owner.id": account._id,
                 },
                 {
-                  "participants.participant": account._id,
+                  "participants.participant.id": account._id,
                 },
               ],
             },
@@ -248,7 +252,7 @@ export let bookingCallRoute = [
           };
           updatedBookedCall = await BookingCall.findOneAndUpdate(
             {
-              owner: account._id,
+              "owner.id": account._id,
               _id: request.params.bookingCallId,
             },
             {
@@ -307,7 +311,7 @@ export let bookingCallRoute = [
         });
 
         const deleteBookedCall = await BookingCall.deleteOne({
-          owner: account._id,
+          "owner.id": account._id,
           _id: request.params.bookingCallId,
         });
 
