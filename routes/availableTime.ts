@@ -10,6 +10,7 @@ import {
   updateAvailableTimeSchema,
 } from "../validation/availableTime";
 import AvailableTime from "../models/availableTime";
+import Account from "../models/account";
 
 const options = { abortEarly: false, stripUnknown: true };
 
@@ -100,6 +101,51 @@ export let availableTimeRoute = [
             .response({ status: "err", err: "Schedule does not exist!" })
             .code(404);
         }
+        return response.response({ status: "ok", data: schedule }).code(200);
+      } catch (err) {
+        return response
+          .response({ status: err, err: "Not implemented" })
+          .code(501);
+      }
+    },
+  },
+  {
+    method: "GET",
+    path: "/{contactorId}",
+    options: {
+      auth: "jwt",
+      description: "Get a schedule of Contactor",
+      plugins: getAvailableTimeSwagger,
+      tags: ["api", "availableTime"],
+    },
+
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+
+        console.log(
+          `GET api/v1/schedule/${request.params.contactorId} request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        const contactorAccount = await Account.findById(
+          request.params.contactorId
+        );
+
+        if (!contactorAccount) {
+          return response
+            .response({ status: "err", err: "Not found!" })
+            .code(404);
+        }
+
+        // check whether schedule already exist.
+        const schedule = await AvailableTime.findOne({
+          email: contactorAccount.email,
+        });
+        // if (!schedule) {
+        //   return response
+        //     .response({ status: "err", err: "Schedule does not exist!" })
+        //     .code(404);
+        // }
         return response.response({ status: "ok", data: schedule }).code(200);
       } catch (err) {
         return response

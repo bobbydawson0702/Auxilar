@@ -39,7 +39,7 @@ export const updateAvailableTimeSwagger = {
         description: "Update schedule success",
       },
       404: {
-        description: "Schedule does not exist",
+        description: "Not found!",
       },
       501: {
         description: "Not implemented",

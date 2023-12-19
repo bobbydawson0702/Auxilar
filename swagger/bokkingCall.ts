@@ -20,7 +20,7 @@ export const getBookedCallSwagger = {
         description: "Get booked call success",
       },
       404: {
-        description: "Booked call does not exist",
+        description: "Not found!",
       },
       501: {
         description: "Not implemented",

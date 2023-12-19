@@ -112,6 +112,52 @@ export let bookingCallRoute = [
   },
   {
     method: "GET",
+    path: "/bookedcalls/{contactorId}",
+    options: {
+      auth: "jwt",
+      description: "Get a booked call",
+      plugins: getBookedCallSwagger,
+      tags: ["api", "bookingCall"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(
+          `GET api/v1/book/${request.params.contactorId} request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        // Get account id
+        const contactorAccount = await Account.findById(
+          request.params.contactorId
+        );
+
+        if (!contactorAccount) {
+          return response
+            .response({ status: "err", err: "Not found!" })
+            .code(404);
+        }
+
+        const bookedCalls = await BookingCall.find({
+          $or: [
+            {
+              owner: contactorAccount._id,
+            },
+            {
+              "participants.participant": contactorAccount._id,
+            },
+          ],
+        }).select("meeting_date meeting_time");
+
+        return response.response({ status: "ok", data: bookedCalls }).code(200);
+      } catch (error) {
+        return response
+          .response({ staus: "err", err: "Not implemented" })
+          .code(501);
+      }
+    },
+  },
+  {
+    method: "GET",
     path: "/{bookingCallId}",
     options: {
       auth: "jwt",
