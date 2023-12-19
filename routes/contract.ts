@@ -72,6 +72,7 @@ export let contractRoute = [
           client_id: account._id,
           expert_id: data["expert_id"],
           milestones: data["milestones"],
+          additional_information: data["additional_information"] ?? null,
           total_budget: data["total_budget"],
         };
 
@@ -242,6 +243,7 @@ export let contractRoute = [
         const updateContractData = {
           milestones: data["milestones"],
           total_budget: data["total_budget"],
+          additional_information: data["additional_information"] ?? null,
         };
 
         //Update contract
@@ -257,6 +259,7 @@ export let contractRoute = [
             {
               milestones: updateContractData.milestones,
               total_budget: updateContractData.total_budget,
+              additional_information: updateContractData.additional_information,
             },
             { new: true }
           );

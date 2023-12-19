@@ -1,5 +1,3 @@
-import { date } from "joi";
-
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
@@ -42,9 +40,6 @@ const ContractSchema = new Schema({
           type: Date,
         },
       },
-      additional_information: {
-        type: String,
-      },
       completeness: {
         type: String,
         enum: ["upcoming", "ongoing", "success", "failed"],
@@ -52,12 +47,12 @@ const ContractSchema = new Schema({
       },
     },
   ],
+  additional_information: {
+    type: String,
+  },
   total_budget: {
     proposed_budget: {
       type: Number,
-    },
-    additional_information: {
-      type: String,
     },
   },
 });
