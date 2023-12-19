@@ -166,7 +166,7 @@ export let conversationRoute = [
       try {
         const currentDate = new Date().toUTCString();
         console.log(
-          `GET api/v1/conversation request from ${request.auth.credentials.email} Time: ${currentDate}`
+          `GET api/v1/conversation/all request from ${request.auth.credentials.email} Time: ${currentDate}`
         );
 
         // check whether account is Admin
@@ -193,8 +193,60 @@ export let conversationRoute = [
                 "proposal.id": 1,
               },
             },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
           ]);
         } else if (account.account_type === "client") {
+          console.log("client id------------------------->", account);
           // get all conversations associated with current client.
           allConversations = await Conversation.aggregate([
             {
@@ -214,6 +266,57 @@ export let conversationRoute = [
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
               },
             },
           ]);
@@ -239,6 +342,57 @@ export let conversationRoute = [
                 "proposal.id": 1,
               },
             },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
           ]);
         } else {
           // get all conversations associated with current mentor.
@@ -260,6 +414,57 @@ export let conversationRoute = [
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
               },
             },
           ]);
