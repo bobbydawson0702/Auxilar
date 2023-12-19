@@ -583,6 +583,57 @@ export let conversationRoute = [
           //     "proposal.id": 1,
           //   },
           // },
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "client_id",
+              foreignField: "_id",
+              as: "client_info",
+              pipeline: [
+                {
+                  $project: {
+                    _id: false,
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "expert_id",
+              foreignField: "_id",
+              as: "expert_info",
+              pipeline: [
+                {
+                  $project: {
+                    _id: false,
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "mentor_id",
+              foreignField: "_id",
+              as: "mentor_info",
+              pipeline: [
+                {
+                  $project: {
+                    _id: false,
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
         ]);
 
         if (!myConversation) {
