@@ -57,7 +57,7 @@
     "sol-merger": "^4.4.0",
     "solc": "^0.8.21",
     "stream-to-file": "^2.0.1",
-    "stripe": "^13.4.0",
+    "stripe": "^14.9.0",
     "web3": "^4.3.0"
   },
   "engines": {

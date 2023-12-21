@@ -28,7 +28,7 @@ const registerSocketServer = async (server) => {
     socket.on("newMessage", (data) => {
       console.log(data);
       console.log(socket["account_type"]);
-      if (data["to"] !== "admin") 
+      if (data["to"] !== "admin")
         io.to(data["to"]).emit("messageFromServer", data);
       else io.to(data["from"]).emit("messageFromServer", data);
     });
