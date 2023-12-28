@@ -55,6 +55,7 @@ exports.proposalRoute = [
             },
             // },
             handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+                var _a, _b;
                 try {
                     const currentDate = new Date().toUTCString();
                     console.log(`POST api/v1/proposal/${request.params.jobId} 
@@ -104,7 +105,7 @@ exports.proposalRoute = [
                         cover_letter: data["proposalData"]["cover_letter"],
                         total_amount: data["proposalData"]["total_amount"],
                         milestones: data["proposalData"]["milestones"],
-                        proposal_status: 1,
+                        proposal_status: (_a = data["proposalData"]["proposal_status"]) !== null && _a !== void 0 ? _a : null,
                         mentor_check: [],
                         attached_files: [],
                     };
@@ -127,7 +128,7 @@ exports.proposalRoute = [
                             });
                         });
                         proposalField["mentor_check"] = mentor_check;
-                        proposalField["proposal_status"] = 2;
+                        proposal_status: (_b = data["proposalData"]["proposal_status"]) !== null && _b !== void 0 ? _b : null;
                     }
                     // Check whether attached_files exist
                     if (data["attached_files"]) {
@@ -235,7 +236,7 @@ exports.proposalRoute = [
                 },
             },
             handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-                var _a, _b;
+                var _c, _d, _e, _f;
                 try {
                     const currentDate = new Date().toUTCString();
                     console.log(`PUT api/v1/proposal/${request.params.jobId} 
@@ -289,13 +290,14 @@ exports.proposalRoute = [
                             .response({ status: "err", err: "Applied proposal not found!" })
                             .code(404);
                     }
+                    console.log("data[proposal_status]------------>", data["proposalData"]["proposal_status"]);
                     // receive field
                     const proposalField = {
                         expert: { id: account.id, email: account.email },
                         cover_letter: data["proposalData"]["cover_letter"],
                         total_amount: data["proposalData"]["total_amount"],
                         milestones: data["proposalData"]["milestones"],
-                        proposal_status: 1,
+                        proposal_status: (_c = data["proposalData"]["proposal_status"]) !== null && _c !== void 0 ? _c : null,
                         mentor_check: [],
                         attached_files: [], // don't use null
                     };
@@ -309,7 +311,8 @@ exports.proposalRoute = [
                             });
                         });
                         proposalField["mentor_check"] = mentor_check;
-                        proposalField["proposal_status"] = 2;
+                        proposalField["proposal_status"] =
+                            (_d = data["proposalData"]["proposal_status"]) !== null && _d !== void 0 ? _d : null;
                     }
                     // Upadate proposal which have attached_files
                     if (data["attached_files"]) {
@@ -323,7 +326,7 @@ exports.proposalRoute = [
                                 "proposals.$.total_amount": proposalField.total_amount,
                                 "proposals.$.milestones": proposalField.milestones,
                                 "proposals.$.proposal_status": proposalField.proposal_status,
-                                "proposals.$.mentor_check": (_a = proposalField["mentor_check"]) !== null && _a !== void 0 ? _a : null,
+                                "proposals.$.mentor_check": (_e = proposalField["mentor_check"]) !== null && _e !== void 0 ? _e : null,
                                 "proposals.$.attached_files": [],
                             },
                         }, { new: true });
@@ -389,7 +392,7 @@ exports.proposalRoute = [
                                 "proposals.$.total_amount": proposalField.total_amount,
                                 "proposals.$.milestones": proposalField.milestones,
                                 "proposals.$.proposal_status": proposalField.proposal_status,
-                                "proposals.$.mentor_check": (_b = proposalField["mentor_check"]) !== null && _b !== void 0 ? _b : null,
+                                "proposals.$.mentor_check": (_f = proposalField["mentor_check"]) !== null && _f !== void 0 ? _f : null,
                                 "proposals.$.attached_files": null,
                             },
                         }, { new: true }).select("proposals");
@@ -457,7 +460,7 @@ exports.proposalRoute = [
                         },
                         {
                             $match: {
-                                "proposals.proposal_status": 1,
+                                "proposals.proposal_status": { $in: [2, 3, 4] },
                             },
                         },
                         {
@@ -618,7 +621,7 @@ exports.proposalRoute = [
                             .code(404);
                     }
                 }
-                return response.response({ status: "ok", data: proposal }).code(201);
+                return response.response({ status: "ok", data: proposal }).code(200);
             }
             catch (error) {
                 return response
@@ -723,7 +726,7 @@ exports.proposalRoute = [
                     "proposals.expert.email": account.email,
                 }, {
                     $set: {
-                        "proposals.$.proposal_status": 0,
+                        "proposals.$.proposal_status": 6,
                     },
                 }, { new: true }).select("proposals");
                 return response
@@ -842,7 +845,7 @@ exports.proposalRoute = [
             tags: ["api", "proposal"],
         },
         handler: (request, h) => __awaiter(void 0, void 0, void 0, function* () {
-            var _c, e_1, _d, _e;
+            var _g, e_1, _h, _j;
             try {
                 const currentDate = new Date().toUTCString();
                 console.log(`GET api/v1/proposal/download/${request.params.fileId} from 
@@ -865,10 +868,10 @@ exports.proposalRoute = [
                 let filename;
                 let contentType;
                 try {
-                    for (var _f = true, file_1 = __asyncValues(file), file_1_1; file_1_1 = yield file_1.next(), _c = file_1_1.done, !_c; _f = true) {
-                        _e = file_1_1.value;
-                        _f = false;
-                        const docs = _e;
+                    for (var _k = true, file_1 = __asyncValues(file), file_1_1; file_1_1 = yield file_1.next(), _g = file_1_1.done, !_g; _k = true) {
+                        _j = file_1_1.value;
+                        _k = false;
+                        const docs = _j;
                         console.log(docs);
                         filename = docs.filename;
                         contentType = mime.contentType(docs.filename);
@@ -877,7 +880,7 @@ exports.proposalRoute = [
                 catch (e_1_1) { e_1 = { error: e_1_1 }; }
                 finally {
                     try {
-                        if (!_f && !_c && (_d = file_1.return)) yield _d.call(file_1);
+                        if (!_k && !_g && (_h = file_1.return)) yield _h.call(file_1);
                     }
                     finally { if (e_1) throw e_1.error; }
                 }
@@ -926,7 +929,155 @@ exports.proposalRoute = [
                     ],
                 }, {
                     $set: {
+                        "proposals.$[proposal].proposal_status": 2,
+                        "proposals.$[proposal].mentor_check.$[mentorCheckId].checked": true,
+                    },
+                }, {
+                    arrayFilters: [
+                        { "proposal._id": request.params.proposalId },
+                        { "mentorCheckId.mentor": account.email },
+                    ],
+                }, { new: true });
+                const ObjectId = mongoose_1.default.Types.ObjectId;
+                const approvedProposal = yield job_1.default.aggregate([
+                    {
+                        $match: {
+                            _id: new ObjectId(request.params.jobId),
+                        },
+                    },
+                    { $unwind: "$proposals" },
+                    {
+                        $match: {
+                            "proposals._id": new ObjectId(request.params.proposalId),
+                            "proposals.mentor_check.mentor": account.email,
+                        },
+                    },
+                ]);
+                // } catch (err) {
+                //   return response
+                //     .response({ status: "err", err: "Applied proposal Not found!" })
+                //     .code(404);
+                // }
+                return response
+                    .response({ status: "ok", data: approvedProposal })
+                    .code(200);
+            }
+            catch (err) {
+                return response
+                    .response({ status: "err", err: "Approve failed!" })
+                    .code(501);
+            }
+        }),
+    },
+    {
+        method: "PUT",
+        path: "/{jobId}/decline/{proposalId}",
+        options: {
+            auth: "jwt",
+            description: "Approve proposal",
+            plugins: proposal_1.approveProposalSwagger,
+            tags: ["api", "proposal"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/proposal/download/${request.params.fileId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+                // Check whether account is mentor
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "mentor") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request" })
+                        .code(403);
+                }
+                // try {
+                yield job_1.default.findOneAndUpdate({
+                    $and: [
+                        { _id: request.params.jobId },
+                        // { "proposals._id": request.params.proposalId },
+                        // {
+                        //   "proposals.mentor_check.mentor": account.email,
+                        // },
+                    ],
+                }, {
+                    $set: {
                         "proposals.$[proposal].proposal_status": 1,
+                        "proposals.$[proposal].mentor_check.$[mentorCheckId].checked": true,
+                    },
+                }, {
+                    arrayFilters: [
+                        { "proposal._id": request.params.proposalId },
+                        { "mentorCheckId.mentor": account.email },
+                    ],
+                }, { new: true });
+                const ObjectId = mongoose_1.default.Types.ObjectId;
+                const approvedProposal = yield job_1.default.aggregate([
+                    {
+                        $match: {
+                            _id: new ObjectId(request.params.jobId),
+                        },
+                    },
+                    { $unwind: "$proposals" },
+                    {
+                        $match: {
+                            "proposals._id": new ObjectId(request.params.proposalId),
+                            "proposals.mentor_check.mentor": account.email,
+                        },
+                    },
+                ]);
+                // } catch (err) {
+                //   return response
+                //     .response({ status: "err", err: "Applied proposal Not found!" })
+                //     .code(404);
+                // }
+                return response
+                    .response({ status: "ok", data: approvedProposal })
+                    .code(200);
+            }
+            catch (err) {
+                return response
+                    .response({ status: "err", err: "Approve failed!" })
+                    .code(501);
+            }
+        }),
+    },
+    {
+        method: "PUT",
+        path: "/{jobId}/viewed/{proposalId}",
+        options: {
+            auth: "jwt",
+            description: "Approve proposal",
+            plugins: proposal_1.approveProposalSwagger,
+            tags: ["api", "proposal"],
+        },
+        handler: (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const currentDate = new Date().toUTCString();
+                console.log(`GET api/v1/proposal/download/${request.params.fileId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+                // Check whether account is mentor
+                const account = yield account_1.default.findOne({
+                    email: request.auth.credentials.email,
+                });
+                if (account.account_type !== "client") {
+                    return response
+                        .response({ status: "err", err: "Forbidden request" })
+                        .code(403);
+                }
+                // try {
+                yield job_1.default.findOneAndUpdate({
+                    $and: [
+                        { _id: request.params.jobId },
+                        // { "proposals._id": request.params.proposalId },
+                        // {
+                        //   "proposals.mentor_check.mentor": account.email,
+                        // },
+                    ],
+                }, {
+                    $set: {
+                        "proposals.$[proposal].proposal_status": 3,
                         "proposals.$[proposal].mentor_check.$[mentorCheckId].checked": true,
                     },
                 }, {

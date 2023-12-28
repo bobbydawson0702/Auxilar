@@ -14,7 +14,7 @@ export let paymentRoute = [
     method: "POST",
     path: "/",
     options: {
-      auth: "jwt",
+      // auth: "jwt",
       description: "Perform payment",
       plugins: performPaymentSwagger,
       tags: ["api", "Payment"],
@@ -31,13 +31,13 @@ export let paymentRoute = [
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
-        const currentDate = new Date().toUTCString();
+      //   const currentDate = new Date().toUTCString();
 
-        console.log(
-          `POST api/v1/payment request from ${request.auth.credentials.email} Time: ${currentDate}`
-        );
+      //   console.log(
+      //     `POST api/v1/payment request from ${request.auth.credentials.email} Time: ${currentDate}`
+      //   );
 
-        console.log("stripe------------->", stripe);
+        // console.log("stripe------------->", stripe);
 
         const data = request.payload;
         console.log("data['amount']------------->", data["amount"]);

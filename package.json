@@ -27,6 +27,8 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@aws-sdk/client-chime-sdk-meetings": "^3.478.0",
+    "@aws-sdk/client-ses": "^3.478.0",
     "@hapi/hapi": "^21.3.2",
     "@hapi/inert": "^7.1.0",
     "@hapi/joi": "^17.1.1",
@@ -58,6 +60,7 @@
     "solc": "^0.8.21",
     "stream-to-file": "^2.0.1",
     "stripe": "^14.9.0",
+    "uuid": "^9.0.1",
     "web3": "^4.3.0"
   },
   "engines": {

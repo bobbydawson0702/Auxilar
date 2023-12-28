@@ -1,5 +1,14 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
 import {
+  ChimeSDKMeetingsClient,
+  CreateAttendeeCommand,
+  CreateMeetingCommand,
+} from "@aws-sdk/client-chime-sdk-meetings";
+
+import { v4 as uuidv4 } from "uuid";
+import dotenv from "dotenv";
+
+import {
   createBookingCallSwagger,
   deleteBookedCallSwagger,
   getBookedCallSwagger,
@@ -12,65 +21,145 @@ import {
 import BookingCall from "../models/bookingCall";
 import Account from "../models/account";
 
+dotenv.config();
+
 const options = { abortEarly: false, stripUnknown: true };
+
+const client = new ChimeSDKMeetingsClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESSKEYID,
+    secretAccessKey: process.env.AWS_SECRETACCESSKEY,
+  },
+});
 
 export let bookingCallRoute = [
   {
     method: "POST",
     path: "/",
     options: {
-      auth: "jwt",
+      // auth: "jwt",
       description: "Create a BookingCall",
       plugins: createBookingCallSwagger,
       tags: ["api", "bookingCall"],
-      validate: {
-        payload: createBookingSchema,
-        options,
-        failAction: (request, h, error) => {
-          const details = error.details.map((d) => {
-            return { err: d.message };
-          });
-          return h.response(details).code(400).takeover();
-        },
-      },
+      // validate: {
+      //   payload: createBookingSchema,
+      //   options,
+      //   failAction: (request, h, error) => {
+      //     const details = error.details.map((d) => {
+      //       return { err: d.message };
+      //     });
+      //     return h.response(details).code(400).takeover();
+      //   },
+      // },
     },
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
-        const currentDate = new Date().toUTCString();
+        // const currentDate = new Date().toUTCString();
 
-        console.log(
-          `POST api/v1/book request from ${request.auth.credentials.email} Time: ${currentDate}`
-        );
+        // console.log(
+        //   `POST api/v1/book request from ${request.auth.credentials.email} Time: ${currentDate}`
+        // );
 
-        const data = request.payload;
+        // const data = request.payload;
 
         // Get account info
-        const account = await Account.findOne({
-          email: request.auth.credentials.email,
-        });
+        // const account = await Account.findOne({
+        //   email: request.auth.credentials.email,
+        // });
 
-        const bookingCallData = {
-          owner: {
-            id: account._id,
-            first_name: account.first_name,
-            last_name: account.last_name,
-          },
-          participants: data["participants"],
-          call_link: data["call_link"],
-          title: data["title"],
-          description: data["description"] ?? null,
-          meeting_date: data["meeting_date"],
-          meeting_time: data["meeting_time"],
-          status: data["status"],
+        const externalMeetingId = uuidv4();
+        const clientRequestToken = uuidv4();
+        console.log(
+          "externalMeetingId----------------------------->",
+          externalMeetingId
+        );
+
+        const input = {
+          // CreateMeetingRequest
+          ClientRequestToken: clientRequestToken, // required
+          MediaRegion: process.env.AWS_REGION, // required
+          // MeetingHostId: meetingHostId,
+          ExternalMeetingId: externalMeetingId, // required
+          // NotificationsConfiguration: { // NotificationsConfiguration
+          //   LambdaFunctionArn: "STRING_VALUE",
+          //   SnsTopicArn: "STRING_VALUE",
+          //   SqsQueueArn: "STRING_VALUE",
+          // },
+          // MeetingFeatures: { // MeetingFeaturesConfiguration
+          //   Audio: { // AudioFeatures
+          //     EchoReduction: "AVAILABLE" || "UNAVAILABLE",
+          //   },
+          //   Video: { // VideoFeatures
+          //     MaxResolution: "None" || "HD" || "FHD",
+          //   },
+          //   Content: { // ContentFeatures
+          //     MaxResolution: "None" || "FHD" || "UHD",
+          //   },
+          //   Attendee: { // AttendeeFeatures
+          //     MaxCount: Number("int"),
+          //   },
+          // },
+          // PrimaryMeetingId: "STRING_VALUE",
+          // TenantIds: [ // TenantIdList
+          //   "STRING_VALUE",
+          // ],
+          // Tags: [ // TagList
+          //   { // Tag
+          //     Key: "STRING_VALUE", // required
+          //     Value: "STRING_VALUE", // required
+          //   },
+          // ],
         };
 
-        const bookingCall = new BookingCall(bookingCallData);
-        await bookingCall.save();
-        return response.response({ status: "ok", data: bookingCall }).code(201);
-      } catch (error) {
+        const command = new CreateMeetingCommand(input);
+        // console.log("command---------------------------->", command);
+        const chimeResponse = await client.send(command);
+
+        // console.log("chimeResponse--------------------->", chimeResponse);
+
+        // Create attendee command
+        const externalUserId = uuidv4();
+
+        const attendanceInput = {
+          MeetingId: chimeResponse.Meeting.MeetingId,
+          ExternalUserId: externalUserId,
+          // Capabilities: {
+          //   //AttendeeCapabilities
+          //   Audio: "SendReceive",
+          //   Video: "SendReceive",
+          //   Content: "SendReceive",
+          // },
+        };
+
+        const attendeeCommand = new CreateAttendeeCommand(attendanceInput);
+
+        const attendeeResponse = await client.send(attendeeCommand);
+
+        console.log("attendeeResponse----------------->", attendeeResponse);
+
+        // const bookingCallData = {
+        //   owner: {
+        //     id: account._id,
+        //     first_name: account.first_name,
+        //     last_name: account.last_name,
+        //   },
+        //   participants: data["participants"],
+        //   call_link: data["call_link"],
+        //   title: data["title"],
+        //   description: data["description"] ?? null,
+        //   meeting_date: data["meeting_date"],
+        //   meeting_time: data["meeting_time"],
+        //   status: data["status"],
+        // };
+
+        // const bookingCall = new BookingCall(bookingCallData);
+        // await bookingCall.save();
         return response
-          .response({ staus: "error", err: "Not implemented" })
-          .code(501);
+          .response({ status: "ok", data: { "meetingResponse": chimeResponse.Meeting, "attendeeResponse": attendeeResponse.Attendee } })
+          .code(201);
+      } catch (error) {
+        return response.response({ status: "error", err: error }).code(501);
       }
     },
   },
