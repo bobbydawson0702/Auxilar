@@ -214,6 +214,7 @@ export let jobRoute = [
       }
     },
   },
+
   {
     method: "GET",
     path: "/",
@@ -298,7 +299,8 @@ export let jobRoute = [
               description: 1,
               budget_type: 1,
               budget_amount: 1,
-              pub_dae: 1,
+              pub_date: 1,
+              end_date: 1,
               state: 1,
               category: 1,
               skill_set: 1,
@@ -311,7 +313,8 @@ export let jobRoute = [
                   input: "$proposals",
                   as: "proposal",
                   cond: {
-                    $eq: ["$$proposal.proposal_status", 1],
+                    // $eq: ["$$proposal.proposal_status", 2],
+                    $in: ["$$proposal.proposal_status", [2, 3, 4, 5, 6, 7]],
                   },
                 },
               },

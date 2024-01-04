@@ -156,3 +156,40 @@ export const approveProposalSwagger = {
     },
   },
 };
+
+export const hireProposalSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Proposal hired Successfully",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      404: {
+        description: "Applied Proposal not found!",
+      },
+      501: {
+        description: "Request not implemented.",
+      },
+    },
+  },
+};
+export const offerProposalSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Proposal offered Successfully",
+      },
+      403: {
+        description: "Forbidden request",
+      },
+      404: {
+        description: "Applied Proposal not found!",
+      },
+      501: {
+        description: "Request not implemented.",
+      },
+    },
+  },
+};

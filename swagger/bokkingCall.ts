@@ -1,42 +1,23 @@
-export const createAvailableTimeSwagger = {
+export const createBookingCallSwagger = {
   "hapi-swagger": {
     responses: {
       201: {
-        description: "Schedule created successfully!",
+        description: "Book a call success!",
       },
       400: {
         description: "Input Fields Required.",
       },
-      409: {
-        description: "Account already exists.",
-      },
       501: {
         description: "Not implemented",
       },
     },
   },
 };
-export const getAvailableTimeSwagger = {
+export const getBookedCallSwagger = {
   "hapi-swagger": {
     responses: {
       200: {
-        description: "Get schedule success",
-      },
-      404: {
-        description: "Schedule does not exist",
-      },
-      501: {
-        description: "Not implemented",
-      },
-    },
-  },
-};
-
-export const updateAvailableTimeSwagger = {
-  "hapi-swagger": {
-    responses: {
-      200: {
-        description: "Update schedule success",
+        description: "Get booked call success",
       },
       404: {
         description: "Not found!",
@@ -48,14 +29,33 @@ export const updateAvailableTimeSwagger = {
   },
 };
 
-export const deleteAvailableTimeSwagger = {
+export const updateBookedCallSwagger = {
   "hapi-swagger": {
     responses: {
       200: {
-        description: "Delete schedule success",
+        description: "Update booked call success",
+      },
+      400: {
+        description: "Input Fields Required.",
       },
       404: {
-        description: "Schedule does not exist",
+        description: "Booked call not found!",
+      },
+      501: {
+        description: "Not implemented",
+      },
+    },
+  },
+};
+
+export const deleteBookedCallSwagger = {
+  "hapi-swagger": {
+    responses: {
+      200: {
+        description: "Delete booked call success",
+      },
+      404: {
+        description: "Booked call not found!",
       },
       501: {
         description: "Not implemented",

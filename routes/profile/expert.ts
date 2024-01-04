@@ -5,8 +5,6 @@ import { Request, ResponseToolkit } from "@hapi/hapi";
 // import { Path } from "mongoose";
 // import process from "process";
 
-import mongoose, { ObjectId, Schema } from "mongoose";
-
 import Account from "../../models/account";
 // import config from '../config';
 import {

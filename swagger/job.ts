@@ -45,6 +45,7 @@ export const updateJobSwagger = {
   },
 };
 
+
 export const findPostedJobSwagger = {
   "hapi-swagger": {
     responses: {

@@ -67,8 +67,8 @@ export let conversationRoute = [
 
         let conversationField;
 
-        // check expert_email
-        const expert = await Account.findOne({ email: data["expert_email"] });
+        // check expert_id
+        const expert = await Account.findById(data["expert_id"]);
         if (!expert) {
           return response
             .response({ status: "err", err: "expert does not exist" })
@@ -89,8 +89,8 @@ export let conversationRoute = [
 
           // check whether conversation already exist
           const existConversation = await Conversation.findOne({
-            client_email: account.email,
-            expert_email: data["expert_email"],
+            client_id: account._id,
+            expert_id: data["expert_id"],
           });
 
           if (existConversation) {
@@ -105,9 +105,9 @@ export let conversationRoute = [
 
           // fill conversationField
           conversationField = {
-            client_email: account.email,
+            client_id: account._id,
             client_avatar: client_profile.avatar,
-            expert_email: data["expert_email"],
+            expert_id: data["expert_id"],
             expert_avatar: expert_profile.avatar,
             job: data["job"],
             proposal: data["proposal"],
@@ -115,8 +115,8 @@ export let conversationRoute = [
         } else if (account.account_type === "mentor") {
           // check whether conversation already exist
           const existConversation = await Conversation.findOne({
-            mentor_email: account.email,
-            expert_email: data["expert_email"],
+            mentor_id: account._id,
+            expert_id: data["expert_id"],
           });
 
           if (existConversation) {
@@ -132,9 +132,9 @@ export let conversationRoute = [
           console.log("here-------------------->>>>>>>>>>");
           // fill conversationField
           conversationField = {
-            expert_email: data["expert_email"],
+            expert_id: data["expert_id"],
             expert_avatar: expert_profile.avatar,
-            mentor_email: account.email,
+            mentor_id: account._id,
             mentor_avatar: mentor_profile.avatar,
           };
         }
@@ -166,7 +166,7 @@ export let conversationRoute = [
       try {
         const currentDate = new Date().toUTCString();
         console.log(
-          `GET api/v1/conversation request from ${request.auth.credentials.email} Time: ${currentDate}`
+          `GET api/v1/conversation/all request from ${request.auth.credentials.email} Time: ${currentDate}`
         );
 
         // check whether account is Admin
@@ -182,9 +182,9 @@ export let conversationRoute = [
             {
               $project: {
                 _id: 0,
-                client_email: 1,
-                expert_email: 1,
-                mentor_email: 1,
+                client_id: 1,
+                expert_id: 1,
+                mentor_id: 1,
                 client_avatar: 1,
                 expert_avatar: 1,
                 mentor_avatar: 1,
@@ -193,27 +193,130 @@ export let conversationRoute = [
                 "proposal.id": 1,
               },
             },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
           ]);
         } else if (account.account_type === "client") {
+          console.log("client id------------------------->", account);
           // get all conversations associated with current client.
           allConversations = await Conversation.aggregate([
             {
               $match: {
-                client_email: account.email,
+                client_id: account._id,
               },
             },
             {
               $project: {
                 _id: 0,
-                client_email: 1,
-                expert_email: 1,
-                mentor_email: 1,
+                client_id: 1,
+                expert_id: 1,
+                mentor_id: 1,
                 client_avatar: 1,
                 expert_avatar: 1,
                 mentor_avatar: 1,
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
               },
             },
           ]);
@@ -222,21 +325,72 @@ export let conversationRoute = [
           allConversations = await Conversation.aggregate([
             {
               $match: {
-                expert_email: account.email,
+                expert_id: account._id,
               },
             },
             {
               $project: {
                 _id: 0,
-                client_email: 1,
-                expert_email: 1,
-                mentor_email: 1,
+                client_id: 1,
+                expert_id: 1,
+                mentor_id: 1,
                 client_avatar: 1,
                 expert_avatar: 1,
                 mentor_avatar: 1,
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
               },
             },
           ]);
@@ -245,21 +399,72 @@ export let conversationRoute = [
           allConversations = await Conversation.aggregate([
             {
               $match: {
-                mentor_email: account.email,
+                mentor_id: account._id,
               },
             },
             {
               $project: {
                 _id: 0,
-                client_email: 1,
-                expert_email: 1,
-                mentor_email: 1,
+                client_id: 1,
+                expert_id: 1,
+                mentor_id: 1,
                 client_avatar: 1,
                 expert_avatar: 1,
                 mentor_avatar: 1,
                 "job.title": 1,
                 "job.id": 1,
                 "proposal.id": 1,
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "client_id",
+                foreignField: "_id",
+                as: "client_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "expert_id",
+                foreignField: "_id",
+                as: "expert_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "mentor_id",
+                foreignField: "_id",
+                as: "mentor_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
               },
             },
           ]);
@@ -277,7 +482,7 @@ export let conversationRoute = [
   },
   {
     method: "GET",
-    path: "/my/{contact_email}",
+    path: "/my/{contactId}",
     options: {
       auth: "jwt",
       description: "Get specific conversation",
@@ -288,7 +493,7 @@ export let conversationRoute = [
       try {
         const currentDate = new Date().toUTCString();
         console.log(
-          `GET api/v1/my/${request.params.contact_email} request from ${request.auth.credentials.email} Time: ${currentDate}`
+          `GET api/v1/my/${request.params.contactId} request from ${request.auth.credentials.email} Time: ${currentDate}`
         );
 
         // check whether acount exist
@@ -296,9 +501,7 @@ export let conversationRoute = [
           email: request.auth.credentials.email,
         });
 
-        const contactAccount = await Account.findOne({
-          email: request.params.contact_email,
-        });
+        const contactAccount = await Account.findById(request.params.contactId);
 
         if (!(myAccount && contactAccount)) {
           return response
@@ -306,22 +509,22 @@ export let conversationRoute = [
             .code(404);
         }
 
-        let client_email: string = null;
-        let expert_email: string = null;
-        let mentor_email: string = null;
+        let client_id: string = null;
+        let expert_id: string = null;
+        let mentor_id: string = null;
 
         // check account type
         switch (myAccount.account_type) {
           case "client": {
-            client_email = myAccount.email;
+            client_id = myAccount._id;
             break;
           }
           case "expert": {
-            expert_email = myAccount.email;
+            expert_id = myAccount._id;
             break;
           }
           case "mentor": {
-            mentor_email = myAccount.email;
+            mentor_id = myAccount._id;
             break;
           }
         }
@@ -329,20 +532,20 @@ export let conversationRoute = [
         let isAllright: boolean = true;
         switch (contactAccount.account_type) {
           case "client": {
-            !client_email
-              ? (client_email = contactAccount.email)
+            !client_id
+              ? (client_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "expert": {
-            !expert_email
-              ? (expert_email = contactAccount.email)
+            !expert_id
+              ? (expert_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "mentor": {
-            !mentor_email
-              ? (mentor_email = contactAccount.email)
+            !mentor_id
+              ? (mentor_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
@@ -359,9 +562,9 @@ export let conversationRoute = [
         const queryAll: object = {
           $and: [],
         };
-        if (client_email) queryAll["$and"].push({ client_email });
-        if (expert_email) queryAll["$and"].push({ expert_email });
-        if (mentor_email) queryAll["$and"].push({ mentor_email });
+        if (client_id) queryAll["$and"].push({ client_id });
+        if (expert_id) queryAll["$and"].push({ expert_id });
+        if (mentor_id) queryAll["$and"].push({ mentor_id });
 
         console.log("queryAll---------------->>>>>>>>>", queryAll);
 
@@ -372,14 +575,65 @@ export let conversationRoute = [
           // {
           //   $project: {
           //     _id: 0,
-          //     client_email: 1,
-          //     expert_email: 1,
-          //     mentor_email: 1,
+          //     client_id: 1,
+          //     expert_id: 1,
+          //     mentor_id: 1,
           //     "job.title": 1,
           //     "job.id": 1,
           //     "proposal.id": 1,
           //   },
           // },
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "client_id",
+              foreignField: "_id",
+              as: "client_info",
+              pipeline: [
+                {
+                  $project: {
+                    _id: false,
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "expert_id",
+              foreignField: "_id",
+              as: "expert_info",
+              pipeline: [
+                {
+                  $project: {
+                    _id: false,
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $lookup: {
+              from: "accounts",
+              localField: "mentor_id",
+              foreignField: "_id",
+              as: "mentor_info",
+              pipeline: [
+                {
+                  $project: {
+                    _id: false,
+                    first_name: 1,
+                    last_name: 1,
+                  },
+                },
+              ],
+            },
+          },
         ]);
 
         if (!myConversation) {
@@ -400,7 +654,7 @@ export let conversationRoute = [
   },
   {
     method: "DELETE",
-    path: "/my/{contact_email}",
+    path: "/my/{contactId}",
     options: {
       auth: "jwt",
       description: "Delete specific conversation",
@@ -411,7 +665,7 @@ export let conversationRoute = [
       try {
         const currentDate = new Date().toUTCString();
         console.log(
-          `DELETE api/v1/my/${request.params.contact_email} request from ${request.auth.credentials.email} Time: ${currentDate}`
+          `DELETE api/v1/my/${request.params.contactId} request from ${request.auth.credentials.email} Time: ${currentDate}`
         );
 
         // check whether acount exist
@@ -419,9 +673,7 @@ export let conversationRoute = [
           email: request.auth.credentials.email,
         });
 
-        const contactAccount = await Account.findOne({
-          email: request.params.contact_email,
-        });
+        const contactAccount = await Account.findById(request.params.contactId);
 
         if (!(myAccount && contactAccount)) {
           return response
@@ -429,22 +681,22 @@ export let conversationRoute = [
             .code(404);
         }
 
-        let client_email: string = null;
-        let expert_email: string = null;
-        let mentor_email: string = null;
+        let client_id: string = null;
+        let expert_id: string = null;
+        let mentor_id: string = null;
 
         // check account type
         switch (myAccount.account_type) {
           case "client": {
-            client_email = myAccount.email;
+            client_id = myAccount._id;
             break;
           }
           case "expert": {
-            expert_email = myAccount.email;
+            expert_id = myAccount._id;
             break;
           }
           case "mentor": {
-            mentor_email = myAccount.email;
+            mentor_id = myAccount._id;
             break;
           }
         }
@@ -452,20 +704,20 @@ export let conversationRoute = [
         let isAllright: boolean = true;
         switch (contactAccount.account_type) {
           case "client": {
-            !client_email
-              ? (client_email = contactAccount.email)
+            !client_id
+              ? (client_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "expert": {
-            !expert_email
-              ? (expert_email = contactAccount.email)
+            !expert_id
+              ? (expert_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "mentor": {
-            !mentor_email
-              ? (mentor_email = contactAccount.email)
+            !mentor_id
+              ? (mentor_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
@@ -482,9 +734,9 @@ export let conversationRoute = [
         const queryAll: object = {
           $and: [],
         };
-        if (client_email) queryAll["$and"].push({ client_email });
-        if (expert_email) queryAll["$and"].push({ expert_email });
-        if (mentor_email) queryAll["$and"].push({ mentor_email });
+        if (client_id) queryAll["$and"].push({ client_id });
+        if (expert_id) queryAll["$and"].push({ expert_id });
+        if (mentor_id) queryAll["$and"].push({ mentor_id });
 
         console.log("queryAll---------------->>>>>>>>>", queryAll);
 
@@ -496,9 +748,9 @@ export let conversationRoute = [
           {
             $project: {
               _id: 0,
-              client_email: 1,
-              expert_email: 1,
-              mentor_email: 1,
+              client_id: 1,
+              expert_id: 1,
+              mentor_id: 1,
               "job.title": 1,
               "job.id": 1,
               "proposal.id": 1,
@@ -516,9 +768,9 @@ export let conversationRoute = [
         myConversation.forEach(async (item) => {
           console.log("item------------------>>>>>>>>>>>", item);
           await Conversation.deleteOne({
-            client_email: item.client_email,
-            expert_email: item.expert_email,
-            mentor_email: item.mentor_email,
+            client_id: item.client_id,
+            expert_id: item.expert_id,
+            mentor_id: item.mentor_id,
           });
         });
 
@@ -574,9 +826,9 @@ export let conversationRoute = [
             email: request.auth.credentials.email,
           });
 
-          const contactAccount = await Account.findOne({
-            email: data["messageData"]["to"],
-          });
+          const contactAccount = await Account.findById(
+            data["messageData"]["to"]
+          );
 
           if (!(myAccount && contactAccount)) {
             return response
@@ -584,22 +836,22 @@ export let conversationRoute = [
               .code(404);
           }
 
-          let client_email: string = null;
-          let expert_email: string = null;
-          let mentor_email: string = null;
+          let client_id: string = null;
+          let expert_id: string = null;
+          let mentor_id: string = null;
 
           // check account type
           switch (myAccount.account_type) {
             case "client": {
-              client_email = myAccount.email;
+              client_id = myAccount._id;
               break;
             }
             case "expert": {
-              expert_email = myAccount.email;
+              expert_id = myAccount._id;
               break;
             }
             case "mentor": {
-              mentor_email = myAccount.email;
+              mentor_id = myAccount._id;
               break;
             }
           }
@@ -607,20 +859,20 @@ export let conversationRoute = [
           let isAllright: boolean = true;
           switch (contactAccount.account_type) {
             case "client": {
-              !client_email
-                ? (client_email = contactAccount.email)
+              !client_id
+                ? (client_id = contactAccount._id)
                 : (isAllright = false);
               break;
             }
             case "expert": {
-              !expert_email
-                ? (expert_email = contactAccount.email)
+              !expert_id
+                ? (expert_id = contactAccount._id)
                 : (isAllright = false);
               break;
             }
             case "mentor": {
-              !mentor_email
-                ? (mentor_email = contactAccount.email)
+              !mentor_id
+                ? (mentor_id = contactAccount._id)
                 : (isAllright = false);
               break;
             }
@@ -635,7 +887,8 @@ export let conversationRoute = [
 
           // confirm message field
           const messageField = {
-            sender: myAccount.email,
+            from: myAccount._id,
+            to: data["messageData"]["to"]._id,
             message_type: data["messageData"]["message_type"],
             message_body: data["messageData"]["message_body"],
             // parent_message_id: data["messageData"]["parent_message_id"] ?? null,
@@ -651,9 +904,9 @@ export let conversationRoute = [
           const queryAll: object = {
             $and: [],
           };
-          if (client_email) queryAll["$and"].push({ client_email });
-          if (expert_email) queryAll["$and"].push({ expert_email });
-          if (mentor_email) queryAll["$and"].push({ mentor_email });
+          if (client_id) queryAll["$and"].push({ client_id });
+          if (expert_id) queryAll["$and"].push({ expert_id });
+          if (mentor_id) queryAll["$and"].push({ mentor_id });
 
           if (data["messageData"]["job"]) {
             queryAll["$and"].push({
@@ -805,9 +1058,9 @@ export let conversationRoute = [
             email: request.auth.credentials.email,
           });
 
-          const contactAccount = await Account.findOne({
-            email: data["messageData"]["to"],
-          });
+          const contactAccount = await Account.findById(
+            data["messageData"]["to"]
+          );
 
           if (!(myAccount && contactAccount)) {
             return response
@@ -815,22 +1068,22 @@ export let conversationRoute = [
               .code(404);
           }
 
-          let client_email: string = null;
-          let expert_email: string = null;
-          let mentor_email: string = null;
+          let client_id: string = null;
+          let expert_id: string = null;
+          let mentor_id: string = null;
 
           // check account type
           switch (myAccount.account_type) {
             case "client": {
-              client_email = myAccount.email;
+              client_id = myAccount._id;
               break;
             }
             case "expert": {
-              expert_email = myAccount.email;
+              expert_id = myAccount._id;
               break;
             }
             case "mentor": {
-              mentor_email = myAccount.email;
+              mentor_id = myAccount._id;
               break;
             }
           }
@@ -838,20 +1091,20 @@ export let conversationRoute = [
           let isAllright: boolean = true;
           switch (contactAccount.account_type) {
             case "client": {
-              !client_email
-                ? (client_email = contactAccount.email)
+              !client_id
+                ? (client_id = contactAccount._id)
                 : (isAllright = false);
               break;
             }
             case "expert": {
-              !expert_email
-                ? (expert_email = contactAccount.email)
+              !expert_id
+                ? (expert_id = contactAccount._id)
                 : (isAllright = false);
               break;
             }
             case "mentor": {
-              !mentor_email
-                ? (mentor_email = contactAccount.email)
+              !mentor_id
+                ? (mentor_id = contactAccount._id)
                 : (isAllright = false);
               break;
             }
@@ -868,9 +1121,9 @@ export let conversationRoute = [
           const queryAll: object = {
             $and: [],
           };
-          if (client_email) queryAll["$and"].push({ client_email });
-          if (expert_email) queryAll["$and"].push({ expert_email });
-          if (mentor_email) queryAll["$and"].push({ mentor_email });
+          if (client_id) queryAll["$and"].push({ client_id });
+          if (expert_id) queryAll["$and"].push({ expert_id });
+          if (mentor_id) queryAll["$and"].push({ mentor_id });
 
           if (data["messageData"]["job"]) {
             queryAll["$and"].push({
@@ -925,7 +1178,8 @@ export let conversationRoute = [
 
           // confirm message field
           const messageField = {
-            sender: myAccount.email,
+            from: myAccount._id,
+            to: data["messageData"]["to"]._id,
             message_type: data["messageData"]["message_type"],
             message_body: data["messageData"]["message_body"],
             // parent_message_id: data["messageData"]["parent_message_id"] ?? null,
@@ -952,7 +1206,8 @@ export let conversationRoute = [
               queryAll,
               {
                 $set: {
-                  "messages.$.sender": messageField.sender,
+                  "messages.$.from": messageField.from,
+                  "messages.$.to": messageField.to,
                   "messages.$.message_type": messageField.message_type,
                   "messages.$.message_body": messageField.message_body,
                   "messages.$.parent_message_id":
@@ -1024,7 +1279,8 @@ export let conversationRoute = [
               queryAll,
               {
                 $set: {
-                  "messages.$.sender": messageField.sender,
+                  "messages.$.from": messageField.from,
+                  "messages.$.to": messageField.to,
                   "messages.$.message_type": messageField.message_type,
                   "messages.$.message_body": messageField.message_body,
                   "messages.$.parent_message_id":
@@ -1052,7 +1308,7 @@ export let conversationRoute = [
 
   {
     method: "GET",
-    path: "/my/messages/{contact_email}/{messageId}",
+    path: "/my/messages/{contactId}/{messageId}",
     options: {
       auth: "jwt",
       description: "Get specific message in conversation",
@@ -1062,7 +1318,7 @@ export let conversationRoute = [
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
         const currentDate = new Date().toUTCString();
-        console.log(`GET api/v1/conversation/my/message/${request.params.contact_email}/${request.params.messageId} from 
+        console.log(`GET api/v1/conversation/my/message/${request.params.contactId}/${request.params.messageId} from 
         ${request.auth.credentials.email} Time: ${currentDate}`);
         const data = request.payload;
 
@@ -1071,9 +1327,7 @@ export let conversationRoute = [
           email: request.auth.credentials.email,
         });
 
-        const contactAccount = await Account.findOne({
-          email: request.params.contact_email,
-        });
+        const contactAccount = await Account.findById(request.params.contactId);
 
         if (!(myAccount && contactAccount)) {
           return response
@@ -1081,22 +1335,22 @@ export let conversationRoute = [
             .code(404);
         }
 
-        let client_email: string = null;
-        let expert_email: string = null;
-        let mentor_email: string = null;
+        let client_id: string = null;
+        let expert_id: string = null;
+        let mentor_id: string = null;
 
         // check account type
         switch (myAccount.account_type) {
           case "client": {
-            client_email = myAccount.email;
+            client_id = myAccount._id;
             break;
           }
           case "expert": {
-            expert_email = myAccount.email;
+            expert_id = myAccount._id;
             break;
           }
           case "mentor": {
-            mentor_email = myAccount.email;
+            mentor_id = myAccount._id;
             break;
           }
         }
@@ -1104,20 +1358,20 @@ export let conversationRoute = [
         let isAllright: boolean = true;
         switch (contactAccount.account_type) {
           case "client": {
-            !client_email
-              ? (client_email = contactAccount.email)
+            !client_id
+              ? (client_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "expert": {
-            !expert_email
-              ? (expert_email = contactAccount.email)
+            !expert_id
+              ? (expert_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "mentor": {
-            !mentor_email
-              ? (mentor_email = contactAccount.email)
+            !mentor_id
+              ? (mentor_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
@@ -1134,9 +1388,9 @@ export let conversationRoute = [
         const queryAll: object = {
           $and: [],
         };
-        if (client_email) queryAll["$and"].push({ client_email });
-        if (expert_email) queryAll["$and"].push({ expert_email });
-        if (mentor_email) queryAll["$and"].push({ mentor_email });
+        if (client_id) queryAll["$and"].push({ client_id });
+        if (expert_id) queryAll["$and"].push({ expert_id });
+        if (mentor_id) queryAll["$and"].push({ mentor_id });
 
         const queryMessage = queryAll;
         queryMessage["$and"].push({
@@ -1166,7 +1420,7 @@ export let conversationRoute = [
   },
   {
     method: "DELETE",
-    path: "/my/messages/{contact_email}/{messageId}",
+    path: "/my/messages/{contactId}/{messageId}",
     options: {
       auth: "jwt",
       description: "Delete specific message in conversation",
@@ -1176,7 +1430,7 @@ export let conversationRoute = [
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
         const currentDate = new Date().toUTCString();
-        console.log(`DELETE api/v1/conversation/my/message/${request.params.contact_email}/${request.params.messageId} from 
+        console.log(`DELETE api/v1/conversation/my/message/${request.params.contactId}/${request.params.messageId} from 
         ${request.auth.credentials.email} Time: ${currentDate}`);
         const data = request.payload;
 
@@ -1185,9 +1439,7 @@ export let conversationRoute = [
           email: request.auth.credentials.email,
         });
 
-        const contactAccount = await Account.findOne({
-          email: request.params.contact_email,
-        });
+        const contactAccount = await Account.findById(request.params.contactId);
 
         if (!(myAccount && contactAccount)) {
           return response
@@ -1195,22 +1447,22 @@ export let conversationRoute = [
             .code(404);
         }
 
-        let client_email: string = null;
-        let expert_email: string = null;
-        let mentor_email: string = null;
+        let client_id: string = null;
+        let expert_id: string = null;
+        let mentor_id: string = null;
 
         // check account type
         switch (myAccount.account_type) {
           case "client": {
-            client_email = myAccount.email;
+            client_id = myAccount._id;
             break;
           }
           case "expert": {
-            expert_email = myAccount.email;
+            expert_id = myAccount._id;
             break;
           }
           case "mentor": {
-            mentor_email = myAccount.email;
+            mentor_id = myAccount._id;
             break;
           }
         }
@@ -1218,20 +1470,20 @@ export let conversationRoute = [
         let isAllright: boolean = true;
         switch (contactAccount.account_type) {
           case "client": {
-            !client_email
-              ? (client_email = contactAccount.email)
+            !client_id
+              ? (client_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "expert": {
-            !expert_email
-              ? (expert_email = contactAccount.email)
+            !expert_id
+              ? (expert_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
           case "mentor": {
-            !mentor_email
-              ? (mentor_email = contactAccount.email)
+            !mentor_id
+              ? (mentor_id = contactAccount._id)
               : (isAllright = false);
             break;
           }
@@ -1248,9 +1500,9 @@ export let conversationRoute = [
         const queryAll: object = {
           $and: [],
         };
-        if (client_email) queryAll["$and"].push({ client_email });
-        if (expert_email) queryAll["$and"].push({ expert_email });
-        if (mentor_email) queryAll["$and"].push({ mentor_email });
+        if (client_id) queryAll["$and"].push({ client_id });
+        if (expert_id) queryAll["$and"].push({ expert_id });
+        if (mentor_id) queryAll["$and"].push({ mentor_id });
 
         const queryMessage = queryAll;
         queryMessage["$and"].push({

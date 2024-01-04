@@ -146,10 +146,21 @@ const JobSchema = new Schema({
           },
         },
       ],
+      /* PROPOSAL STATUS
+       * 0: pending not applied
+       * 1: pending     declined by mentor
+       * 2: pending     approved
+       * 3: pending     viewed
+       * 4: active      interviewed
+       * 5: progress    hired
+       * 6: finished    finished
+       * 7: cancelled
+       * 8: disputed
+       */
       proposal_status: {
         type: Number,
         default: 0,
-        enum: [0, 1, 2], // 1: visible to client, 0: withdraw(deleted), 2: pending status
+        enum: [0, 1, 2, 3, 4, 5, 6, 7],
       },
       pub_date: {
         type: Date,

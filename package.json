@@ -27,14 +27,17 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@aws-sdk/client-chime": "^3.481.0",
+    "@aws-sdk/client-chime-sdk-meetings": "^3.478.0",
+    "@aws-sdk/client-ses": "^3.478.0",
     "@hapi/hapi": "^21.3.2",
     "@hapi/inert": "^7.1.0",
     "@hapi/joi": "^17.1.1",
     "@hapi/nes": "^13.0.1",
     "@hapi/vision": "^7.0.3",
-    "@truffle/hdwallet-provider": "^2.1.14",
+    "@truffle/hdwallet-provider": "^1.7.0",
     "@types/supertest": "^2.0.12",
-    "aws-sdk": "^2.1513.0",
+    "aws-sdk": "^2.1517.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "coinpayments": "^2.2.0",
@@ -57,8 +60,9 @@
     "sol-merger": "^4.4.0",
     "solc": "^0.8.21",
     "stream-to-file": "^2.0.1",
-    "stripe": "^13.4.0",
-    "web3": "^1.10.0"
+    "stripe": "^14.9.0",
+    "uuid": "^9.0.1",
+    "web3": "^4.3.0"
   },
   "engines": {
     "node": ">=20"

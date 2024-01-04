@@ -21,16 +21,26 @@ const registerSocketServer = async (server) => {
           socket["account_type"] = 1;
           console.log(data + "logged in chat room");
         }
-        socket["email"] = account.email;
-        socket.join(account.email);
+        // socket["email"] = account.email;
+        console.log("account._id------------------>", account._id.toString());
+        socket["accountId"] = account._id.toString();
+        console.log("socket[accountId]-------------->", socket["accountId"]);
+        // socket.join(account.email);
+        socket.join(account._id.toString());
       }
     });
     socket.on("newMessage", (data) => {
-      console.log(data);
-      console.log(socket["account_type"]);
-      if (data["to"] !== "admin") 
+      console.log("newMessage------------------->", data);
+      console.log(
+        'socket["account_type"]------------------>',
+        socket["account_type"]
+      );
+      if (data["to"] !== "admin") {
         io.to(data["to"]).emit("messageFromServer", data);
-      else io.to(data["from"]).emit("messageFromServer", data);
+        console.log("data[to]-------------->", data["to"].toString());
+      } else {
+        io.to(data["from"]).emit("messageFromServer", data);
+      }
     });
     socket.on("currentAccount", (data) => {
       console.log(data);

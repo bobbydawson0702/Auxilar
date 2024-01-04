@@ -6,13 +6,38 @@ const Schema = mongoose.Schema;
 
 const BookingCallSchema = new Schema({
   owner: {
-    type: String,
-    required: true,
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    first_name: {
+      type: String,
+      required: true,
+    },
+    last_name: {
+      type: String,
+      required: true,
+    },
   },
-  receiver: {
-    type: String,
-    required: true,
-  },
+  participants: [
+    {
+      participant: {
+        id: {
+          type: Schema.Types.ObjectId,
+          required: true,
+        },
+        first_name: {
+          type: String,
+          required: true,
+        },
+        last_name: {
+          type: String,
+          required: true,
+        },
+      },
+    },
+  ],
+
   call_link: {
     type: String,
     required: true,
@@ -23,21 +48,26 @@ const BookingCallSchema = new Schema({
   },
   description: {
     type: String,
+  },
+  meeting_date: {
+    type: Date,
     required: true,
   },
-  from: {
-    type: Date,
-    default: now,
-    required: true,
-  },
-  to: {
-    type: Date,
-    default: now,
-    required: true,
+  meeting_time: {
+    start: {
+      type: Date,
+      required: true,
+    },
+    end: {
+      type: Date,
+      required: true,
+    },
   },
   status: {
     type: String,
     required: true,
+    enum: ["upcoming", "successed", "failed"],
+    default: "upcoming",
   },
 });
 

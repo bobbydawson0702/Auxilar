@@ -50,8 +50,12 @@ exports.ProposalSchema = joi_1.default.object({
         milestones: joi_1.default.array().items(milestone).required().messages({
             "any.required": "Please provide milestones",
         }),
+        proposal_status: joi_1.default.number().allow(null),
     }),
-    attached_files: joi_1.default.array().allow(null).allow("").meta({ swaggerType: "file" }),
+    attached_files: joi_1.default.array()
+        .allow(null)
+        .allow("")
+        .meta({ swaggerType: "file" }),
 });
 exports.updateProposalSchema = joi_1.default.object({
     proposalData: custom.object({
@@ -65,7 +69,11 @@ exports.updateProposalSchema = joi_1.default.object({
         milestones: joi_1.default.array().items(milestone).required().messages({
             "any.required": "Please provide milestones",
         }),
+        proposal_status: joi_1.default.number().allow(null),
     }),
-    attached_files: joi_1.default.array().allow(null).allow("").meta({ swaggerType: "file" }),
+    attached_files: joi_1.default.array()
+        .allow(null)
+        .allow("")
+        .meta({ swaggerType: "file" }),
 });
 //# sourceMappingURL=proposal.js.map

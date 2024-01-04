@@ -13,6 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expertRoute = void 0;
+// import Jwt from 'jsonwebtoken';
+// import bcrypt from 'bcrypt';
+// import fs from 'fs';
+// import { Path } from "mongoose";
+// import process from "process";
 const account_1 = __importDefault(require("../../models/account"));
 // import config from '../config';
 const expert_1 = require("../../swagger/profile/expert");
