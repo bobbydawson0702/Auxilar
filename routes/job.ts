@@ -214,6 +214,7 @@ export let jobRoute = [
       }
     },
   },
+
   {
     method: "GET",
     path: "/",
@@ -313,7 +314,7 @@ export let jobRoute = [
                   as: "proposal",
                   cond: {
                     // $eq: ["$$proposal.proposal_status", 2],
-                    $in: ["$$proposal.proposal_status", [2, 3, 4]],
+                    $in: ["$$proposal.proposal_status", [2, 3, 4, 5, 6, 7]],
                   },
                 },
               },

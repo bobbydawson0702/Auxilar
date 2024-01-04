@@ -83,6 +83,8 @@ export let contractRoute = [
           client_id: account._id,
           expert_id: data["expert_id"],
         });
+
+        console.log("contract----------------------->", contract);
         if (contract) {
           return response
             .response({ stauts: "err", err: "Contract already exist!" })
@@ -141,7 +143,7 @@ export let contractRoute = [
         const currentDate = new Date().toUTCString();
 
         console.log(
-          `GET api/v1/contract request from ${request.auth.credentials.email} Time: ${currentDate}`
+          `GET api/v1/contract/${request.params.jobId}/${request.params.proposalId}/${request.params.expertId} request from ${request.auth.credentials.email} Time: ${currentDate}`
         );
 
         // check wheter account is client
@@ -175,6 +177,53 @@ export let contractRoute = [
           client_id: request.auth.credentials.accountId,
           expert_id: request.params.expertId,
         });
+        if (!contract) {
+          return response
+            .response({ stauts: "err", err: "Contract doesn't exist" })
+            .code(404);
+        }
+        return response.response({ status: "ok", data: contract }).code(200);
+      } catch (err) {
+        return response
+          .response({ status: err, err: "Not implemented" })
+          .code(501);
+      }
+    },
+  },
+  {
+    method: "GET",
+    path: "/all",
+    options: {
+      auth: "jwt",
+      description: "Get my all contracts",
+      plugins: getContractSwagger,
+      tags: ["api", "contract"],
+    },
+
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+
+        console.log(
+          `GET api/v1/contract/all request from ${request.auth.credentials.email} Time: ${currentDate}`
+        );
+
+        // check wheter account is client
+        const account = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+
+        if (account.account_type === "mentor") {
+          return response
+            .response({ status: "err", err: "Forbidden request!" })
+            .code(403);
+        }
+
+        // Get contract
+        const contract = await Contract.find({
+          expert_id: account._id,
+        });
+
         if (!contract) {
           return response
             .response({ stauts: "err", err: "Contract doesn't exist" })

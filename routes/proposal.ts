@@ -6,6 +6,8 @@ import {
   deleteProposalSwagger,
   downloadProposalSwagger,
   getProposalSwagger,
+  hireProposalSwagger,
+  offerProposalSwagger,
   updateProposalSwagger,
 } from "../swagger/proposal";
 import { ProposalSchema, updateProposalSchema } from "../validation/proposal";
@@ -517,7 +519,7 @@ export let proposalRoute = [
             },
             {
               $match: {
-                "proposals.proposal_status": { $in: [2, 3, 4] },
+                "proposals.proposal_status": { $in: [2, 3, 4, 5, 6, 7] },
               },
             },
             {
@@ -1054,7 +1056,7 @@ export let proposalRoute = [
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
         const currentDate = new Date().toUTCString();
-        console.log(`GET api/v1/proposal/download/${request.params.fileId} from 
+        console.log(`PUT api/v1/proposal/${request.params.jobId}/decline/${request.params.proposalId} from 
         ${request.auth.credentials.email} Time: ${currentDate}`);
 
         // Check whether account is mentor
@@ -1189,6 +1191,243 @@ export let proposalRoute = [
             $match: {
               "proposals._id": new ObjectId(request.params.proposalId),
               "proposals.mentor_check.mentor": account.email,
+            },
+          },
+        ]);
+        // } catch (err) {
+        //   return response
+        //     .response({ status: "err", err: "Applied proposal Not found!" })
+        //     .code(404);
+        // }
+
+        return response
+          .response({ status: "ok", data: approvedProposal })
+          .code(200);
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Approve failed!" })
+          .code(501);
+      }
+    },
+  },
+  {
+    method: "PUT",
+    path: "/{jobId}/offer/{proposalId}",
+    options: {
+      auth: "jwt",
+      description: "Offer proposal",
+      plugins: offerProposalSwagger,
+      tags: ["api", "proposal"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(`PUT api/v1/proposal/${request.params.jobId}/offer/${request.params.proposalId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+
+        // Check whether account is client
+        const account = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+        if (account.account_type !== "client") {
+          return response
+            .response({ status: "err", err: "Forbidden request" })
+            .code(403);
+        }
+        // try {
+        await Job.findOneAndUpdate(
+          {
+            $and: [
+              { _id: request.params.jobId },
+              // { "proposals._id": request.params.proposalId },
+              // {
+              //   "proposals.mentor_check.mentor": account.email,
+              // },
+            ],
+          },
+          {
+            $set: {
+              "proposals.$[proposal].proposal_status": 5, //proposal offered
+              "proposals.$[proposal].mentor_check.$[mentorCheckId].checked":
+                true,
+            },
+          },
+          {
+            arrayFilters: [
+              { "proposal._id": request.params.proposalId },
+              { "mentorCheckId.mentor": account.email },
+            ],
+          },
+          { new: true }
+        );
+
+        const ObjectId = mongoose.Types.ObjectId;
+
+        const findedProposal = await Job.aggregate([
+          {
+            $match: {
+              _id: new ObjectId(request.params.jobId),
+            },
+          },
+          {
+            $unwind: "$proposals",
+          },
+          {
+            $match: {
+              "proposals._id": new ObjectId(request.params.proposalId),
+            },
+          },
+          {
+            $project: {
+              proposals: 1,
+            },
+          },
+        ]);
+
+        // console.log("findedProposal------------>", findedProposal[0].proposals);
+
+        await Expert.findOneAndUpdate(
+          {
+            account: findedProposal[0].proposals.expert.id,
+          },
+          {
+            $push: {
+              ongoing_project: { project: request.params.jobId },
+            },
+          }
+        );
+
+        console.log("here------------------------>");
+
+        const approvedProposal = await Job.aggregate([
+          {
+            $match: {
+              _id: new ObjectId(request.params.jobId),
+            },
+          },
+          { $unwind: "$proposals" },
+          {
+            $match: {
+              "proposals._id": new ObjectId(request.params.proposalId),
+            },
+          },
+        ]);
+        // } catch (err) {
+        //   return response
+        //     .response({ status: "err", err: "Applied proposal Not found!" })
+        //     .code(404);
+        // }
+
+        return response
+          .response({ status: "ok", data: approvedProposal })
+          .code(200);
+      } catch (err) {
+        return response
+          .response({ status: "err", err: "Approve failed!" })
+          .code(501);
+      }
+    },
+  },
+  {
+    method: "PUT",
+    path: "/{jobId}/hire/{proposalId}",
+    options: {
+      auth: "jwt",
+      description: "Hire proposal",
+      plugins: hireProposalSwagger,
+      tags: ["api", "proposal"],
+    },
+    handler: async (request: Request, response: ResponseToolkit) => {
+      try {
+        const currentDate = new Date().toUTCString();
+        console.log(`PUT api/v1/proposal/${request.params.jobId}/hire/${request.params.proposalId} from 
+        ${request.auth.credentials.email} Time: ${currentDate}`);
+
+        // Check whether account is expert
+        const account = await Account.findOne({
+          email: request.auth.credentials.email,
+        });
+        if (account.account_type !== "expert") {
+          return response
+            .response({ status: "err", err: "Forbidden request" })
+            .code(403);
+        }
+        // try {
+        await Job.findOneAndUpdate(
+          {
+            $and: [
+              { _id: request.params.jobId },
+              // { "proposals._id": request.params.proposalId },
+              // {
+              //   "proposals.mentor_check.mentor": account.email,
+              // },
+            ],
+          },
+          {
+            $set: {
+              "proposals.$[proposal].proposal_status": 6, //proposal hired
+              "proposals.$[proposal].mentor_check.$[mentorCheckId].checked":
+                true,
+              state: 2,
+            },
+          },
+          {
+            arrayFilters: [
+              { "proposal._id": request.params.proposalId },
+              { "mentorCheckId.mentor": account.email },
+            ],
+          },
+          { new: true }
+        );
+
+        const ObjectId = mongoose.Types.ObjectId;
+
+        const findedProposal = await Job.aggregate([
+          {
+            $match: {
+              _id: new ObjectId(request.params.jobId),
+            },
+          },
+          {
+            $unwind: "$proposals",
+          },
+          {
+            $match: {
+              "proposals._id": new ObjectId(request.params.proposalId),
+            },
+          },
+          {
+            $project: {
+              proposals: 1,
+            },
+          },
+        ]);
+
+        // console.log("findedProposal------------>", findedProposal[0].proposals);
+
+        await Expert.findOneAndUpdate(
+          {
+            account: findedProposal[0].proposals.expert.id,
+          },
+          {
+            $push: {
+              ongoing_project: { project: request.params.jobId },
+            },
+          }
+        );
+
+        console.log("here------------------------>");
+
+        const approvedProposal = await Job.aggregate([
+          {
+            $match: {
+              _id: new ObjectId(request.params.jobId),
+            },
+          },
+          { $unwind: "$proposals" },
+          {
+            $match: {
+              "proposals._id": new ObjectId(request.params.proposalId),
             },
           },
         ]);
