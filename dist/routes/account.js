@@ -571,13 +571,70 @@ exports.accountRoute = [
                 // Get account profile
                 let accountProfile = null;
                 if (account.account_type === "client") {
-                    accountProfile = yield client_1.default.findOne({ account: account._id });
+                    accountProfile = yield client_1.default.aggregate([
+                        { $match: { account: account._id } },
+                        {
+                            $lookup: {
+                                from: "accounts",
+                                localField: "account",
+                                foreignField: "_id",
+                                as: "account_info",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            _id: false,
+                                            first_name: 1,
+                                            last_name: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ]);
                 }
                 else if (account.account_type === "expert") {
-                    accountProfile = yield expert_1.default.findOne({ account: account._id });
+                    accountProfile = yield expert_1.default.aggregate([
+                        { $match: { account: account._id } },
+                        {
+                            $lookup: {
+                                from: "accounts",
+                                localField: "account",
+                                foreignField: "_id",
+                                as: "account_info",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            _id: false,
+                                            first_name: 1,
+                                            last_name: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ]);
                 }
                 else {
-                    accountProfile = yield mentor_1.default.findOne({ account: account._id });
+                    accountProfile = yield mentor_1.default.aggregate([
+                        { $match: { account: account._id } },
+                        {
+                            $lookup: {
+                                from: "accounts",
+                                localField: "account",
+                                foreignField: "_id",
+                                as: "account_info",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            _id: false,
+                                            first_name: 1,
+                                            last_name: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ]);
                 }
                 if (!accountProfile) {
                     return response

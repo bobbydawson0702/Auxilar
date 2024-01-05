@@ -271,7 +271,7 @@ export let accountRoute = [
         console.log(
           `POST api/v1/account/signin request from ${request.payload["email"]}`
         );
-        
+
         const email = request.payload["email"];
         const password = request.payload["password"];
         const account = await Account.findOne({ email });
@@ -619,11 +619,68 @@ export let accountRoute = [
         // Get account profile
         let accountProfile = null;
         if (account.account_type === "client") {
-          accountProfile = await Client.findOne({ account: account._id });
+          accountProfile = await Client.aggregate([
+            { $match: { account: account._id } },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "account",
+                foreignField: "_id",
+                as: "account_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+          ]);
         } else if (account.account_type === "expert") {
-          accountProfile = await Expert.findOne({ account: account._id });
+          accountProfile = await Expert.aggregate([
+            { $match: { account: account._id } },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "account",
+                foreignField: "_id",
+                as: "account_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+          ]);
         } else {
-          accountProfile = await Mentor.findOne({ account: account._id });
+          accountProfile = await Mentor.aggregate([
+            { $match: { account: account._id } },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "account",
+                foreignField: "_id",
+                as: "account_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+          ]);
         }
         if (!accountProfile) {
           return response
