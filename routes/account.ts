@@ -575,7 +575,7 @@ export let accountRoute = [
         console.log(request.auth.credentials.email);
         const account = await Account.find({
           account_type: "mentor",
-        }).select({ email: 1, _id: false });
+        }).select({ email: 1, first_name: 1, last_name: 1 });
         // if (!account) {
         //   return response.response({ err: "Account not found!" }).code(404);
         // }
