@@ -637,13 +637,13 @@ export let proposalRoute = [
             {
               $match: {
                 _id: new ObjectId(request.params.jobId),
-                "proposals.mentor_check.mentor": account.email,
+                "proposals.mentor_check.mentor": account.id,
               },
             },
             { $unwind: "$proposals" },
             {
               $match: {
-                "proposals.mentor_check.mentor": account.email,
+                "proposals.mentor_check.mentor": account.id,
               },
             },
             {
@@ -860,7 +860,8 @@ export let proposalRoute = [
             { $unwind: "$proposals" },
             {
               $match: {
-                "proposals.mentor_check.mentor": account.email,
+                "proposals.mentor_check.mentor": account.id,
+                // "proposals.mentor_check.mentor": account.email,
               },
             },
             {
@@ -1006,7 +1007,7 @@ export let proposalRoute = [
           {
             arrayFilters: [
               { "proposal._id": request.params.proposalId },
-              { "mentorCheckId.mentor": account.email },
+              { "mentorCheckId.mentor": account.id },
             ],
           },
           { new: true }
@@ -1024,7 +1025,7 @@ export let proposalRoute = [
           {
             $match: {
               "proposals._id": new ObjectId(request.params.proposalId),
-              "proposals.mentor_check.mentor": account.email,
+              "proposals.mentor_check.mentor": account.id,
             },
           },
         ]);
@@ -1089,7 +1090,7 @@ export let proposalRoute = [
           {
             arrayFilters: [
               { "proposal._id": request.params.proposalId },
-              { "mentorCheckId.mentor": account.email },
+              { "mentorCheckId.mentor": account.id },
             ],
           },
           { new: true }
@@ -1107,7 +1108,7 @@ export let proposalRoute = [
           {
             $match: {
               "proposals._id": new ObjectId(request.params.proposalId),
-              "proposals.mentor_check.mentor": account.email,
+              "proposals.mentor_check.mentor": account.id,
             },
           },
         ]);
@@ -1172,7 +1173,7 @@ export let proposalRoute = [
           {
             arrayFilters: [
               { "proposal._id": request.params.proposalId },
-              { "mentorCheckId.mentor": account.email },
+              { "mentorCheckId.mentor": account.id },
             ],
           },
           { new: true }
@@ -1190,7 +1191,7 @@ export let proposalRoute = [
           {
             $match: {
               "proposals._id": new ObjectId(request.params.proposalId),
-              "proposals.mentor_check.mentor": account.email,
+              "proposals.mentor_check.mentor": account.id,
             },
           },
         ]);
@@ -1255,7 +1256,7 @@ export let proposalRoute = [
           {
             arrayFilters: [
               { "proposal._id": request.params.proposalId },
-              { "mentorCheckId.mentor": account.email },
+              { "mentorCheckId.mentor": account.id },
             ],
           },
           { new: true }
@@ -1374,7 +1375,7 @@ export let proposalRoute = [
           {
             arrayFilters: [
               { "proposal._id": request.params.proposalId },
-              { "mentorCheckId.mentor": account.email },
+              { "mentorCheckId.mentor": account.id },
             ],
           },
           { new: true }
