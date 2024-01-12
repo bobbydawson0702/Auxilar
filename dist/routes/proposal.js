@@ -580,13 +580,13 @@ exports.proposalRoute = [
                         {
                             $match: {
                                 _id: new ObjectId(request.params.jobId),
-                                "proposals.mentor_check.mentor": account._id,
+                                "proposals.mentor_check.mentor": account.id,
                             },
                         },
                         { $unwind: "$proposals" },
                         {
                             $match: {
-                                "proposals.mentor_check.mentor": account._id,
+                                "proposals.mentor_check.mentor": account.id,
                             },
                         },
                         {
@@ -785,7 +785,7 @@ exports.proposalRoute = [
                         { $unwind: "$proposals" },
                         {
                             $match: {
-                                "proposals.mentor_check.mentor": account._id,
+                                "proposals.mentor_check.mentor": account.id,
                                 // "proposals.mentor_check.mentor": account.email,
                             },
                         },
@@ -936,7 +936,7 @@ exports.proposalRoute = [
                 }, {
                     arrayFilters: [
                         { "proposal._id": request.params.proposalId },
-                        { "mentorCheckId.mentor": account._id },
+                        { "mentorCheckId.mentor": account.id },
                     ],
                 }, { new: true });
                 const ObjectId = mongoose_1.default.Types.ObjectId;
@@ -950,7 +950,7 @@ exports.proposalRoute = [
                     {
                         $match: {
                             "proposals._id": new ObjectId(request.params.proposalId),
-                            "proposals.mentor_check.mentor": account._id,
+                            "proposals.mentor_check.mentor": account.id,
                         },
                     },
                 ]);
@@ -1010,7 +1010,7 @@ exports.proposalRoute = [
                 }, {
                     arrayFilters: [
                         { "proposal._id": request.params.proposalId },
-                        { "mentorCheckId.mentor": account._id },
+                        { "mentorCheckId.mentor": account.id },
                     ],
                 }, { new: true });
                 const ObjectId = mongoose_1.default.Types.ObjectId;
@@ -1024,7 +1024,7 @@ exports.proposalRoute = [
                     {
                         $match: {
                             "proposals._id": new ObjectId(request.params.proposalId),
-                            "proposals.mentor_check.mentor": account._id,
+                            "proposals.mentor_check.mentor": account.id,
                         },
                     },
                 ]);
@@ -1084,7 +1084,7 @@ exports.proposalRoute = [
                 }, {
                     arrayFilters: [
                         { "proposal._id": request.params.proposalId },
-                        { "mentorCheckId.mentor": account._id },
+                        { "mentorCheckId.mentor": account.id },
                     ],
                 }, { new: true });
                 const ObjectId = mongoose_1.default.Types.ObjectId;
@@ -1098,7 +1098,7 @@ exports.proposalRoute = [
                     {
                         $match: {
                             "proposals._id": new ObjectId(request.params.proposalId),
-                            "proposals.mentor_check.mentor": account._id,
+                            "proposals.mentor_check.mentor": account.id,
                         },
                     },
                 ]);
@@ -1158,7 +1158,7 @@ exports.proposalRoute = [
                 }, {
                     arrayFilters: [
                         { "proposal._id": request.params.proposalId },
-                        { "mentorCheckId.mentor": account._id },
+                        { "mentorCheckId.mentor": account.id },
                     ],
                 }, { new: true });
                 const ObjectId = mongoose_1.default.Types.ObjectId;
@@ -1261,7 +1261,7 @@ exports.proposalRoute = [
                 }, {
                     arrayFilters: [
                         { "proposal._id": request.params.proposalId },
-                        { "mentorCheckId.mentor": account._id },
+                        { "mentorCheckId.mentor": account.id },
                     ],
                 }, { new: true });
                 const ObjectId = mongoose_1.default.Types.ObjectId;
