@@ -49,7 +49,7 @@ const registerSocketServer = async (server) => {
       socket.join(data);
     });
     socket.on("disconnect", () => {
-      console.log(socket["email"] + " disconnected");
+      console.log(socket["accountId"] + " disconnected");
     });
   });
 };

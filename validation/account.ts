@@ -50,7 +50,7 @@ export const resetAccountPasswordSchema = Joi.object({
     "any.required": "Please provide email",
     "string.email": "Please provide a valid email.",
   }),
-  passcode: Joi.string().required().messages({
+  passcode: Joi.number().required().messages({
     "any.required": "Please provide new password.",
   }),
 });

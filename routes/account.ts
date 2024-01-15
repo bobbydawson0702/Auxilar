@@ -271,7 +271,7 @@ export let accountRoute = [
         console.log(
           `POST api/v1/account/signin request from ${request.payload["email"]}`
         );
-        
+
         const email = request.payload["email"];
         const password = request.payload["password"];
         const account = await Account.findOne({ email });
@@ -439,37 +439,84 @@ export let accountRoute = [
 
         const baseUrl = `${request.server.info.protocol}://${request.info.host}`;
         // linkUrl: `localhost:3000/account/update-password/${token}`,
-        const content = `<div style="background-color: #f2f2f2; padding: 20px; border-radius: 10px">
-        <h1 style="font-size: 36px; color: #333; margin-bottom: 20px">Hello</h1>
-        <p style="font-size: 18px; color: #666; margin-bottom: 20px">
-          Welcome To Homepage
-        </p>
-        <p style="font-size: 18px; color: #666; margin-bottom: 40px">
-          This is your email verification link. Please type in this number to
-          reset your password
-        </p>
-        <a
-          href="localhost:3000/update-password/"
-          style="
-            background-color: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 10px;
-            font-size: 18px;
-          "
-          >${random6Digits}</a
-        >
-      </div>`;
+
+        const ses = new AWS.SES({
+          region: config.awsRegion,
+          accessKeyId: config.awsAccessKeyId,
+          secretAccessKey: config.awsSecretAccessKey,
+        });
+
+        // const content = `Hi ${request.payload["first_name"]} ${request.payload["last_name"]}
+        //                 Thanks for your interest in joining Auxilar! To complete your registration, we need you to
+        //                 verify your email address."http://136.243.150.17:3000/account/verify-email/${token}"
+        //                 Verify Email!
+        //                 Please note that not all applications to join Auxilar are accepted.
+        //                 We will notify you of our decision by email within 24 hours.
+        //                 Thanks for your time,
+        //                 The Auxilar Team`;
+        const content = `<tr><td style="background-color:rgba(255,255,255,1);padding-top:30px;padding-bottom:30px">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tbody><tr><td align="left" style="padding-top:0;padding-bottom:20px;padding-left:30px">
+      <span style="font-size:40px;color:rgb(27,158,197)">Auxilar</span>
+      </td></tr>
+      <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+      padding:20px"><h2 style="margin-top:0;margin-bottom:0;font-family:Helvetica,sans-serif;
+      font-weight:normal;font-size:24px;line-height:30px;color:rgba(0,30,0,1)">
+      Update Password</h2></td></tr>
+      <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+      padding-left:20px;padding-right:20px;padding-top:20px">Hi ${account.first_name} ${account.last_name} , </td></tr>
+      <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+      padding-left:20px;padding-right:20px;padding-top:20px">
+      Thanks for your interest in Auxilar! To complete your password update, we need you to
+       reset your password first. </td></tr><tr><td style="font-family:Helvetica,Arial,sans-serif;
+       font-size:16px;line-height:24px;padding:40px 20px 20px"><table style="text-align:center"
+        width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>
+        <tr><td><div style="text-align:center;margin:0 auto"><a style="background-color:rgb(27,158,197);
+        border:2px solid rgb(0,123,168);border-radius:100px;min-width:230px;color:rgba(255,255,255,1);
+        white-space:nowrap;font-weight:normal;display:block;font-family:Helvetica,Arial,sans-serif;
+        font-size:16px;line-height:40px;text-align:center;text-decoration:none"
+        href="http://136.243.150.17:3000/account/reset-password" target="_blank"
+        data-saferedirecturl="https://www.google.com/url?q="http://136.243.150.17:3000/account/reset-password">
+        passcode: ${random6Digits}</a></div></td></tr></tbody></table></td></tr><tr>
+        <td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding-left:20px;padding-right:20px;padding-top:20px">
+        Please note that not all applications to join Auxilar are accepted.
+        We will notify you of our decision by email within 24 hours. </td></tr>
+        <tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;
+        padding-left:20px;padding-right:20px;padding-top:30px"><div style="padding-top:10px">
+        Thanks for your time,<br>The Auxilar Team</div></td></tr></tbody></table></td></tr>`;
+
+        const emailParams = {
+          Source: "galaxydragon0702@gmail.com",
+          Destination: {
+            ToAddresses: [account.email],
+          },
+          Message: {
+            Subject: {
+              Data: "Reset Password",
+            },
+            Body: {
+              Html: {
+                Data: content,
+              },
+            },
+          },
+        };
+
+        ses.sendEmail(emailParams, (err, data) => {
+          if (err) {
+            console.log("Error sending email:", err);
+          } else {
+            console.log("Email sent successfully:", data);
+          }
+        });
+
         return response
-          .response({
-            msg: "reset password!",
-            htmlContent: content,
-          })
+          .response({ status: "ok", data: "Reset Password" })
           .code(200);
       } catch (error) {
         console.log(error);
-        return response.response({ err: error }).code(500);
+        return response.response({ status: "err", err: error }).code(500);
       }
     },
   },
@@ -507,13 +554,17 @@ export let accountRoute = [
         return response.response({ err: "Passcode incorrect!" }).code(404);
       }
 
-      return response.response({ msg: "Reset your password" }).code(200);
+      const token = Jwt.sign({ passcode: passcode }, config.jwtSecret, {
+        expiresIn: "1day",
+      });
+
+      return response.response({ status: "ok", data: token }).code(200);
     },
   },
 
   {
     method: "POST",
-    path: "/update-password",
+    path: "/update-password/{token}",
     options: {
       description: "Update password",
       plugins: updateAccountPasswordSwagger,
@@ -536,13 +587,32 @@ export let accountRoute = [
     handler: async (request: Request, response: ResponseToolkit) => {
       try {
         console.log(`POST api/v1/account/update-password request from ...`);
-        // const decoded = Jwt.decode(request.params.token);
+
+        const decodedtoken = Jwt.decode(request.params.token);
+
+        console.log("decodedtoken---------------->", decodedtoken);
+
+        const passcode = await Passcode.findOne({
+          email: decodedtoken.passcode.email,
+          passcode: decodedtoken.passcode.passcode,
+        });
+
+        console.log("passcode--------------------->", passcode);
+
+        if (!passcode) {
+          return response
+            .response({ status: "err", err: "Passcode incorrect" })
+            .code(412); // 412: precondition failed
+        }
+
         console.log(request.payload);
         const email = request.payload["email"];
         const new_Password = request.payload["new_password"];
         const account = await Account.findOne({ email });
         if (!account) {
-          return response.response({ err: "Account not found!" }).code(404);
+          return response
+            .response({ status: "err", err: "Account not found" })
+            .code(404);
         }
         const hash = await bcrypt.hash(new_Password, 10);
         account.password = hash;
@@ -575,7 +645,7 @@ export let accountRoute = [
         console.log(request.auth.credentials.email);
         const account = await Account.find({
           account_type: "mentor",
-        }).select({ email: 1, _id: false });
+        }).select({ email: 1, first_name: 1, last_name: 1 });
         // if (!account) {
         //   return response.response({ err: "Account not found!" }).code(404);
         // }
@@ -587,7 +657,7 @@ export let accountRoute = [
           .code(200);
       } catch (error) {
         console.log(error);
-        return response.response({ err: error }).code(500);
+        return response.response({ status: "err", err: error }).code(500);
       }
     },
   },
@@ -619,11 +689,68 @@ export let accountRoute = [
         // Get account profile
         let accountProfile = null;
         if (account.account_type === "client") {
-          accountProfile = await Client.findOne({ account: account._id });
+          accountProfile = await Client.aggregate([
+            { $match: { account: account._id } },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "account",
+                foreignField: "_id",
+                as: "account_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+          ]);
         } else if (account.account_type === "expert") {
-          accountProfile = await Expert.findOne({ account: account._id });
+          accountProfile = await Expert.aggregate([
+            { $match: { account: account._id } },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "account",
+                foreignField: "_id",
+                as: "account_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+          ]);
         } else {
-          accountProfile = await Mentor.findOne({ account: account._id });
+          accountProfile = await Mentor.aggregate([
+            { $match: { account: account._id } },
+            {
+              $lookup: {
+                from: "accounts",
+                localField: "account",
+                foreignField: "_id",
+                as: "account_info",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: false,
+                      first_name: 1,
+                      last_name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+          ]);
         }
         if (!accountProfile) {
           return response
